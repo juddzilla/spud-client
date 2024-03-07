@@ -1,13 +1,20 @@
 import { Text, View, StyleSheet } from "react-native";
-
 import DrawerScreen from '../../../components/DrawerScreen';
+import TextContainer from '../../../components/UI/layout/Text-Container';
+import Bold from '../../../components/UI/text/Bold';
+import Light from '../../../components/UI/text/Light';
+import Regular from '../../../components/UI/text/Regular';
 
-export default function Page() {
+export default function Home() {
   return (
     <>
       <View style={styles.container}>
-        {DrawerScreen('Home')}        
-        <Text style={{ fontSize: 24 }}>Index pasge of Home Drawer</Text>
+        {DrawerScreen('Home')}
+        <TextContainer>
+          <Bold >Inter Bold</Bold>
+          <Regular>Inter Regular</Regular>
+          <Light >Inter Light</Light>
+        </TextContainer>
       </View>
     </>
   );
@@ -16,9 +23,6 @@ export default function Page() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
 

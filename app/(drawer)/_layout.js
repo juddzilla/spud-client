@@ -1,12 +1,29 @@
-import { View, Text } from 'react-native';
+import { useCallback } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
+import { useFonts } from 'expo-font';
 
-console.log('Drawer', Drawer);
-export default function DrawerLayout() {
+import Bold from '../../assets/fonts/Inter-Bold.otf';
+import Black from '../../assets/fonts/Inter-Black.otf';
+import Light from '../../assets/fonts/Inter-Light.otf';
+import Regular from '../../assets/fonts/Inter-Regular.otf';
+
+export default function DrawerLayout() {  
+  const [fontsLoaded, fontError] = useFonts({
+    'Inter-Black': Black,
+    'Inter-Bold': Bold,
+    'Inter-Light': Light,
+    'Inter-Regular': Regular,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      console.log('fontError', fontError);
+      console.log('fontsLoaded', fontsLoaded);
+    }
+  }, [fontsLoaded, fontError]);
   return (    
-    // <View><Text>Juddd</Text></View>
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }}  onLayout={onLayoutRootView}>
       <Drawer
         screenOptions={{ headerShown: false}}
       >

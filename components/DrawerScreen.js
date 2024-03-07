@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
-import  {useSegments } from 'expo-router'
+import  {useSegments, Link, router } from 'expo-router'
 import { DrawerToggleButton } from "@react-navigation/drawer";
 import { Drawer } from 'expo-router/drawer';
-import { Text } from 'react-native';
-import { Link } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
 export default function(title, showHeader) {
@@ -11,12 +10,23 @@ export default function(title, showHeader) {
     console.log('segments', segments);
     useEffect(() => {
     }, [segments])
+
+    function goBack() {
+      if (router.canGoBack()) {
+
+        router.back();
+      }
+    }
     return (
         <Drawer.Screen
           options={{
             title,
             headerShown: showHeader || true,
-            headerLeft: () => <DrawerToggleButton />,
+            headerLeft: () => (
+              <TouchableOpacity onPress={goBack}>
+                  <FontAwesome name="long-arrow-left" size={24} color="black" />
+              </TouchableOpacity>
+            ),
             headerRight: () => (
                 <Link href='/talk'>
                     <FontAwesome name="microphone" size={24} color="black" />
