@@ -224,7 +224,7 @@ export default function Notes() {
 
   return (
     <>
-      {DrawerScreen('Loiss', true, headerRight)}
+      {DrawerScreen('Collections', true, headerRight)}
       {ListTable({
         list,
         ListHeaderComponent,

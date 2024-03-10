@@ -5,7 +5,7 @@ import { useNavigation } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
-export default function(title, headerRight) {
+export default function(title, headerShown, headerRight) {
     // const segments = useSegments();
     // console.log('segments', segments);
     // useEffect(() => {
@@ -24,7 +24,7 @@ export default function(title, headerRight) {
         <Drawer.Screen
           options={{
             title,
-            headerShown: false,
+            headerShown: headerShown || false,
             headerLeft: () => {
               if (!router.canGoBack()) {
                 return (

@@ -3,16 +3,61 @@
 // ability to summarize entire convo
 // archive
 // delete
-import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useGlobalSearchParams, Link } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 
+import Bold from '../../../components/UI/text/Bold';
+import Light from '../../../components/UI/text/Light';
+import Regular from '../../../components/UI/text/Regular';
 
-export default function Page() {
+import Fetch from '../../../interfaces/fetch';
+
+
+export default function Convo() {
   const [message, setMessage] = useState(null);
+  const [messages, setMessages] = useState(null);
+  const [title, setTitle] = useState('Convo');
   const glob = useGlobalSearchParams();
-const local = useLocalSearchParams();
+  const local = useLocalSearchParams();
+
+  const Message = ({ index, item}) => {
+    const itemStyle = {
+      
+      paddingHorizontal: 4,      
+      marginVertical: 2,      
+      borderRadius: 8,
+      borderWidth: 1,
+      shadowColor: "#e2e8f0",
+      shadowOffset: {
+          width: 0,
+          height: 12,
+      },
+      shadowOpacity: 0.58,
+      shadowRadius: 16.00,
+      elevation: 24,
+  };
+
+    return (
+      <View style={itemStyle}>
+        <View style={{ flexDirection: 'row'}}>
+          <Bold>{ item.type }</Bold>
+          <Light>{ item.updated }</Light>
+        </View>
+        <Regular>{ item.body }</Regular>
+      </View>
+    )
+  };
+
+useEffect(() => {
+  Fetch.get('convo')
+  .then(res => {
+    setMessages(res.messages);
+    setTitle(res.title);
+  })
+  .catch(err => { console.warn('Convo Error', err)});
+}, [])
 
 console.log("Local:", local, "Global:", glob.user);
 
@@ -30,12 +75,19 @@ function onChange() {}
 
   return (
     <View style={{flex: 1}}>
-      {DrawerScreen('Convorp')}
+      {DrawerScreen(title, true)}
       <View style={{flex: 1}}>
-        <Text>Here</Text>
-        <Text>Here</Text>
-        <Text>Here</Text>
-        <Text>Here</Text>
+        <FlatList
+          data={messages}
+          renderItem={Message}
+          keyExtractor={item => item.id}        
+          inverted={true}
+          
+          // ListHeaderComponent={ListHeaderComponent}
+          
+          //if set to true, the UI will show a loading indicator
+          
+        />   
       </View>
       <View>
         <TextInput

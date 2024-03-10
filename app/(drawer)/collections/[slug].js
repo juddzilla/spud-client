@@ -3,5 +3,5 @@
 import { Text } from 'react-native';
 
 export default function Page() {
-  return <Text>Note slug</Text>;
+  return <Text>Recipe slug</Text>;
 }

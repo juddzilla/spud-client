@@ -67,6 +67,13 @@ export default function DrawerLayout() {
               title: "T",
             }}
           />
+          <Drawer.Screen
+            name="collections"
+            options={{
+              drawerLabel: "Collections",
+              title: "T",
+            }}
+          />
         </Drawer>
       </GestureHandlerRootView>
     
