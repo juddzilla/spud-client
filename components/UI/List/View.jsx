@@ -6,24 +6,24 @@ import {
   View,
 } from 'react-native';
 
-import { useLocalSearchParams, useGlobalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 
 import SearchBar from '../SearchInputWithIcon';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 
-import Regular from '../../../components/UI/text/Regular';
 import ListTable from '../../../components/UI/List/Table';
 import Sort from '../../../components/UI/List/Sort'
 import Icon from '../../../components/UI/icons';;
 import Fetch from '../../../interfaces/fetch';
 import colors from '../colors';
 import Bold from '../text/Bold';
+
 export default function ListView(props) {
     const { defaultTitle, detail, nestingChildren, uri } = props.options;
     const local = useLocalSearchParams();
-    const global =  useGlobalSearchParams();
-    console.log('local',local ,global);
+    // const global =  useGlobalSearchParams();
+    // console.log('local',local ,global);
     
   const initialQuery = {
     page: 1,
@@ -47,9 +47,7 @@ export default function ListView(props) {
   function getData() {      
       if (!endOfList) {
         Fetch.get(uri, query)
-        .then(({ results, totalResultsCount }) => {  
-            console.log('res', results);
-
+        .then(({ results, totalResultsCount }) => {            
             const newList = Array.isArray(results) ? results : results.children; 
           if (newList.length < query.per) {
             setEndOfList(true);
@@ -113,7 +111,6 @@ export default function ListView(props) {
     if (nestingChildren) {
         route = `${nestingChildren}/${local.slug}/`;
     }
-    console.log('nestingChildren',nestingChildren);
 
     const typeToRouteMap = {
         Collection: 'collections',
@@ -121,8 +118,7 @@ export default function ListView(props) {
         List: 'lists',
         Note: 'notes'
     };
-    route += `${typeToRouteMap[type]}/${id}`;
-    console.log('ROUTE', route);
+    route += `${typeToRouteMap[type]}/${id}`;    
     router.push(route);
   }
 
@@ -215,7 +211,8 @@ export default function ListView(props) {
         onEndReached,
         onLongPress,
         onPress,
-        onRefresh,        
+        onRefresh,  
+        remove,      
         selected,
       })}
       {Actions()}

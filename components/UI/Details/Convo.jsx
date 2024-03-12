@@ -5,7 +5,7 @@
 // delete
 import { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Pressable, TextInput, View } from 'react-native';
-import { useLocalSearchParams, useGlobalSearchParams, Link } from 'expo-router';
+// import { useLocalSearchParams, useGlobalSearchParams, Link } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 
 import Bold from '../text/Bold';
@@ -18,8 +18,8 @@ export default function Convo() {
   const [message, setMessage] = useState(null);
   const [messages, setMessages] = useState(null);
   const [title, setTitle] = useState('Convo');
-  const glob = useGlobalSearchParams();
-  const local = useLocalSearchParams();
+  // const glob = useGlobalSearchParams();
+  // const local = useLocalSearchParams();
 
   const Message = ({ index, item}) => {
     const itemStyle = {
@@ -58,7 +58,7 @@ useEffect(() => {
   .catch(err => { console.warn('Convo Error', err)});
 }, []);
 
-console.log("Local:", local, "Global:", glob.user);
+// console.log("Local:", local, "Global:", glob.user);
 
 const styles = StyleSheet.create({
   input: {

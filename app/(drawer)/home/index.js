@@ -25,13 +25,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-// import { Text } from 'react-native';
-// // most recent
-// // most used
-
-// export default function Home() {
-//     return (
-//         <Text>Home view</Text>
-//     )
-// }

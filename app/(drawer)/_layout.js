@@ -22,8 +22,8 @@ export default function DrawerLayout() {
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
-      console.log('fontError', fontError);
-      console.log('fontsLoaded', fontsLoaded);
+      // console.log('fontError', fontError);
+      // console.log('fontsLoaded', fontsLoaded);
     }
   }, [fontsLoaded, fontError]);
   return (    

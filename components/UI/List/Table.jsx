@@ -1,9 +1,12 @@
 import {
+  Animated,
   FlatList,
   Pressable,
   StyleSheet,
   View,
 } from 'react-native';
+import { BaseButton } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import Icon from '../icons';
 import Bold from '../text/Bold';
@@ -26,7 +29,8 @@ export default function ListTable({
     onEndReached,
     onLongPress,
     onPress,
-    onRefresh,        
+    onRefresh,  
+    remove,      
     selected,    
 }) {  
 
@@ -76,6 +80,28 @@ export default function ListTable({
           title: { fontSize: 16, marginBottom: 4 },
         });
 
+        const renderRightActions = (progress, dragX) => {
+          // const transform = dragX.interpolate({
+          //   inputRange: [0, 30, 60, 61],
+          //   outputRange: [-10, 0, 0, -301],
+          // });
+
+          // console.log('transform',transform);
+
+          return (
+            <BaseButton style={{alignItems: 'center', justifyContent: 'center'}} onPress={() => { remove([id])}}>
+              <Animated.View
+                style={{
+                  // transform: [{ translateX: transform }],
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: 60,
+                }}>
+                <Icon name='trash' styles={{transform: [{ translateX: -12 }]}} />
+              </Animated.View>
+            </BaseButton>
+          );
+        };
         const typeToIconMap = {
           Collection: 'collection',
           Convo: 'convo',
@@ -84,22 +110,24 @@ export default function ListTable({
         };
 
         return (
-          <Pressable
-              style={styled.pressable}
-              onPress={() => onPress(type, id)} 
-              onLongPress={() => onLongPress(index)}
-          >      
-              <View style={styled.content}>
-                  <View style={styled.icon.container}>
-                      <Icon name={typeToIconMap[type]} styles={styled.icon.image} />
-                      {/* <Bold style={styled.title}>{subtitle}</Bold> */}
-                  </View>
-                  <View style={styled.info}>
-                      <Bold style={styled.title}>{title}</Bold>
-                      <Light style={styled.subtitle}>{ subtitle || "Thse lsast bit on convo goes here..." }</Light>
-                  </View>
-              </View>
-          </Pressable>    
+          <Swipeable renderRightActions={renderRightActions}>
+            <Pressable
+                style={styled.pressable}
+                onPress={() => onPress(type, id)} 
+                onLongPress={() => onLongPress(index)}
+            >      
+                <View style={styled.content}>
+                    <View style={styled.icon.container}>
+                        <Icon name={typeToIconMap[type]} styles={styled.icon.image} />
+                        {/* <Bold style={styled.title}>{subtitle}</Bold> */}
+                    </View>
+                    <View style={styled.info}>
+                        <Bold style={styled.title}>{title}</Bold>
+                        <Light style={styled.subtitle}>{ subtitle || "Thse lsast bit on convo goes here..." }</Light>
+                    </View>
+                </View>
+            </Pressable>  
+          </Swipeable>  
       )};
 
     // console.log('ist', list);

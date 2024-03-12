@@ -5,10 +5,11 @@
 // list timeline view
 
 import { useEffect, useState } from 'react';
-import { FlatList, Pressable, Modal, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { Animated, FlatList, Pressable, Modal, StyleSheet, Switch, TextInput, View } from 'react-native';
 import DrawerScreen from '../../../components/DrawerScreen';
 
-import Action from '../../../components/UI/buttons/Action';
+import { BaseButton } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
@@ -83,9 +84,7 @@ export default function List() {
     .catch(err => { console.warn('List Error', err)});
   }, []);
 
-  function toggleCompleted({id, index}) {
-    console.log('listItems[index]', listItems[index]);
-    // return;
+  function toggleCompleted({id, index}) {        
       if (listItems[index].id === id) {
         const newListItems = [...listItems];
         newListItems[index].completed = !newListItems[index].completed;
@@ -93,6 +92,11 @@ export default function List() {
       }
   }
 
+  function remove(ids) {
+    // make api request, onsuccess
+    const newList = listItems.filter(i => !ids.includes(i.id));
+    setListItems(newList);
+  }
 
   function update(index, text) {
     const newListItems = [...listItems];
@@ -159,7 +163,31 @@ export default function List() {
 
   const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
 
+  const renderRightActions = (progress, dragX) => {
+    // const transform = dragX.interpolate({
+    //   inputRange: [0, 30, 60, 61],
+    //   outputRange: [-10, 0, 0, -301],
+    // });
+
+    // console.log('transform',transform);
+
+    return (
+      <BaseButton style={{alignItems: 'center', justifyContent: 'center'}} onPress={() => { remove([item.id])}}>
+        <Animated.View
+          style={{
+            // transform: [{ translateX: transform }],
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: 60,
+          }}>
+          <Icon name='trash' styles={{transform: [{ translateX: -4 }, { translateY: -3 }]}} />
+        </Animated.View>
+      </BaseButton>
+    );
+  };
+
   return (
+    <Swipeable renderRightActions={renderRightActions}>
       <View style={styled.container}>
         <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id, index})}>
           <Icon name={iconName} styles={styled.icon} />
@@ -178,6 +206,7 @@ export default function List() {
           }
         </View>
       </View>
+      </Swipeable>
     )
   };
 
