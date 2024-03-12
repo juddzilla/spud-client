@@ -4,14 +4,15 @@
 // importance
 // list timeline view
 
-import { useEffect, useState, useCallback } from 'react';
-import { Animated, FlatList, Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { FlatList, Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
 
 import { BaseButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
-import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
+import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
@@ -32,6 +33,7 @@ export default function List() {
   const [focus, setFocus] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [listType, setListType] = useState('unordered');
+  const itemRefs = useRef(new Map());
 
   const styles = StyleSheet.create({
     centeredView: {
@@ -39,6 +41,11 @@ export default function List() {
       justifyContent: 'center',
       alignItems: 'center',
       marginTop: 22,
+    },
+    rowItem: {
+      height: 100,
+      alignItems: "center",
+      justifyContent: "center",
     },
     modalView: {
       margin: 20,
@@ -81,19 +88,20 @@ export default function List() {
   useEffect(() => {
     Fetch.get('list')
     .then(res => {
-      console.log("RES", res);
       setListItems(res.children);
       setTitle(res.title);
     })
     .catch(err => { console.warn('List Error', err)});
   }, []);
 
-  function toggleCompleted({id, index}) {        
-      if (listItems[index].id === id) {
-        const newListItems = [...listItems];
-        newListItems[index].completed = !newListItems[index].completed;
-        setListItems(newListItems)
-      }
+  function toggleCompleted({id}) {        
+      const newListItems = listItems.map(li => {
+        if (li.id === id) {
+          li.completed = !li.completed;
+        }
+        return li;
+      });
+      setListItems(newListItems);
   }
 
   function remove(ids, close) {
@@ -109,13 +117,12 @@ export default function List() {
     setListItems(newListItems)
   }
 
-  const ListItem = useCallback(({ index, item}) => {
-    
+  const ListItem = useCallback(({ drag, isActive, item}) => {    
     const styled = StyleSheet.create({
       container: {
         backgroundColor: item.completed ? '#f8fafc' : 'white',        
         flexDirection: 'row',      
-        paddingRight: 48,      
+        paddingRight: 48,              
         marginHorizontal: 4,
         borderBottomWidth: 1,
         borderBottomColor: colors.darkBg,      
@@ -159,50 +166,78 @@ export default function List() {
   const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
 
   const RenderRightActions = (progress, dragX) => {    
-    const { close } = useSwipeableItemParams();
+    const { percentOpen } = useSwipeableItemParams();
+    const animStyle = useAnimatedStyle(
+      () => ({
+        opacity: percentOpen.value,
+      }),
+      [percentOpen]
+    );
 
     return (
-      <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { remove([item.id]); close() }}>
+      <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { remove([item.id]) }}>
         <Animated.View
           style={{            
             justifyContent: 'center',
             alignItems: 'center',
             width: 60,
-          }}>
-          <Icon name='trash' styles={{transform: [{ translateX: -2 }]}} />
+            flex: 1,
+            ...animStyle,
+          }}>            
+          <Icon name='trash' styles={{transform: [{ translateX: -16 }]}} />
         </Animated.View>
       </BaseButton>
     );
   };
 
   return (
-    // <ScaleDecorator>
+    <ScaleDecorator>
       <SwipeableItem
         key={item.id}
         item={item}
-        renderUnderlayLeft={() => <RenderRightActions />}
-        snapPointsLeft={[60]}
+        renderUnderlayLeft={() => <RenderRightActions drag={drag}/>}
+        snapPointsLeft={[48]}
+        overSwipe={20}
+        // ref={(ref) => {
+        //   if (ref && !itemRefs.current.get(item.key)) {
+        //     itemRefs.current.set(item.key, ref);
+        //   }
+        // }}
+        // onChange={({ openDirection }) => {
+        //   if (openDirection !== OpenDirection.NONE) {
+        //     // Close all other open items
+        //     [...itemRefs.current.entries()].forEach(([key, ref]) => {
+        //       if (key !== item.key && ref) ref.close();
+        //     });
+        //   }
+        // }}
       >
-        <View style={styled.container}>
-          <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id, index})}>
-            <Icon name={iconName} styles={styled.icon} />
-          </Pressable>
-          <View style={styled.body}>
-            {
-              item.completed ? (
-                <Light style={styled.text}>{item.body}</Light>
-              ) : (
-                <TextInput              
-                  multiline={true}
-                  onChangeText={(text) => update(index, text)}
-                  style={styled.input}
-                >{ item.body }</TextInput>
-              )
-            }
+        <TouchableOpacity
+          activeOpacity={1}
+          onLongPress={drag}
+          disabled={isActive}          
+        >
+          <View style={styled.container}>            
+            <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id})}>
+              <Icon name={iconName} styles={styled.icon} />
+            </Pressable>
+            <View style={styled.body}>
+              {
+                item.completed ? (
+                  <Light style={styled.text}>{item.body}</Light>
+                ) : (
+                  <TextInput              
+                    multiline={true}
+                    onChangeText={(text) => update(index, text)}
+                    style={styled.input}
+                  >{ item.body }</TextInput>
+                )
+              }
+            </View>
           </View>
-        </View>
-        </SwipeableItem>
-    
+        </TouchableOpacity>        
+      </SwipeableItem>
+    </ScaleDecorator>
     )
   });
 
@@ -315,12 +350,13 @@ export default function List() {
         
         {DrawerScreen(title, true, headerRight)}
         <Sort />
-        <FlatList
+        <DraggableFlatList
             data={listItems}
             onDragEnd={onReorder}
             renderItem={ListItem}
             keyExtractor={item => item.id}   
-            style={{ flex: 1 }}
+            activationDistance={20}
+            // style={{ flex: 1 }}
             // ListHeaderComponent={ListHeaderComponent}
             
             //if set to true, the UI will show a loading indicator
