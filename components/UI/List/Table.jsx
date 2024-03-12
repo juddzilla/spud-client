@@ -1,12 +1,15 @@
 import {
   FlatList,
-  Pressable, 
+  Pressable,
+  StyleSheet,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
+import Icon from '../icons';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
+
+import colors from '../colors';
 
 // infinite scroll
 // find
@@ -28,17 +31,19 @@ export default function ListTable({
 }) {  
 
     const ListItem = ({ index, item }) => {
-        const { id, subtitle, title } = item;
+        const { id, subtitle, title, type } = item;
 
-        const itemStyle = {
+        const styled = StyleSheet.create({
+          pressable: {
             backgroundColor: !selected.includes(item.id) ? 'white' : 'red',        
             paddingHorizontal: 4,
-            paddingVertical: 16,
+            paddingVertical: 8,
             marginVertical: 8,
             marginHorizontal: 16,
             borderRadius: 8,
             flexDirection: 'row',
-            alignItems: 'center',            
+            alignItems: 'center',     
+            // overflow: 'hidden',
             
             shadowColor: "#e2e8f0",
             shadowOffset: {
@@ -48,27 +53,56 @@ export default function ListTable({
             shadowOpacity: 0.58,
             shadowRadius: 16.00,
             elevation: 24,
+          },
+          content: {
+            // alignItems: 'center',
+            flexDirection: 'row', 
+          },
+          info: {
+            // paddingVertical: 12,
+          },
+          icon: {
+            container: {
+              // backgroundColor: colors.darkestBg,
+              // height: 44, 
+              width:40, 
+              marginRight: 0, 
+              alignItems: 'center', 
+              justifyContent: 'flex-start',
+            },
+            image: { size: 36, color: colors.lightBg }
+          },
+          subtitle: { fontSize: 12, color: '#6b7280' },
+          title: { fontSize: 16, marginBottom: 4 },
+        });
+
+        const typeToIconMap = {
+          Collection: 'collection',
+          Convo: 'convo',
+          List: 'list',
+          Note: 'notes',
         };
 
         return (
-        <Pressable
-            style={itemStyle}
-            onPress={() => onPress(id)} 
-            onLongPress={() => onLongPress(index)}
-        >      
-            <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-                <View style={{ backgroundColor: 'black', height: 44, width:64, marginRight: 0, alignItems: 'center', justifyContent: 'center' }}>
-                    <Ionicons name="chatbubbles-outline" size={24} color='white' style={{}} />
-                </View>
-                <View>
-                    <Bold style={{ fontSize: 16, marginBottom: 8 }}>{title}</Bold>
-                    <Light style={{ fontSize: 12, color: '#6b7280' }}>{ subtitle || "Thse lsast bit on convo goes here..." }</Light>
-                </View>
-            </View>
-        </Pressable>    
-    )};
+          <Pressable
+              style={styled.pressable}
+              onPress={() => onPress(type, id)} 
+              onLongPress={() => onLongPress(index)}
+          >      
+              <View style={styled.content}>
+                  <View style={styled.icon.container}>
+                      <Icon name={typeToIconMap[type]} styles={styled.icon.image} />
+                      {/* <Bold style={styled.title}>{subtitle}</Bold> */}
+                  </View>
+                  <View style={styled.info}>
+                      <Bold style={styled.title}>{title}</Bold>
+                      <Light style={styled.subtitle}>{ subtitle || "Thse lsast bit on convo goes here..." }</Light>
+                  </View>
+              </View>
+          </Pressable>    
+      )};
 
-    console.log('ist', list);
+    // console.log('ist', list);
 
   return (
     <>

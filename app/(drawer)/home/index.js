@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <View style={styles.container}>
-        {DrawerScreen('Home')}
+        {DrawerScreen('Home', true)}
         <TextContainer>
           <Bold >Inter Bold</Bold>
           <Regular>Inter Regular</Regular>

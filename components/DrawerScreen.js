@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
-import  {useSegments, Link, router } from 'expo-router'
+import  {router } from 'expo-router'
 import { Drawer } from 'expo-router/drawer';
 import { useNavigation } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import Icon from './UI/icons';
 
 export default function(title, headerShown, headerRight) {
     // const segments = useSegments();
@@ -29,17 +28,17 @@ export default function(title, headerShown, headerRight) {
               if (!router.canGoBack()) {
                 return (
                   <TouchableOpacity onPress={toggleMenu}>
-                    <FontAwesome name="navicon" size={24} color="black" />
+                    <Icon name="navicon" />
                   </TouchableOpacity>                  
                 )
               }
               return (
                 <TouchableOpacity onPress={goBack}>
-                    <FontAwesome name="long-arrow-left" size={24} color="black" />
+                    <Icon name="leftArrowLong" />
                 </TouchableOpacity>
               )
             },
-            headerRight,
+            headerRight: headerRight || null,
           }}
         />
     )
