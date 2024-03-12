@@ -4,13 +4,16 @@
 // importance
 // list timeline view
 
-import { useEffect, useState } from 'react';
-import { Animated, FlatList, Pressable, Modal, StyleSheet, Switch, TextInput, View } from 'react-native';
-import DrawerScreen from '../../../components/DrawerScreen';
+import { useEffect, useState, useCallback } from 'react';
+import { Animated, FlatList, Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
 
 import { BaseButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
+import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
+import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
+
+import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
@@ -78,6 +81,7 @@ export default function List() {
   useEffect(() => {
     Fetch.get('list')
     .then(res => {
+      console.log("RES", res);
       setListItems(res.children);
       setTitle(res.title);
     })
@@ -92,10 +96,11 @@ export default function List() {
       }
   }
 
-  function remove(ids) {
+  function remove(ids, close) {
     // make api request, onsuccess
     const newList = listItems.filter(i => !ids.includes(i.id));
     setListItems(newList);
+    
   }
 
   function update(index, text) {
@@ -104,14 +109,12 @@ export default function List() {
     setListItems(newListItems)
   }
 
-  const ListItem = ({ index, item}) => {
+  const ListItem = useCallback(({ index, item}) => {
+    
     const styled = StyleSheet.create({
       container: {
-        backgroundColor: item.completed ? '#f8fafc' : 'white',
-        flexDirection: 'row',
-        // alignItems: 'center',
-        // paddingVertical: 10,
-        // paddingBottom: 8,
+        backgroundColor: item.completed ? '#f8fafc' : 'white',        
+        flexDirection: 'row',      
         paddingRight: 48,      
         marginHorizontal: 4,
         borderBottomWidth: 1,
@@ -130,25 +133,17 @@ export default function List() {
         height: 44, 
         justifyContent: 'center', 
         width: 44,
-        // color: 'red',
       },
       icon: {
-        color: item.completed ? colors.lightText : colors.text,
-        // marginRight: 8,
+        color: item.completed ? colors.lightText : colors.text,        
       },
       body: {
-        paddingTop: 10,
-        // backgroundColor: 'blue',
+        paddingTop: 10,        
       },
       input: {
         color: colors.text,
-        fontFamily: 'Inter-Bold',             
-        // minHeight: 44,
-        // paddingTop: 13,
-        // paddingVertical: 8,
-        paddingRight: 0,
-        // lineHeight: 16,
-        // backgroundColor: 'red'
+        fontFamily: 'Inter-Bold',                     
+        paddingRight: 0,        
         position: 'relative',
         top: -2,
         paddingBottom: 10,
@@ -163,52 +158,53 @@ export default function List() {
 
   const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
 
-  const renderRightActions = (progress, dragX) => {
-    // const transform = dragX.interpolate({
-    //   inputRange: [0, 30, 60, 61],
-    //   outputRange: [-10, 0, 0, -301],
-    // });
-
-    // console.log('transform',transform);
+  const RenderRightActions = (progress, dragX) => {    
+    const { close } = useSwipeableItemParams();
 
     return (
-      <BaseButton style={{alignItems: 'center', justifyContent: 'center'}} onPress={() => { remove([item.id])}}>
+      <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { remove([item.id]); close() }}>
         <Animated.View
-          style={{
-            // transform: [{ translateX: transform }],
+          style={{            
             justifyContent: 'center',
             alignItems: 'center',
             width: 60,
           }}>
-          <Icon name='trash' styles={{transform: [{ translateX: -4 }, { translateY: -3 }]}} />
+          <Icon name='trash' styles={{transform: [{ translateX: -2 }]}} />
         </Animated.View>
       </BaseButton>
     );
   };
 
   return (
-    <Swipeable renderRightActions={renderRightActions}>
-      <View style={styled.container}>
-        <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id, index})}>
-          <Icon name={iconName} styles={styled.icon} />
-        </Pressable>
-        <View style={styled.body}>
-          {
-            item.completed ? (
-              <Light style={styled.text}>{item.body}</Light>
-            ) : (
-              <TextInput              
-                multiline={true}
-                onChangeText={(text) => update(index, text)}
-                style={styled.input}
-              >{ item.body }</TextInput>
-            )
-          }
+    // <ScaleDecorator>
+      <SwipeableItem
+        key={item.id}
+        item={item}
+        renderUnderlayLeft={() => <RenderRightActions />}
+        snapPointsLeft={[60]}
+      >
+        <View style={styled.container}>
+          <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id, index})}>
+            <Icon name={iconName} styles={styled.icon} />
+          </Pressable>
+          <View style={styled.body}>
+            {
+              item.completed ? (
+                <Light style={styled.text}>{item.body}</Light>
+              ) : (
+                <TextInput              
+                  multiline={true}
+                  onChangeText={(text) => update(index, text)}
+                  style={styled.input}
+                >{ item.body }</TextInput>
+              )
+            }
+          </View>
         </View>
-      </View>
-      </Swipeable>
+        </SwipeableItem>
+    
     )
-  };
+  });
 
   function create() {
     if (!creating.trim().length) {
@@ -217,7 +213,6 @@ export default function List() {
     setListItems([...listItems, { id: `ss23w2323${listItems.length}`, body: creating.trim(), updated: `34534535${listItems.length}`}])
     setCreating('');
   }
-
 
   function Sort() {
     const iconsMap = {
@@ -310,6 +305,10 @@ export default function List() {
     )
   }
 
+  function onReorder({data}) {
+    setListItems(data);
+  }
+
   return (
     <>
       <View style={{ flex: 1}}>
@@ -318,6 +317,7 @@ export default function List() {
         <Sort />
         <FlatList
             data={listItems}
+            onDragEnd={onReorder}
             renderItem={ListItem}
             keyExtractor={item => item.id}   
             style={{ flex: 1 }}

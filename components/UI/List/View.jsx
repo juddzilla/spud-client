@@ -211,8 +211,8 @@ export default function ListView(props) {
         onEndReached,
         onLongPress,
         onPress,
-        onRefresh,  
-        remove,      
+        onRefresh,
+        remove,
         selected,
       })}
       {Actions()}

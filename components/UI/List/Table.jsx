@@ -29,7 +29,7 @@ export default function ListTable({
     onEndReached,
     onLongPress,
     onPress,
-    onRefresh,  
+    onRefresh,
     remove,      
     selected,    
 }) {  
@@ -130,15 +130,13 @@ export default function ListTable({
           </Swipeable>  
       )};
 
-    // console.log('ist', list);
 
   return (
     <>
       <FlatList
         data={list}
         renderItem={ListItem}
-        keyExtractor={item => item.id}
-        onEndReached={onEndReached}        
+        keyExtractor={item => item.id}              
         ListHeaderComponent={ListHeaderComponent}
         onRefresh={onRefresh}
         //if set to true, the UI will show a loading indicator
