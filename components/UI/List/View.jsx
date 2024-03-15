@@ -16,7 +16,12 @@ import { TextInput } from 'react-native-gesture-handler';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 
-import Sort from '../../../components/UI/List/Sort'
+import Sort from '../filtering/Sort';
+import Search from '../filtering/Search';
+
+import Talk from '../actions/Talk';
+import Input from '../actions/Input';
+
 import Icon from '../../../components/UI/icons';;
 
 import Fetch from '../../../interfaces/fetch';
@@ -25,12 +30,13 @@ import colors from '../colors';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 
+import styles from '../styles';
 
 export default function ListView(props) {
+  const placeholder = 'newnew';
   const { defaultTitle, detail, nestingChildren, uri } = props.options;
   const local = useLocalSearchParams();
   
-    
   const initialQuery = {
     page: 1,
     per: 20,
@@ -41,17 +47,17 @@ export default function ListView(props) {
   const [endOfList, setEndOfList] = useState(false);
   const [list, setList] = useState([]);
   const [query, setQuery] = useState(initialQuery);
-  const [search, setSearch] = useState('');
+  
   const [selected, setSelected] = useState([]);
   const [total, setTotal] = useState(null);
   const [newName, setNewName] = useState('');
   const [focus, setFocus] = useState(false);
 
-  useEffect(() => {    
+  useEffect(() => {        
     getData(query);
   }, [endOfList, query]);
 
-  function getData() {      
+  function getData() {          
       if (!endOfList) {
         Fetch.get(uri, query)
         .then(({ results, totalResultsCount }) => {            
@@ -88,29 +94,34 @@ export default function ListView(props) {
     )
   }
 
-  function create() {
-    router.push(`${detail}/create`);
+  function create(title) {
+    router.push(`${detail}/create?title=${title}`);
+  }
+
+  function onTalk() {
+
   }
 
   function onRefresh() {    
     setEndOfList(false);
   }
 
-  function update(params) {
+  function update(params) {    
+    console.log('par', params);
     setQuery({...query, ...params});
   }
 
   function onLongPress(index) {    
-    const id = list[index].id;
-    const selectedIndex = selected.indexOf(id);
+    // const id = list[index].id;
+    // const selectedIndex = selected.indexOf(id);
     
-    if (selectedIndex !== -1) {
-      selected.splice(selectedIndex, 1);
-    } else {
-      selected.push(id);
-    }
+    // if (selectedIndex !== -1) {
+    //   selected.splice(selectedIndex, 1);
+    // } else {
+    //   selected.push(id);
+    // }
     
-    setSelected([...selected]);
+    // setSelected([...selected]);
   }
   
   function onPress(type, id) {
@@ -133,14 +144,6 @@ export default function ListView(props) {
     if (!endOfList) {
       update({ page: query.page + 1})
     }
-  }
-
-  
-
-  function onFilterUpdate(text) {
-    // debounce  
-    setSearch(text);
-    // update({ search: text });
   }
 
   const ListItem = ({ item }) => {
@@ -255,37 +258,11 @@ export default function ListView(props) {
   )};
 
   return (
-    <View style={{ flex: 1 }}>
-      {DrawerScreen(defaultTitle, true, headerRight)}       
-      <View style={{ paddingHorizontal: 20, paddingVertical: 0,  flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>           
-        <View 
-          style={{
-            backgroundColor: (focus || search.length) ? 'white' : colors.darkBg,              
-            borderWidth: 1,
-            borderColor: '#e2e8f0',
-            borderRadius: 8,
-            paddingLeft: 32,
-            marginRight: 12,
-            paddingRight: 16,
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-          }}>   
-            <Icon name="search" styles={{size:16, color:'#d4d4d4', position: 'absolute', zIndex: 1, left: 10}} />
-            <TextInput
-              value={search}
-              onBlur={() => setFocus(false)}
-              onChangeText={onFilterUpdate}
-              onFocus={() => setFocus(true)}
-              placeholder={'placeholder'}
-              style={{                    
-                  height: 40,                      
-                  marginRight: 0, 
-                  flex: 1,
-              }}
-            />
-          </View>
-          <Sort query={query} update={update} />
+    <View style={styles.View}>
+      {DrawerScreen(defaultTitle, true, headerRight)}     
+      <View style={styles.header}>           
+        <Sort query={query} update={update} />
+        <Search placeholder={'Search'} update={update} />
       </View>
 
       <FlatList
@@ -297,95 +274,9 @@ export default function ListView(props) {
         refreshing={false}
       /> 
 
-      <View style={{
-        backgroundColor: 'transparent',
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        borderTopWidth: 1,
-        paddingLeft: 16,
-        paddingRight: 16,
-        paddingVertical: 10,                
-        borderColor: colors.darkBg,
-        borderLeftWidth: 1,
-        borderWidth: 1,
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-      }}>          
-        
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',                    
-        }}>
-          <View style={{
-            flex: 1,
-            marginRight: 16,
-          }}>
-                       
-            <TextInput
-              value={newName}
-              onChangeText={(text) => { setNewName(text)}}
-              style={{ 
-                backgroundColor: 'white',
-                borderWidth: 1,
-                borderColor: colors.darkBg,
-                borderRadius: 99,
-                paddingHorizontal: 36,
-                // paddingRight: 80,
-                height: 48,                 
-              }}
-              placeholder='New'
-              />
-              <View style={{
-                zIndex: 10,
-                width: 44, 
-                height: 48, 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                position: 'absolute', 
-                left: 0,
-                top: 0,
-              }}>
-                <Icon name='plus' styles={{ color: colors.darkBg, size: 14 }}/>
-              </View>
-              <View style={{
-                zIndex: 10,
-                width: 44, 
-                height: 48, 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                position: 'absolute', 
-                right: 0,
-                top: 0,
-              }}>
-                <Icon name='send' styles={{ color: newName.length ? colors.darkestBg : 'transparent', size: 16 }}/>
-              </View>
-          </View>
-          <Pressable            
-            onPress={() => {}}
-            style={({ pressed }) => ({
-              backgroundColor: colors.brand,
-              borderWidth: 1, 
-              borderColor: pressed ? 'black' : 'white',  
-              width: 64, 
-              height: 64, 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              borderRadius: 100,
-              shadowColor: colors.darkestBg,
-              shadowOffset: {
-                width: 0,
-                height: 5,
-              },
-              shadowOpacity: 0.34,
-              shadowRadius: 6.27,
-
-              elevation: 10,
-            })}>            
-            <Icon name='mic' styles={{size: 30, color: 'white' }} />
-          </Pressable>
-        </View>     
+      <View style={styles.footer}>                  
+          <Input onSubmit={create} placeholder={placeholder}/>
+          <Talk />          
       </View>
     </View>
   );

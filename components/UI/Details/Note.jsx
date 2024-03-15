@@ -13,7 +13,7 @@ import Icon from '../icons';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 
-import ActionBar from './ActionBar';
+import ActionBar from '../actions/Input';
 
 export default function Note() {
   const [title, setTitle] = useState('List');

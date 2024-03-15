@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { FlatList, StyleSheet, Pressable, TextInput, View } from 'react-native';
+import { StyleSheet, Pressable, TextInput, View } from 'react-native';
 import Icon from '../icons';
 import colors from '../colors';
 
-import TalkButton from '../talkButton';
+// import TalkButton from './Talk';
 
-export default function ActionBar({ onSend, placeholder }) {
+export default function ActionBar({ onSubmit, placeholder }) {
     const [focus, setFocus] = useState(false);
     const [message, setMessage] = useState('');
 
-    function onSendMessage() {
-        onSend(message);
+    function onSubmitMessage() {
+        onSubmit(message);
         setMessage('');
     }
 
@@ -87,25 +87,22 @@ export default function ActionBar({ onSend, placeholder }) {
       });
 
     return (
-        <View style={styled.container}>
-            <View style={styled.input.container}>          
-                <Icon name='plus' styles={styled.input.icons.leading} />
-                <TextInput
-                    value={message}
-                    onBlur={() => setFocus(false)}
-                    onChangeText={(text) => setMessage(text)}
-                    onFocus={() => setFocus(true)}
-                    placeholder={placeholder || 'NEW'}
-                    style={styled.input.field}
-                />
-                <Pressable
-                    onPress={onSendMessage}
-                    style={styled.input.send}
-                >
-                    <Icon name='send' styles={styled.input.icons.trailing} />
-                </Pressable>
-            </View>
-            <TalkButton />
+        <View style={styled.input.container}>          
+            <Icon name='plus' styles={styled.input.icons.leading} />
+            <TextInput
+                value={message}
+                onBlur={() => setFocus(false)}
+                onChangeText={(text) => setMessage(text)}
+                onFocus={() => setFocus(true)}
+                placeholder={placeholder || 'NEW'}
+                style={styled.input.field}
+            />
+            <Pressable
+                onPress={onSubmitMessage}
+                style={styled.input.send}
+            >
+                <Icon name='send' styles={styled.input.icons.trailing} />
+            </Pressable>
         </View>
     )
 }

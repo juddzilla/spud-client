@@ -17,7 +17,7 @@ import Icon from '../icons';
 import colors from '../colors';
 
 
-import ActionBar from './ActionBar';
+import ActionBar from '../actions/Input';
 export default function Convo() {
   const [creating, setCreating] = useState('');
   const [messages, setMessages] = useState(null);
