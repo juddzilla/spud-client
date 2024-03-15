@@ -221,12 +221,16 @@ const COLLECTION = {
 
 const CONVO = {
   id: '342342424',
-  messages: [
-    { id: '232323', body: 'MEssage 1', type: 'user', updated: 12324234},
-    { id: '2w32323', body: 'MEssage 2', type: 'system', updated: 12324235},
-    { id: '23w2323', body: 'MEssage 3', type: 'user', updated: 12324237},
-    { id: '2w3232h3', body: 'MEssage 4', type: 'system', updated: 12324238},
-    { id: '23w2h323', body: 'MEssage 5', type: 'user', updated: 12324239},
+  messages: [    
+    { id: '2w32r323', body: 'Can you clarify?', type: 'system', updated: 12324235},
+    { id: '23w2w323', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', type: 'user', updated: 12324237},
+    { id: '2w3g2323', body: 'Lssorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet mauris commodo quis imperdiet massa tincidunt. Porttitor leo a diam sollicitudin. Aliquam ut porttitor leo a diam. Elit eget gravida cum sociis natoque. Eget felis eget nunc lobortis mattis aliquam faucibus purus in. Nisl nisi scelerisque eu ultrices vitae auctor. Neque sodales ut etiam sit amet nisl. Dictumst quisque sagittis purus sit. Odio ut sem nulla pharetra diam sit. Iaculis eu non diam phasellus. Pretium fusce id velit ut tortor. Sit amet commodo nulla facilisi nullam vehicula. Eget nunc lobortis mattis aliquam faucibus purus in massa. Varius sit amet mattis vulputate enim nulla aliquet porttitor lacus. Eget nulla facilisi etiam dignissim diam quis. Nec sagittis aliquam malesuada bibendum arcu vitae. Scelerisque in dictum non consectetur a erat.', type: 'system', updated: 12324235},
+    { id: '23w27h323', body: 'MEssage 5', type: 'user', updated: 12324239},
+    { id: '2w3r232h3', body: `Yes, if you change the order of a ListItem, you would typically need to update the order field for all related ListItems accordingly to maintain the desired order.
+
+    However, to minimize the overhead of updating all related ListItems, you can implement logic to handle reordering efficiently. For example, if you want to move an item from one position to another, you can swap the order values of the two relevant ListItems rather than updating all items.
+    
+    Here's a simplified example of how you might implement such logic:`, type: 'system', updated: 12324238},
   ],
   title: 'Covo Title Goes Here',
   updated: 3423423424

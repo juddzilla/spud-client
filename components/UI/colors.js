@@ -1,32 +1,67 @@
+const black = '#000';
+const white = '#fff';
 
-export default {
-    grey: '',
-    darkGrey: '',
-    lightGrey: '',
+const slate = {
+    lightest: '#f1f5f9', // 100
+    light: '#e2e8f0', // 200
+    medium: '#64748b', // 500
+    mediumDark: '#475569', // 800
+    dark: '#0f172a', // 900
+    darkest: '#020617', // 950
+};
+
+const teal = {
+    medium: '#2dd4bf', // 400
+};
+
+const zinc = {
+    light: '#d4d4d8', // zinc 300
+    dark: '#18181b' //zinc 900
+};
+
+const red = {
+    primary: '#ef4444' // red 900
+};
+
+const colors = {
+    brand: teal.medium, // teal 400
     
-    primary: '',
-    secondary: '',
-    brand: '#2dd4bf', // teal 400
-    
-    text: '#0f172a', // slate 900
-    darkText: '#020617', // slate 950
-    lightText: '#64748b',// slate 500
+    text: slate.dark, 
+    darkText: slate.dark, 
+    lightText: slate.medium,
 
-    darkBg: '#e2e8f0', // slate 200
-    lightBg: '#f1f5f9', // slate 100
+    darkBg: slate.light, 
+    lightBg: slate.lightest, 
 
-    darkestBg: '#475569', // slate 800
+    darkestBg: slate.mediumDark, 
+    lightWhite: '#f8fafc',
+
+    black,
+    white,
+
+    colorway: {
+        dark: {
+            primary: slate.light,
+            secondary: slate.lightest,
+        }
+    },
 
     sort: {
-        active: '',
-        inactive: ''
+        inactive: zinc.light, // zinc 300
+        active: zinc.dark, //zinc 900
     },
     input: {
-        placeholder: '',
-        text: ''
+        dark: {
+            backgroundColor: slate.light,
+            color: slate.dark,
+            icon: slate.medium,
+        },        
     },
     header: {
         icon: '',
         text: ''
-    }
+    },
+    remove: red.primary,
 }
+
+export default colors;

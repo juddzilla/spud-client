@@ -4,11 +4,15 @@
 // importance
 // list timeline view
 
+// delete
+// add to collection
+//
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { FlatList, Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
+import { Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 import { BaseButton } from 'react-native-gesture-handler';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
@@ -18,71 +22,25 @@ import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
-import Icon from '../icons';
+import Icon, { sorting } from '../icons';
+import ActionBar from './ActionBar';
+
 import colors from '../colors';
+import Styles from '../styles';
 
 export default function List() {
   // id or new
   // 
+  const sortOn = ['order', 'updated'];
   const [title, setTitle] = useState('List');
   const [listItems, setListItems] = useState([]);
-  const [active, setActive] = useState(null);
-  const [edittingIndex, setEdittingIndex] = useState(null);
-  const [creating, setCreating] = useState('');
+  const [filter, setFilter] = useState('');
   const [sort, setSort] = useState({ property: 'order', direction: 'desc' });
-  const [focus, setFocus] = useState(false);
+  
   const [showOptions, setShowOptions] = useState(false);
-  const [listType, setListType] = useState('unordered');
-  const itemRefs = useRef(new Map());
+  
 
-  const styles = StyleSheet.create({
-    centeredView: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 22,
-    },
-    rowItem: {
-      height: 100,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    modalView: {
-      margin: 20,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      padding: 35,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    },
-    button: {
-      borderRadius: 20,
-      padding: 10,
-      elevation: 2,
-    },
-    buttonOpen: {
-      backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-      backgroundColor: '#2196F3',
-    },
-    textStyle: {
-      color: 'white',
-      fontWeight: 'bold',
-      textAlign: 'center',
-    },
-    modalText: {
-      marginBottom: 15,
-      textAlign: 'center',
-    },
-  });
+  
 
 
   useEffect(() => {
@@ -165,7 +123,7 @@ export default function List() {
 
   const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
 
-  const RenderRightActions = (progress, dragX) => {    
+  const RenderRightActions = () => {    
     const { percentOpen } = useSwipeableItemParams();
     const animStyle = useAnimatedStyle(
       () => ({
@@ -198,19 +156,6 @@ export default function List() {
         renderUnderlayLeft={() => <RenderRightActions drag={drag}/>}
         snapPointsLeft={[48]}
         overSwipe={20}
-        // ref={(ref) => {
-        //   if (ref && !itemRefs.current.get(item.key)) {
-        //     itemRefs.current.set(item.key, ref);
-        //   }
-        // }}
-        // onChange={({ openDirection }) => {
-        //   if (openDirection !== OpenDirection.NONE) {
-        //     // Close all other open items
-        //     [...itemRefs.current.entries()].forEach(([key, ref]) => {
-        //       if (key !== item.key && ref) ref.close();
-        //     });
-        //   }
-        // }}
       >
         <TouchableOpacity
           activeOpacity={1}
@@ -241,39 +186,25 @@ export default function List() {
     )
   });
 
-  function create() {
-    if (!creating.trim().length) {
+  function create(text) {
+    if (!text.trim().length) {
       return;
     }
-    setListItems([...listItems, { id: `ss23w2323${listItems.length}`, body: creating.trim(), updated: `34534535${listItems.length}`}])
-    setCreating('');
+    setListItems([...listItems, { id: `ss23w2323${listItems.length}`, body: text.trim(), updated: `34534535${listItems.length}`}])
+    // setCreating('');
   }
 
   function Sort() {
-    const iconsMap = {
-      order: {
-        asc: 'numericSortAsc',
-        desc: 'numericSortDesc',
-        inactive: 'numericSortInactive'
-      },
-      updated: {
-        asc: 'dateAsc',
-        desc: 'dateDesc',
-        inactive: 'dateInactive'
-      }
-    };
-  
     const sortIcon = (property) => {
       const active = sort.property === property;
-      const activeColor = '#000';
-      const inactiveColor = '#d4d4d8';
-      let color = inactiveColor;
-      let name = iconsMap[property].inactive
+      
+      let color = colors.sort.inactive;
+      let name = sorting[property].inactive
       let size = 22;
       
       if (active) {
-        color = activeColor;
-        name = sort.direction === 'asc' ? iconsMap[property].asc : iconsMap[property].desc;
+        color = colors.sort.active;
+        name = sort.direction === 'asc' ? sorting[property].asc : sorting[property].desc;
         size = 24;
       }
   
@@ -291,15 +222,14 @@ export default function List() {
  
     return (
       (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              { Object.keys(iconsMap).map(property => {
-              const properties = sortIcon(property);
-              // console.log('properties', properties);
+          <View style={Styles.row}>
+              { sortOn.map(property => {
+              const properties = sortIcon(property);              
               return (
                   <Pressable
                     key={property}
                     onPress={() => chooseSort(property)}
-                    style={{ width: 48, height: 64, alignItems: 'center', justifyContent: 'center'}}
+                    style={{ ...Styles.centered, ...Styles.buttons.icon }}
                   >
                     <Icon name={properties.name} styles={{size: properties.size, color: properties.color }} />
                   </Pressable>
@@ -311,8 +241,136 @@ export default function List() {
   }
 
   function headerRight() {
+    const styles = StyleSheet.create({
+      background: {
+        flex: 1,
+        // alignItems: 'flex-end',           
+        backgroundColor: 'rgba(255,255,255,0.4)',
+        // paddingTop: getStatusBarHeight() + 35,                  
+      },    
+      confirmation: {
+        container: {
+          flex: 1, 
+          // justifyContent: 'center',
+          alignItems: 'center',
+          padding: 16,
+          // width: '50%',
+          // paddingHorizontal: '10%',
+          // backgroundColor: 'blue',
+        },
+        content: {
+          backgroundColor: colors.white,
+          padding: 16,          
+          borderRadius: 8,
+          shadowColor: colors.darkestBg,
+          shadowOffset: {
+            width: 0,
+            height: 5,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 6.27,
+          elevation: 10,
+          width: '100%',
+          option: {
+            alignItems: 'center',
+            
+            child: {
+              marginBottom: 8,
+            },
+            body: {
+              flexDirection: 'row', 
+              flexWrap: 'wrap',
+              textAlign: 'center',
+              marginBottom: 16,
+            }
+          },
+        },
+        button: {
+          ...Styles.centered,
+          // paddingHorizontal: 16,
+          // paddingVertical: 8,
+          borderWidth: 1,          
+          borderRadius: 8,
+          marginBottom: 8,
+          height: 44,
+          ...Styles.centered
+        },
+        actions : {
+          cancel: {
+            backgroundColor: colors.black,     
+            borderColor: colors.black,        
+          },
+          remove: {            
+            backgroundColor: colors.remove,     
+            borderColor: colors.remove,        
+          },
+        }
+      },
+      options: {
+        // marginTop: 1,
+        // marginRight: 4,
+        // backgroundColor: 'green',
+        // borderRadius: 2,
+        // paddingVertical: 12,
+        // alignItems: 'center', 
+        close: {
+          ...Styles.centered,
+          backgroundColor: colors.white,
+          height: 48,
+          paddingRight: 16,
+          paddingTop: 4,
+        },
+        container: {
+          alignItems: 'flex-end',           
+          backgroundColor: 'rgba(255,255,255,0.4)',
+          paddingTop: getStatusBarHeight() + 35, 
+        },
+        option: {
+          ...Styles.row, 
+          flexDirection: 'row-reverse', 
+          // backgroundColor: 'white', 
+          paddingLeft: 4, 
+          paddingRight: 16,
+          paddingVertical: 8, 
+          borderRadius: 4,
+          marginBottom: 4,
+          overflow: 'hidden',
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 2,
+          elevation: 5,
+          icon : {
+            container: {
+              ...Styles.buttons.icon, 
+              ...Styles.centered, 
+              backgroundColor: colors.black, 
+              borderRadius: 999, 
+              marginLeft: 16,
+            },
+            image: {
+              color: colors.white,
+            }
+          },
+          text: {
+            container: {
+              backgroundColor: colors.white,
+              padding: 8,
+              paddingHorizontal: 16,
+              borderRadius: 999,
+            },
+            text: {
+              fontSize: 16,
+            },
+          },
+        },
+      },
+    });
     return (
-      <>
+      <View>        
         <Modal
 
           transparent={true}
@@ -321,22 +379,104 @@ export default function List() {
             
             setShowOptions(!showOptions);
           }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>              
-              <Bold style={styles.modalText}>Delete</Bold>
-              <Bold style={styles.modalText}>Rename</Bold>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setShowOptions(!showOptions)}>
-                <Bold style={styles.textStyle}>Hide Modal</Bold>
-              </Pressable>
+            <View style={styles.background}>
+              <View style={styles.options.container}>
+                <Pressable
+                    style={styles.options.close}
+                    onPress={() => setShowOptions(!showOptions)}>
+                  <Icon name='close' />
+                </Pressable>
+                <View style={styles.options}> 
+                  <Pressable>
+                    <View style={styles.options.option}>
+                      <View style={styles.options.option.icon.container}>
+                        <Icon name='trash' styles={styles.options.option.icon.image} />
+                      </View>
+                      <View style={styles.options.option.text.container}>
+                        <Bold style={styles.options.option.text.text}>Delete</Bold>
+                      </View>
+                    </View>                
+                  </Pressable>                                       
+                  
+                  <Pressable>
+                    <View style={styles.options.option}>
+                    <View style={styles.options.option.icon.container}>
+                        <Icon name='pencil' styles={styles.options.option.icon.image}/>
+                      </View>
+                      <View style={styles.options.option.text.container}>
+                        <Bold style={styles.options.option.text.text}>Rename</Bold>
+                      </View>
+                    </View>                
+                  </Pressable>                                         
+                </View>
+              </View>
+
+              <View style={styles.confirmation.container}>
+                <View style={styles.confirmation.content}>
+                  <View style={styles.confirmation.content.option}>
+                    <View style={{...Styles.centered, ...Styles.buttons.icon, backgroundColor: colors.remove, borderRadius: 999, ...styles.confirmation.content.option.child}}>
+                      <Icon name='trash' styles={{color: colors.white}} />
+                    </View>
+                    <Bold style={styles.confirmation.content.option.child}>Confirmation Required</Bold>
+                    <View style={{ ...styles.confirmation.content.option.child, ...styles.confirmation.content.option.body}}>
+                      <Light style={{textAlign: 'center'}}>Are you certain you want to delete this List? This action cannot be reversed.</Light>                    
+                      {/* <Bold>{title}</Bold> */}
+                      {/* <Light>?</Light> */}
+                    </View>
+                    <View style={{width: '100%'}}>
+                      <Pressable style={{ ...styles.confirmation.actions.remove, ...styles.confirmation.button}}>
+                        <Bold style={{color: colors.white}}>Delete</Bold>
+                      </Pressable>
+                      <Pressable style={styles.confirmation.button}>
+                        <Bold>Cancel</Bold>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+                
+                <View style={styles.confirmation.content}>
+                  <View style={{...styles.confirmation.content.option, width: '100%'}}>
+                    <View style={{...Styles.centered, ...Styles.buttons.icon, backgroundColor: colors.black, borderRadius: 999, ...styles.confirmation.content.option.child}}>
+                      <Icon name='pencil' styles={{color: colors.white}}/>
+                    </View>
+                    <Bold style={styles.confirmation.content.option.child}>Change List Title</Bold>
+                    <View style={{ ...styles.confirmation.content.option.child, ...styles.confirmation.content.option.body}}>
+                      <Light style={{textAlign: 'center'}}>sdff sdfsdf </Light>                    
+                      {/* <Bold>{title}</Bold> */}
+                      {/* <Light>?</Light> */}
+                    </View>
+                    <TextInput
+                      value={title}
+                      style={{
+                        textAlign: 'center',
+                        ...styles.confirmation.content.option.child, 
+                        borderWidth: 1, 
+                        borderColor: colors.darkBg,
+                        width: '100%',
+                        height: 48,
+                        borderRadius: 8,
+                        marginBottom: 16,
+                      }}
+                    />
+                    <View style={{width: '100%'}}>
+                      <Pressable style={{ ...styles.confirmation.actions.cancel, ...styles.confirmation.button}}>
+                        <Bold style={{color: colors.white}} >Save</Bold>
+                      </Pressable>
+                      <Pressable style={styles.confirmation.button}>
+                        <Bold>Cancel</Bold>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+
+              </View>
             </View>
-          </View>
+            
         </Modal>
         <Pressable onPress={ () => setShowOptions(!showOptions)}>
           <Icon name='dots' />
         </Pressable>
-      </>
+      </View>
     )
   }
 
@@ -344,12 +484,31 @@ export default function List() {
     setListItems(data);
   }
 
+  function onFilterChange(text) {
+    // debounce
+    setFilter(text);
+  }
+
   return (
     <>
-      <View style={{ flex: 1}}>
-        
-        {DrawerScreen(title, true, headerRight)}
-        <Sort />
+      <View style={Styles.View}>        
+        {DrawerScreen(title, true, headerRight)}    
+        <View style={Styles.header}>
+          <Sort />
+          <View style={{ ...Styles.row, flex: 1, marginRight: 16}}>            
+            <TextInput
+              value={filter}
+              onChangeText={onFilterChange} 
+              placeholder='filter'         
+              style={{
+                ...Styles.inputs.size.small,
+                backgroundColor: colors.input.dark.backgroundColor,                
+                color: colors.input.dark.color,
+              }}
+            />         
+            <Icon name='search' styles={{ color: colors.input.dark.icon, position: 'absolute', left: 12, size: 14 }} /> 
+          </View>
+        </View>
         <DraggableFlatList
             data={listItems}
             onDragEnd={onReorder}
@@ -359,98 +518,11 @@ export default function List() {
             // style={{ flex: 1 }}
             // ListHeaderComponent={ListHeaderComponent}
             
-            //if set to true, the UI will show a loading indicator
-            
+            //if set to true, the UI will show a loading indicator            
           />           
       </View>
+      <ActionBar onSend={create} />           
       
-      <View style={{
-        backgroundColor: 'transparent',
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        // paddingHorizontal: 32, 
-        paddingLeft: 32,
-        paddingRight: 16,
-        paddingVertical: 12,
-        borderTopWidth: 0,        
-        borderTopColor: colors.darkBg,
-      }}>          
-        <View style={{
-            backgroundColor: focus ? 'white' : colors.darkBg,
-            
-            borderWidth: 1,
-            borderColor: '#e2e8f0',
-            borderRadius: 32,
-            paddingLeft: 32,
-            marginRight: 12,
-            paddingRight: 16,
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-          }}>   
-            <Icon name='plus' styles={{size:16, color:'#d4d4d4', position: 'absolute', zIndex: 1, left: 12}} />
-            <TextInput
-                value={creating}
-                onBlur={() => setFocus(false)}
-                onChangeText={(text) => setCreating(text)}
-                onFocus={() => setFocus(true)}
-                placeholder='Create New List Item'
-                style={{                    
-                    height: 48,                      
-                    marginRight: 0, 
-                    flex: 1,
-                    paddingRight: 48,
-                }}
-            />
-            <Pressable
-              onPress={create}
-              style={{
-                height: 40,
-                width: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: colors.darkBg, 
-                borderRadius: 40,
-                opacity: (focus && creating.trim().length) ? 1 : 0,
-                position: 'absolute', 
-                right: 4
-              }}
-            >
-
-              <Icon name='send' styles={{size:16, color: focus ? colors.darkestBg : '#d4d4d4', zIndex: 1}} />
-            </Pressable>
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',          
-        }}>
-          <Pressable            
-            onPress={() => {}}
-            style={({ pressed }) => ({
-              backgroundColor: colors.brand,
-              borderWidth: 1, 
-              borderColor: pressed ? 'black' : 'white',  
-              width: 64, 
-              height: 64, 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              borderRadius: 100,
-              shadowColor: colors.darkestBg,
-              shadowOffset: {
-                width: 0,
-                height: 5,
-              },
-              shadowOpacity: 0.34,
-              shadowRadius: 6.27,
-
-              elevation: 10,
-            })}>
-            <Icon name='mic' styles={{size: 30, color: 'white' }} />
-          </Pressable>
-        </View>     
-      </View>
     </>
   )
 }

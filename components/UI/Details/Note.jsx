@@ -11,6 +11,9 @@ import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Icon from '../icons';
 import Bold from '../text/Bold';
+import Light from '../text/Light';
+
+import ActionBar from './ActionBar';
 
 export default function Note() {
   const [title, setTitle] = useState('List');
@@ -59,6 +62,17 @@ export default function Note() {
       marginBottom: 15,
       textAlign: 'center',
     },
+    date: {
+      container: {      
+        flexDirection: 'row',
+        // justifyContent: 'flex-end',
+        paddingLeft: 16,
+        paddingTop: 16,        
+      },
+      body: {
+        fontSize: 12,
+      }
+    }
   });
 
   useEffect(() => {
@@ -103,6 +117,9 @@ export default function Note() {
     <View style={{ flex: 1}}>
       
       {DrawerScreen(title, true, headerRight)}
+      <View style={styles.date.container}>
+        <Light style={styles.date.body}>Last Updated: Today, 12:34pm</Light>
+      </View>
       <TextInput
         style={{
           flex: 1,
@@ -117,7 +134,8 @@ export default function Note() {
         placeholder="type here"
         editable={true}
         multiline={true}
-      />        
+      />
+      <ActionBar hideInput={true}/>
     </View>
   )
 }
