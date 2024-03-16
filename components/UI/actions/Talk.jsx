@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Dimensions, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
+
 import colors from '../colors';
 import Icon from '../icons';
-
 import Bold from '../text/Bold';
+
+import CustomModal from './Modal';
+
 export default function TalkButton() {
   const [showModal, setShowModal] = useState(false);
 

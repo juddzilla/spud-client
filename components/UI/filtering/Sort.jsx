@@ -8,7 +8,7 @@ import colors from '../colors';
 
 import Icon, { sorting } from '../icons';
 
-export default function Sort({ fields, query, update }) {  
+export default function Sort({ disabled, fields, query, update }) {  
   const sortIcon = (property) => {        
     const active = query.property === property;
     const activeColor = colors.sort.active;
@@ -17,7 +17,7 @@ export default function Sort({ fields, query, update }) {
     let name = sorting[property].inactive;        
     let size = 22;
     
-    if (active) {
+    if (!disabled && active) {
       color = activeColor;
       name = query.direction === 'asc' ? sorting[property].asc : sorting[property].desc;
       size = 24;
@@ -26,7 +26,10 @@ export default function Sort({ fields, query, update }) {
     return { color, name, size };
   };
     
-  function chooseSort(property) {
+  function chooseSort(property) {  
+    if (disabled) {
+      return;
+    }
     let direction = 'desc';
     if (query.property === property) {
       direction = ['asc', 'desc'].filter(dir => dir !== query.direction)[0];        

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 
 import {
+  Dimensions,
   FlatList,
   Pressable,
   StyleSheet,
@@ -10,9 +11,8 @@ import {
 
 import { useLocalSearchParams, router } from 'expo-router';
 import { BaseButton } from 'react-native-gesture-handler';
-import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
+import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { TextInput } from 'react-native-gesture-handler';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 
@@ -22,15 +22,16 @@ import Search from '../filtering/Search';
 import Talk from '../actions/Talk';
 import Input from '../actions/Input';
 
-import Icon from '../../../components/UI/icons';;
 
 import Fetch from '../../../interfaces/fetch';
 
 import colors from '../colors';
+import Icon from '../icons';
+import styles from '../styles';
+
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 
-import styles from '../styles';
 
 export default function ListView({options}) {
   const {
@@ -51,50 +52,38 @@ export default function ListView({options}) {
     sortDirection: filters.sort.defaults.direction,
   }
   const [endOfList, setEndOfList] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [list, setList] = useState([]);
   const [query, setQuery] = useState(initialQuery);
-  
-  const [selected, setSelected] = useState([]);
 
   useEffect(() => {        
-    getData(query);
+    getData();
   }, [endOfList, query]);
 
   function getData() {          
-      if (!endOfList) {
-        Fetch.get(uri, query)
-        .then(({ results, totalResultsCount }) => {            
+    // console.log('getData', query);  
+    // TODO remove settimeout  
+      setTimeout(() => {
+        if (!endOfList) {
+          Fetch.get(uri, query)
+          .then(({ results, totalResultsCount }) => { 
+            setInitialLoadComplete(true);
             const newList = Array.isArray(results) ? results : results.children; 
-          if (newList.length < query.per) {
-            setEndOfList(true);
-          }
-          setList(newList);
-          setTotal(totalResultsCount);
-        })
-        .catch(err => {})
-      }
+            if (newList.length < query.per) {
+              setEndOfList(true);
+            }
+            setList(newList);
+            setTotal(totalResultsCount);
+          })
+          .catch(err => {})
+        }
+      }, 3000);
   }
 
   function remove(ids) {
     // make api request, onsuccess
     const newList = list.filter(i => !ids.includes(i.id));
     setList(newList);
-  }
-
-  function removeSelected() {
-    remove(selected);
-  }
-
-  function headerRight() {
-    if (!selected.length) {
-      return null;
-    }
-
-    return (
-      <Pressable onPress={removeSelected}>
-        <Icon name="trash" />
-      </Pressable>
-    )
   }
 
   function create(title) {
@@ -114,20 +103,20 @@ export default function ListView({options}) {
     setQuery({...query, ...params});
   }
 
-  function onLongPress(index) {    
-    // const id = list[index].id;
-    // const selectedIndex = selected.indexOf(id);
+  // function onLongPress(index) {    
+  //   const id = list[index].id;
+  //   const selectedIndex = selected.indexOf(id);
     
-    // if (selectedIndex !== -1) {
-    //   selected.splice(selectedIndex, 1);
-    // } else {
-    //   selected.push(id);
-    // }
+  //   if (selectedIndex !== -1) {
+  //     selected.splice(selectedIndex, 1);
+  //   } else {
+  //     selected.push(id);
+  //   }
     
-    // setSelected([...selected]);
-  }
+  //   setSelected([...selected]);
+  // }
   
-  function onPress(type, id) {
+  function onPress(type, {id, title}) {
     let route = '';
     if (nestingChildren) {
         route = `${nestingChildren}/${local.slug}/`;
@@ -138,8 +127,8 @@ export default function ListView({options}) {
         Convo: 'convos',
         List: 'lists',
         Note: 'notes'
-    };
-    route += `${typeToRouteMap[type]}/${id}`;    
+    };    
+    route += `${typeToRouteMap[type]}/${id}?title=${title}`;    
     router.push(route);
   }
 
@@ -157,7 +146,7 @@ export default function ListView({options}) {
         backgroundColor: 'white',
         marginVertical: 4,
         marginHorizontal: 4,        
-        borderRadius: 8,
+        borderRadius: 2,
         flexDirection: 'row',
         alignItems: 'center', 
         
@@ -231,12 +220,12 @@ export default function ListView({options}) {
           key={item.id}
           item={item}
           renderUnderlayLeft={() => <RenderRightActions />}
-          snapPointsLeft={[48]}
+          snapPointsLeft={[60]}
           overSwipe={20}              
         >          
         <Pressable
             style={styled.pressable}
-            onPress={() => onPress(type, id)} 
+            onPress={() => onPress(type, item)} 
         >      
             <View style={styled.content}>
                 <View style={styled.icon.container}>
@@ -251,23 +240,60 @@ export default function ListView({options}) {
       </SwipeableItem>        
   )};
 
+  const ListEmptyComponent = () => {
+    const Empty = (props) => (
+      <View style={{        
+        // height: Dimensions.get('window').width,
+        // padding: 16, 
+        flex: 1, 
+        // backgroundColor: 'red',
+        ...styles.centered
+      }}>
+        <View style={{          
+          height: Dimensions.get('window').width - 32,
+          width: Dimensions.get('window').width - 32,          
+          ...styles.centered
+        }}>
+          {props.children}
+        </View>
+      </View>
+    )
+    
+    if (!initialLoadComplete) {
+      return (
+        <Empty><Bold>Loading</Bold></Empty>  
+      )
+    }
+    return (
+      <Empty><Bold>Create Your First Below</Bold></Empty>
+    )
+  }
+
   return (
     <View style={styles.View}>
       {DrawerScreen(defaultTitle)}     
       <View style={styles.header}>           
         <Sort
+          disabled={list.length === 0}
           fields={filters.sort.fields}
           query={{direction: query.sortDirection, property: query.sortProperty}} 
           update={update}
         />
-        <Search placeholder={filters.placeholder} update={update} />
+        <Search
+          disabled={list.length === 0}
+          placeholder={filters.placeholder} 
+          update={update} 
+        />
       </View>
 
       <FlatList
         data={list}
+        // data={[]}
         renderItem={ListItem}
         keyExtractor={item => item.id}                      
+        ListEmptyComponent={ListEmptyComponent}
         onRefresh={onRefresh}
+        onEndReached={onEndReached}
         //if set to true, the UI will show a loading indicator
         refreshing={false}
       /> 

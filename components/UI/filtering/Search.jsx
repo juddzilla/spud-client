@@ -22,7 +22,7 @@ const useDebouncedValue = (inputValue, delay) => {
     return debouncedValue;
   };
 
-export default function Search({ placeholder, update }) {    
+export default function Search({ disabled, placeholder, update }) {        
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
 
@@ -56,7 +56,7 @@ export default function Search({ placeholder, update }) {
                 ...styles.centered,
             },
             icon: {
-                color: colors.input.dark.icon, 
+                color: disabled ? colors.white : colors.input.dark.icon, 
                 size: 14,
             },
          }
@@ -64,8 +64,8 @@ export default function Search({ placeholder, update }) {
     return (
         <View style={style.container}>
             <TextInput
+                editable={!!disabled === false}
                 value={search}
-                // editable={listItems.length !== 0}
                 onChangeText={(text) => setSearch(text)} 
                 placeholder={placeholder}
                 style={style.input}

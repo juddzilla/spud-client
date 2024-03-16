@@ -22,10 +22,11 @@ import Talk from '../../UI/actions/Talk';
 
 import styles from '../styles';
 
+import Options from '../actions/Options';
+
 export default function Convo() {  
   const [messages, setMessages] = useState(null);
   const [title, setTitle] = useState('Convo');
-
   
   // const glob = useGlobalSearchParams();
   // const local = useLocalSearchParams();
@@ -101,7 +102,7 @@ function headerRight() {
 }
 
 function create(text) {
-  console.log('create t', text);
+  // console.log('create t', text);
   if (!text.trim().length) {
     return;
   }
@@ -111,9 +112,20 @@ function create(text) {
 
 function onChange() {}
 
+const headerOptions = [
+  {
+      name: 'rename',
+      cb: () => {}
+  },
+  {
+      name: 'remove',
+      cb: () => {}
+  }
+];
+
   return (
     <View style={styles.View}>
-      {DrawerScreen(title, headerRight)}
+      {DrawerScreen(title, () => <Options options={headerOptions} />)}    
       <View style={flatlist.container}>
         <FlatList
           

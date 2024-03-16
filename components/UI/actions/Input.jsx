@@ -2,16 +2,28 @@ import { useState } from 'react';
 import { StyleSheet, Pressable, TextInput, View } from 'react-native';
 import Icon from '../icons';
 import colors from '../colors';
+import Bold from '../text/Bold';
+
+import CustomModal from './Modal';
+
+import styles from '../styles';
 
 // import TalkButton from './Talk';
 
-export default function ActionBar({ onSubmit, placeholder }) {
+export default function Input({ onSubmit, placeholder, hideModal }) {
     const [focus, setFocus] = useState(false);
     const [message, setMessage] = useState('');
+    const [showModal, toggleModal] = useState(false);
 
     function onSubmitMessage() {
-        onSubmit(message);
-        setMessage('');
+        if (!hideModal) {
+            toggleModal(true);
+        }
+        // TODO remore setimtout
+        setTimeout(() => {
+            onSubmit(message);
+            setMessage('');
+        }, 2000);
     }
 
     const styled = StyleSheet.create({
@@ -84,25 +96,46 @@ export default function ActionBar({ onSubmit, placeholder }) {
                 right: 4
             },
         },
+        modal: {
+            container: {
+                backgroundColor: 'red', 
+                flex: 1,
+                ...styles.centered
+            },
+            content: {
+
+            }
+        }
       });
 
     return (
-        <View style={styled.input.container}>          
-            <Icon name='plus' styles={styled.input.icons.leading} />
-            <TextInput
-                value={message}
-                onBlur={() => setFocus(false)}
-                onChangeText={(text) => setMessage(text)}
-                onFocus={() => setFocus(true)}
-                placeholder={placeholder || 'NEW'}
-                style={styled.input.field}
-            />
-            <Pressable
-                onPress={onSubmitMessage}
-                style={styled.input.send}
+        <>
+            <CustomModal
+                show={showModal}
+                toggleShow={toggleModal}
             >
-                <Icon name='send' styles={styled.input.icons.trailing} />
-            </Pressable>
-        </View>
+                <View style={styled.modal.container}>
+                    <Bold>Creating {message}</Bold>
+                </View>
+
+            </CustomModal>
+            <View style={styled.input.container}>          
+                <Icon name='plus' styles={styled.input.icons.leading} />
+                <TextInput
+                    value={message}
+                    onBlur={() => setFocus(false)}
+                    onChangeText={(text) => setMessage(text)}
+                    onFocus={() => setFocus(true)}
+                    placeholder={placeholder || 'NEW'}
+                    style={styled.input.field}
+                />
+                <Pressable
+                    onPress={onSubmitMessage}
+                    style={styled.input.send}
+                >
+                    <Icon name='send' styles={styled.input.icons.trailing} />
+                </Pressable>
+            </View>
+        </>
     )
 }

@@ -18,10 +18,20 @@ import Talk from '../../UI/actions/Talk';
 
 import styles from '../styles';
 
+import Options from '../actions/Options';
+
 export default function Note() {
   const [title, setTitle] = useState('List');
   const [note, setNote] = useState('');
-  const [showOptions, setShowOptions] = useState(false);
+
+  useEffect(() => {
+    Fetch.get('note')
+    .then(res => {
+      setNote(res.body);
+      setTitle(res.title);
+    })
+    .catch(err => { console.warn('note Error', err)});
+  }, []);
 
   const styled = StyleSheet.create({
     centeredView: {
@@ -68,9 +78,11 @@ export default function Note() {
     date: {
       container: {      
         flexDirection: 'row',
+        // backgroundColor: 'green',
+        flex: 1,
         // justifyContent: 'flex-end',
-        paddingLeft: 16,
-        paddingTop: 16,        
+        paddingLeft: 8,
+        // paddingTop: 16,        
       },
       body: {
         fontSize: 12,
@@ -78,51 +90,22 @@ export default function Note() {
     }
   });
 
-  useEffect(() => {
-    Fetch.get('note')
-    .then(res => {
-      setNote(res.body);
-      setTitle(res.title);
-    })
-    .catch(err => { console.warn('note Error', err)});
-  }, []);
+  const headerOptions = [
+    {
+        name: 'rename',
+        cb: () => {}
+    },
+    {
+        name: 'remove',
+        cb: () => {}
+    }
+];
 
-  function headerRight() {
-    return (
-      <>
-       <Modal
-          transparent={true}
-          visible={showOptions}
-          onRequestClose={() => {
-            
-            setShowOptions(!showOptions);
-          }}>
-          <View style={styled.centeredView}>
-            <View style={styled.modalView}>              
-              <Bold style={styled.modalText}>Delete</Bold>
-              <Bold style={styled.modalText}>Rename</Bold>
-              <Pressable
-                style={[styled.button, styled.buttonClose]}
-                onPress={() => setShowOptions(!showOptions)}>
-                <Bold style={styled.textStyle}>Hide Modal</Bold>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-        <Pressable onPress={ () => setShowOptions(!showOptions)}>
-          <Icon name='dots' />
-        </Pressable>
-      </>
-    )
-  }
-  
   return (
     <View style={styles.View}>
       
-      {DrawerScreen(title, headerRight)}
-      <View style={styled.date.container}>
-        <Light style={styled.date.body}>Last Updated: Today, 12:34pm</Light>
-      </View>
+      {DrawerScreen(title, () => <Options options={headerOptions} />)}    
+      
       <View style={{flex: 1}}>
         <TextInput
           style={{
@@ -141,7 +124,11 @@ export default function Note() {
         />
       </View>
       <View style={styles.footer}>
+        <View style={styled.date.container}>
+          <Light style={styled.date.body}>Last Updated: Today, 12:34pm</Light>
+        </View>
         {/* <Input create={() => {}} placeholder='' /> */}
+
         <Talk />
       </View>
     </View>

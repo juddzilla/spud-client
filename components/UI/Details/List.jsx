@@ -17,7 +17,7 @@ import { BaseButton } from 'react-native-gesture-handler';
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import  { useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
+import  { router, useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
@@ -32,6 +32,8 @@ import Search from '../filtering/Search';
 
 import Talk from '../actions/Talk';
 import Input from '../actions/Input';
+
+import Options from '../actions/Options';
 
 function sortByUpdated(direction) {
   return function(a, b) {
@@ -65,20 +67,22 @@ export default function List() {
   const glob = useGlobalSearchParams();
   const local = useLocalSearchParams();
 
-  // console.log("Local:", local.user, "Global:", glob);
+  // console.log("Local:", local, "Global:", glob.params);
+
+  const initialTitle = local.title ? local.title : 'List';
   
   let initialList = [];
   const sortOn = ['order', 'updated'];
-  const [title, setTitle] = useState('List');
-  const [newTitle, setNewTitle] = useState('List');
+  const [title, setTitle] = useState(initialTitle);
+  const [newTitle, setNewTitle] = useState(initialTitle);  
   const [initialListItems, setInitialListItems] = useState(initialList);
   const [listItems, setListItems] = useState(initialList);
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState({ property: 'order', direction: 'desc' });
 
-  
   const [showOptions, setShowOptions] = useState(false);
   const [action, setAction] = useState('');
+  
   
   useEffect(() => {
     setNewTitle(title);
@@ -109,16 +113,19 @@ export default function List() {
   }, [filter, sort, initialListItems, setListItems]);
 
   useEffect(() => {
-    Fetch.get('list')
-    .then(res => {            
-      setInitialListItems(res.children);
-      setTitle(res.title);
-    })
-    .catch(err => { console.warn('List Error', err)});
+    if (local.slug) {
+      // console.log('local', local.slug);
+      Fetch.get('list')
+      .then(res => {            
+        setInitialListItems(res.children);
+        // setTitle(res.title);
+      })
+      .catch(err => { console.warn('List Error', err)});
+    }
   }, []);
 
   function toggleCompleted({id}) {        
-      const newListItems = listItems.map(li => {
+      const newListItems = initialListItems.map(li => {
         if (li.id === id) {
           li.completed = !li.completed;
         }
@@ -127,15 +134,19 @@ export default function List() {
       setListItems(newListItems);
   }
 
-  function remove(ids, close) {
+  function removeItem(id) {
     // make api request, onsuccess
-    const newList = listItems.filter(i => !ids.includes(i.id));
-    setListItems(newList);
-    
+    const newList = initialListItems.filter(i => i.id !== id);
+    setListItems(newList);    
+  }
+
+  function removeList() {
+    console.log('slig', local.slug);
+    router.back();    
   }
 
   function update(index, text) {
-    const newListItems = [...listItems];
+    const newListItems = [...initialListItems];
     newListItems[index].body = text;
     setInitialListItems(newListItems)
   }
@@ -167,19 +178,19 @@ export default function List() {
       return;
     }
     setInitialListItems([
-      ...listItems, 
+      ...initialListItems, 
       { 
-        id: `ss23w2323${listItems.length}`, 
-        index: listItems.length,
+        id: `ss23w2323${initialListItems.length}`, 
+        index: initialListItems.length,
         body: text.trim(), 
-        updated: `2024-02-20 07:37:27.06557${listItems.length}-08`,
+        updated: `2024-02-20 07:37:27.06557${initialListItems.length}-08`,
       }])    
   }
 
   const EmptyState = () => {
     return (
       <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>
-        { listItems.length !== 0 ? (
+        { initialListItems.length !== 0 ? (
           <View style={{...Styles.row}}>
             <Light style={{marginRight: 2}}>No list items containing</Light>
             <Bold>"{filter}"</Bold>
@@ -192,6 +203,7 @@ export default function List() {
       </View>
     )
   }
+
   const HeaderRight = () => {
     const styles = StyleSheet.create({
       background: {
@@ -311,11 +323,11 @@ export default function List() {
     });
 
     const actions = [
-      {
+      {        
         display: 'Delete',
         icon: 'trash',
       },
-      {
+      {        
         display: 'Rename',
         icon: 'pencil',
       },
@@ -518,7 +530,7 @@ export default function List() {
       );
 
       return (
-        <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { remove([item.id]) }}>
+        <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { removeItem(item.id) }}>
           <Animated.View
             style={{            
               justifyContent: 'center',
@@ -571,31 +583,46 @@ export default function List() {
     )
   });
 
-  return (
-    <View style={Styles.View}>        
-        {DrawerScreen(title, HeaderRight)}    
-        
-        <View style={Styles.header}>           
-          <Sort fields={sortOn} query={sort} update={onSortUpdate} />
-          <Search placeholder={'Filter'} update={onFilterUpdate} />
-        </View>
+  const headerOptions = [
+    {
+        name: 'rename',
+        cb: setTitle,
+    },
+    {
+        name: 'remove',
+        cb: removeList
+    }
+];
 
-        <View style={{flex: 1}}>
-          <DraggableFlatList
-            activationDistance={20}           
-            data={listItems}
-            keyExtractor={item => item.id}   
-            ListEmptyComponent={<EmptyState />}
-            onDragEnd={onDragEnd}
-            renderItem={ListItem}
-            refreshing={true}
-          />
+
+{/* <HeaderRight toggleShow={setShowOptions} options={[]}/> */}
+  return (
+    <>
+      {DrawerScreen(title, () => <Options options={headerOptions} />)}    
+      <View style={Styles.View}>        
+          
+          <View style={Styles.header}>           
+            <Sort fields={sortOn} query={sort} update={onSortUpdate} />
+            <Search placeholder={'Filter'} update={onFilterUpdate} />
+          </View>
+
+          <View style={{flex: 1}}>
+            <DraggableFlatList
+              activationDistance={20}           
+              data={listItems}
+              keyExtractor={item => item.id}   
+              ListEmptyComponent={<EmptyState />}
+              onDragEnd={onDragEnd}
+              renderItem={ListItem}
+              refreshing={true}
+            />
+          </View>
+          
+          <View style={Styles.footer}>                  
+            <Input hideModal={true} onSubmit={create} placeholder='Create New List Item'/>
+            <Talk />          
+          </View>       
         </View>
-        
-        <View style={Styles.footer}>                  
-          <Input onSubmit={create} placeholder='Create New List Item'/>
-          <Talk />          
-        </View>       
-      </View>
+    </>
   );
 }
