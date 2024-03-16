@@ -2,8 +2,19 @@ import ListView from '../../../components/UI/List/View';
 
 export default function Convos() {  
   const options = {
-    defaultTitle:'Conversations',
+    actions: {
+      placeholder: 'Create New Conversation',
+      talkUri: '',
+    },
+    defaultTitle:'Your Conversations',
     detail:'/convos',
+    filters: {
+      placeholder: 'Search by Title',
+      sort: {
+        defaults: { property: 'updated', direction: 'desc'},
+        fields: ['name', 'updated'],
+      },
+    },
     uri:'convos'
   };
 

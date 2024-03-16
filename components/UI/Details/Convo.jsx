@@ -4,7 +4,7 @@
 // archive
 // delete
 import { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Pressable, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 // import { useLocalSearchParams, useGlobalSearchParams, Link } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 
@@ -17,12 +17,15 @@ import Icon from '../icons';
 import colors from '../colors';
 
 
-import ActionBar from '../actions/Input';
-export default function Convo() {
-  const [creating, setCreating] = useState('');
+import Input from '../../UI/actions/Input';
+import Talk from '../../UI/actions/Talk';
+
+import styles from '../styles';
+
+export default function Convo() {  
   const [messages, setMessages] = useState(null);
   const [title, setTitle] = useState('Convo');
-  const [focus, setFocus] = useState(false);
+
   
   // const glob = useGlobalSearchParams();
   // const local = useLocalSearchParams();
@@ -83,22 +86,6 @@ useEffect(() => {
 
 // console.log("Local:", local, "Global:", glob.user);
 
-const actions = StyleSheet.create({
-  container: {
-    backgroundColor: focus ? 'white' : 'transparent',    
-    // borderTopColor: colors.darkBg,
-    // borderTopWidth: 1,
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    
-    paddingLeft: 32,
-    paddingRight: 16,
-    paddingVertical: 12,
-  },
-  
-});
-
 const flatlist = StyleSheet.create({
   container: {
     flex: 1,
@@ -113,16 +100,20 @@ function headerRight() {
   )
 }
 
-function create() {
-  setMessages([...messages, {type: 'user', body: creating}]);
-  setCreating('');
+function create(text) {
+  console.log('create t', text);
+  if (!text.trim().length) {
+    return;
+  }
+  messages.unshift( {id: messages.length+3, type: 'system', body: text}, {id: messages.length+2, type: 'user', body: text});
+  setMessages([...messages]);  
 }
 
 function onChange() {}
 
   return (
-    <View style={{flex: 1}}>
-      {DrawerScreen(title, true, headerRight)}
+    <View style={styles.View}>
+      {DrawerScreen(title, headerRight)}
       <View style={flatlist.container}>
         <FlatList
           
@@ -133,9 +124,11 @@ function onChange() {}
           // ListHeaderComponent={ListHeaderComponent}          
         />   
       </View>
-      <ActionBar />
-      
-      
+
+      <View style={styles.footer}>
+        <Input onSubmit={create} placeholder='Create New Message'/> 
+        <Talk />
+      </View>
     </View>
   )
 }

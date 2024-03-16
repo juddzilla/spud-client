@@ -15,22 +15,57 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { BaseButton } from 'react-native-gesture-handler';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
-import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
+import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-
+import  { useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
-import Icon, { sorting } from '../icons';
-import ActionBar from '../actions/Input';
+import Icon from '../icons';
 
 import colors from '../colors';
 import Styles from '../styles';
 
+import Sort from '../filtering/Sort';
+import Search from '../filtering/Search';
+
+import Talk from '../actions/Talk';
+import Input from '../actions/Input';
+
+function sortByUpdated(direction) {
+  return function(a, b) {
+    const dateAWithoutOffset = a.updated.replace(/-\d{2}$/, '');
+    const dateBWithoutOffset = b.updated.replace(/-\d{2}$/, '');        
+    const dateA = new Date(dateAWithoutOffset);        
+    const dateB = new Date(dateBWithoutOffset);
+    
+    if (direction === 'asc') {
+        return dateA - dateB;
+    } else if (direction === 'desc') {
+        return dateB - dateA;
+    }
+  };
+}
+
+function sortByIndex(direction) {
+  return function(a, b) {
+      if (direction === 'asc') {
+          return a.index - b.index;
+      } else if (direction === 'desc') {
+          return b.index - a.index;
+      }
+  };
+}
+
+
 export default function List() {
   // id or new
   // 
+  const glob = useGlobalSearchParams();
+  const local = useLocalSearchParams();
+
+  // console.log("Local:", local.user, "Global:", glob);
   
   let initialList = [];
   const sortOn = ['order', 'updated'];
@@ -56,19 +91,27 @@ export default function List() {
   }, [showOptions, setAction]);
 
   useEffect(() => {
+    const sortMap = {
+      order: sortByIndex,
+      updated: sortByUpdated
+    };
+
     let items = initialListItems;
     
     if (filter.trim().length) {
       items = items.filter(item => item.body.toLowerCase().includes(filter.toLowerCase()));      
     }
-    setListItems(items);
-  }, [filter, setFilter])
+    items = items.sort(sortMap[sort.property](sort.direction));
+    
+    setListItems([...items]);
+
+
+  }, [filter, sort, initialListItems, setListItems]);
 
   useEffect(() => {
     Fetch.get('list')
-    .then(res => {      
+    .then(res => {            
       setInitialListItems(res.children);
-      setListItems(res.children);
       setTitle(res.title);
     })
     .catch(err => { console.warn('List Error', err)});
@@ -94,7 +137,24 @@ export default function List() {
   function update(index, text) {
     const newListItems = [...listItems];
     newListItems[index].body = text;
-    setListItems(newListItems)
+    setInitialListItems(newListItems)
+  }
+
+  function onSortUpdate({ sortProperty, sortDirection }) {
+    setSort({direction: sortDirection, property: sortProperty});    
+  }
+
+  function onFilterUpdate({search}) {
+    setFilter(search);
+  }
+
+  function onDragEnd({data}) {
+    const reordered = data.map((item, index) => {
+      item.index = index;
+      return item;
+    });
+
+    setInitialListItems(reordered);
   }
 
   function updateTitle() {
@@ -106,7 +166,14 @@ export default function List() {
     if (!text.trim().length) {
       return;
     }
-    setListItems([...listItems, { id: `ss23w2323${listItems.length}`, body: text.trim(), updated: `34534535${listItems.length}`}])    
+    setInitialListItems([
+      ...listItems, 
+      { 
+        id: `ss23w2323${listItems.length}`, 
+        index: listItems.length,
+        body: text.trim(), 
+        updated: `2024-02-20 07:37:27.06557${listItems.length}-08`,
+      }])    
   }
 
   const EmptyState = () => {
@@ -395,6 +462,7 @@ export default function List() {
   };
 
   const ListItem = useCallback(({ drag, isActive, item}) => {    
+    const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
     const styled = StyleSheet.create({
       container: {
         backgroundColor: item.completed ? '#f8fafc' : 'white',        
@@ -438,161 +506,96 @@ export default function List() {
         position: 'relative', 
         top: 3
       }
-  });
+    });
 
-  const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
+    const RenderRightActions = () => {    
+      const { percentOpen } = useSwipeableItemParams();
+      const animStyle = useAnimatedStyle(
+        () => ({
+          opacity: percentOpen.value,
+        }),
+        [percentOpen]
+      );
 
-  const RenderRightActions = () => {    
-    const { percentOpen } = useSwipeableItemParams();
-    const animStyle = useAnimatedStyle(
-      () => ({
-        opacity: percentOpen.value,
-      }),
-      [percentOpen]
-    );
-
-    return (
-      <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { remove([item.id]) }}>
-        <Animated.View
-          style={{            
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 60,
-            flex: 1,
-            ...animStyle,
-          }}>            
-          <Icon name='trash' styles={{transform: [{ translateX: -16 }]}} />
-        </Animated.View>
-      </BaseButton>
-    );
-  };
-
-  return (
-    <ScaleDecorator>
-      <SwipeableItem
-        key={item.id}
-        item={item}
-        renderUnderlayLeft={() => <RenderRightActions drag={drag}/>}
-        snapPointsLeft={[48]}
-        overSwipe={20}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onLongPress={drag}
-          disabled={isActive}          
-        >
-          <View style={styled.container}>            
-            <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id})}>
-              <Icon name={iconName} styles={styled.icon} />
-            </Pressable>
-            <View style={styled.body}>
-              {
-                item.completed ? (
-                  <Light style={styled.text}>{item.body}</Light>
-                ) : (
-                  <TextInput              
-                    multiline={true}
-                    onChangeText={(text) => update(index, text)}
-                    style={styled.input}
-                  >{ item.body }</TextInput>
-                )
-              }
-            </View>
-          </View>
-        </TouchableOpacity>        
-      </SwipeableItem>
-    </ScaleDecorator>
-    )
-  });
-
-  const Sort = () => {
-    const sortIcon = (property) => {
-      const active = sort.property === property;
-      
-      let color = colors.sort.inactive;
-      let name = sorting[property].inactive
-      let size = 22;
-      
-      if (active) {
-        color = colors.sort.active;
-        name = sort.direction === 'asc' ? sorting[property].asc : sorting[property].desc;
-        size = 24;
-      }
-  
-      return { color, name, size };
+      return (
+        <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { remove([item.id]) }}>
+          <Animated.View
+            style={{            
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 60,
+              flex: 1,
+              ...animStyle,
+            }}>            
+            <Icon name='trash' styles={{transform: [{ translateX: -16 }]}} />
+          </Animated.View>
+        </BaseButton>
+      );
     };
-  
-    function chooseSort(property) {
-      let direction = 'desc';
-      if (sort.property === property) {
-        direction = ['asc', 'desc'].filter(dir => dir !== sort.direction)[0];        
-      }
-      // setSort({ property, direction });
-      setSort({ property, direction });
-    }
- 
+
     return (
-      (
-          <View style={Styles.row}>
-              { sortOn.map(property => {
-              const properties = sortIcon(property);              
-              return (
-                  <Pressable
-                    key={property}
-                    onPress={() => chooseSort(property)}
-                    style={{ ...Styles.centered, ...Styles.buttons.icon }}
-                  >
-                    <Icon name={properties.name} styles={{size: properties.size, color: properties.color }} />
-                  </Pressable>
-              )
-              })}          
-          </View>          
-      )
+      <ScaleDecorator>
+        <SwipeableItem
+          key={item.id}
+          item={item}
+          renderUnderlayLeft={() => <RenderRightActions drag={drag}/>}
+          snapPointsLeft={[48]}
+          overSwipe={20}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onLongPress={drag}
+            disabled={isActive}          
+          >
+            <View style={styled.container}>            
+              <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id})}>
+                <Icon name={iconName} styles={styled.icon} />
+              </Pressable>
+              <View style={styled.body}>
+                {
+                  item.completed ? (
+                    <Light style={styled.text}>{item.body}</Light>
+                  ) : (
+                    <TextInput              
+                      multiline={true}
+                      onChangeText={(text) => update(index, text)}
+                      style={styled.input}
+                    >{ item.body }</TextInput>
+                  )
+                }
+              </View>
+            </View>
+          </TouchableOpacity>        
+        </SwipeableItem>
+      </ScaleDecorator>
     )
-  };
+  });
 
   return (
-    <>
-      <View style={Styles.View}>        
-        {DrawerScreen(title, true, HeaderRight)}    
+    <View style={Styles.View}>        
+        {DrawerScreen(title, HeaderRight)}    
         
-        <View style={Styles.header}>
-          <Sort />
-          <View style={Styles.header.input.container}>            
-            <TextInput
-              value={filter}
-              editable={listItems.length !== 0}
-              onChangeText={(text) => setFilter(text)} 
-              placeholder='Filter items'
-              style={{
-                ...Styles.inputs.size.small,
-                backgroundColor: colors.input.dark.backgroundColor,                
-                color: colors.input.dark.color,
-                paddingRight: 44,
-              }}
-            />         
-            <Icon name='search' styles={{ color: colors.input.dark.icon, position: 'absolute', left: 12, size: 14 }} /> 
-            { filter.length > 0 &&            
-              <Pressable
-                onPress={() => setFilter('')}
-                style={{position: 'absolute', right: 0, ...Styles.buttons.iconSmall, ...Styles.centered }}>
-                <Icon name='close' styles={{ color: colors.input.dark.icon, size: 14 }} /> 
-              </Pressable>
-            }
-          </View>
+        <View style={Styles.header}>           
+          <Sort fields={sortOn} query={sort} update={onSortUpdate} />
+          <Search placeholder={'Filter'} update={onFilterUpdate} />
+        </View>
+
+        <View style={{flex: 1}}>
+          <DraggableFlatList
+            activationDistance={20}           
+            data={listItems}
+            keyExtractor={item => item.id}   
+            ListEmptyComponent={<EmptyState />}
+            onDragEnd={onDragEnd}
+            renderItem={ListItem}
+            refreshing={true}
+          />
         </View>
         
-        <DraggableFlatList
-          activationDistance={20}           
-          data={listItems}
-          keyExtractor={item => item.id}   
-          ListEmptyComponent={<EmptyState />}
-          onDragEnd={({data}) => setListItems(data)}
-          renderItem={ListItem}
-        />
-
+        <View style={Styles.footer}>                  
+          <Input onSubmit={create} placeholder='Create New List Item'/>
+          <Talk />          
+        </View>       
       </View>
-      <ActionBar onSend={create} />           
-    </>
-  )
+  );
 }

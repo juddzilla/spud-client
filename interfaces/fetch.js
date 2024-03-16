@@ -222,15 +222,16 @@ const COLLECTION = {
 const CONVO = {
   id: '342342424',
   messages: [    
-    { id: '2w32r323', body: 'Can you clarify?', type: 'system', updated: 12324235},
-    { id: '23w2w323', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', type: 'user', updated: 12324237},
-    { id: '2w3g2323', body: 'Lssorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet mauris commodo quis imperdiet massa tincidunt. Porttitor leo a diam sollicitudin. Aliquam ut porttitor leo a diam. Elit eget gravida cum sociis natoque. Eget felis eget nunc lobortis mattis aliquam faucibus purus in. Nisl nisi scelerisque eu ultrices vitae auctor. Neque sodales ut etiam sit amet nisl. Dictumst quisque sagittis purus sit. Odio ut sem nulla pharetra diam sit. Iaculis eu non diam phasellus. Pretium fusce id velit ut tortor. Sit amet commodo nulla facilisi nullam vehicula. Eget nunc lobortis mattis aliquam faucibus purus in massa. Varius sit amet mattis vulputate enim nulla aliquet porttitor lacus. Eget nulla facilisi etiam dignissim diam quis. Nec sagittis aliquam malesuada bibendum arcu vitae. Scelerisque in dictum non consectetur a erat.', type: 'system', updated: 12324235},
-    { id: '23w27h323', body: 'MEssage 5', type: 'user', updated: 12324239},
-    { id: '2w3r232h3', body: `Yes, if you change the order of a ListItem, you would typically need to update the order field for all related ListItems accordingly to maintain the desired order.
+    { id: 5, body: 'Can you clarify?', type: 'system', updated: 12324235},
+    { id: 4, body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', type: 'user', updated: 12324237},
+    { id: 3, body: 'Lssorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet mauris commodo quis imperdiet massa tincidunt. Porttitor leo a diam sollicitudin. Aliquam ut porttitor leo a diam. Elit eget gravida cum sociis natoque. Eget felis eget nunc lobortis mattis aliquam faucibus purus in. Nisl nisi scelerisque eu ultrices vitae auctor. Neque sodales ut etiam sit amet nisl. Dictumst quisque sagittis purus sit. Odio ut sem nulla pharetra diam sit. Iaculis eu non diam phasellus. Pretium fusce id velit ut tortor. Sit amet commodo nulla facilisi nullam vehicula. Eget nunc lobortis mattis aliquam faucibus purus in massa. Varius sit amet mattis vulputate enim nulla aliquet porttitor lacus. Eget nulla facilisi etiam dignissim diam quis. Nec sagittis aliquam malesuada bibendum arcu vitae. Scelerisque in dictum non consectetur a erat.', type: 'system', updated: 12324235},
+    { id: 2, body: 'MEssage 5', type: 'user', updated: 12324239},
+    { id: 1, body: `Yes, if you change the order of a ListItem, you would typically need to update the order field for all related ListItems accordingly to maintain the desired order.
 
     However, to minimize the overhead of updating all related ListItems, you can implement logic to handle reordering efficiently. For example, if you want to move an item from one position to another, you can swap the order values of the two relevant ListItems rather than updating all items.
     
     Here's a simplified example of how you might implement such logic:`, type: 'system', updated: 12324238},
+    { id: 0, body: 'what the hell is going on?', type: 'user', updated: 12324238},
   ],
   title: 'Covo Title Goes Here',
   updated: 3423423424
@@ -246,9 +247,9 @@ const NOTE = {
 const LIST = {
   id: '342342424',
   children: [
-    { id: '232323', body: 'List Item 1', updated: '42423423', completed: true},
-    { id: '2w32323', body: 'List Item 2', updated: '4242424', completed: false},
-    { id: '23w2323', body: 'List Item 3', updated: '34534535', completed: false}
+    { id: '232323', index: 0, body: 'List Item 1', updated: '2024-01-20 07:37:27.065578-08', completed: true},
+    { id: '2w32323', index: 1, body: 'List Item 2', updated: '2024-01-21 10:38:27.065578-08', completed: false},
+    { id: '23w2323', index: 2, body: 'List Item 3', updated: '2024-01-24 15:37:27.065578-08', completed: false}
   ],
   title: 'List Title Goes Here',
   updated: 3423423424

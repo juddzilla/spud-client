@@ -4,22 +4,22 @@ import {
   View,
 } from 'react-native';
 
+import colors from '../colors';
+
 import Icon, { sorting } from '../icons';
 
-export default function Sort({ query, update }) {
-  const sortOn =['name', 'updated'];
-    
+export default function Sort({ fields, query, update }) {  
   const sortIcon = (property) => {        
-    const active = query.sortProperty === property;
-    const activeColor = '#000';
-    const inactiveColor = '#d4d4d8';
+    const active = query.property === property;
+    const activeColor = colors.sort.active;
+    const inactiveColor = colors.sort.inactive;
     let color = inactiveColor;
     let name = sorting[property].inactive;        
     let size = 22;
     
     if (active) {
       color = activeColor;
-      name = query.sortDirection === 'asc' ? sorting[property].asc : sorting[property].desc;
+      name = query.direction === 'asc' ? sorting[property].asc : sorting[property].desc;
       size = 24;
     }
 
@@ -28,8 +28,8 @@ export default function Sort({ query, update }) {
     
   function chooseSort(property) {
     let direction = 'desc';
-    if (query.sortProperty === property) {
-      direction = ['asc', 'desc'].filter(dir => dir !== query.sortDirection)[0];        
+    if (query.property === property) {
+      direction = ['asc', 'desc'].filter(dir => dir !== query.direction)[0];        
     }
     // setSort({ property, direction });
     update({ sortProperty: property, sortDirection: direction});
@@ -39,7 +39,7 @@ export default function Sort({ query, update }) {
   return (
     (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            { sortOn.map(property => {
+            { fields.map(property => {
             const properties = sortIcon(property);
             return (
                 <Pressable

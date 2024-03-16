@@ -32,26 +32,29 @@ import Light from '../text/Light';
 
 import styles from '../styles';
 
-export default function ListView(props) {
-  const placeholder = 'newnew';
-  const { defaultTitle, detail, nestingChildren, uri } = props.options;
+export default function ListView({options}) {
+  const {
+    actions,
+    defaultTitle,
+    detail,
+    filters,
+    nestingChildren,    
+    uri,
+   } = options;
   const local = useLocalSearchParams();
   
   const initialQuery = {
     page: 1,
     per: 20,
     search: '',
-    sortProperty: 'updated',
-    sortDirection: 'desc',
+    sortProperty: filters.sort.defaults.property,
+    sortDirection: filters.sort.defaults.direction,
   }
   const [endOfList, setEndOfList] = useState(false);
   const [list, setList] = useState([]);
   const [query, setQuery] = useState(initialQuery);
   
   const [selected, setSelected] = useState([]);
-  const [total, setTotal] = useState(null);
-  const [newName, setNewName] = useState('');
-  const [focus, setFocus] = useState(false);
 
   useEffect(() => {        
     getData(query);
@@ -107,7 +110,7 @@ export default function ListView(props) {
   }
 
   function update(params) {    
-    console.log('par', params);
+    // console.log('par', params);
     setQuery({...query, ...params});
   }
 
@@ -151,16 +154,12 @@ export default function ListView(props) {
 
     const styled = StyleSheet.create({
       pressable: {
-        backgroundColor: !selected.includes(item.id) ? 'white' : 'red',        
-        // paddingHorizontal: 4,
-        // paddingVertical: 8,
+        backgroundColor: 'white',
         marginVertical: 4,
-        marginHorizontal: 4,
-        // height: 44,
+        marginHorizontal: 4,        
         borderRadius: 8,
         flexDirection: 'row',
-        alignItems: 'center',     
-        // overflow: 'hidden',
+        alignItems: 'center', 
         
         shadowColor: colors.darkBg,
         shadowOffset: {
@@ -172,19 +171,14 @@ export default function ListView(props) {
         elevation: 24,
       },
       content: {
-        // alignItems: 'center',
         flexDirection: 'row', 
       },
       info: {
-        // flexDirection: 'row', 
-        // alignItems: 'center',
-        // paddingVertical: 12,
         paddingTop: 13,
         paddingBottom: 9,
       },
       icon: {
         container: {
-          // backgroundColor: colors.darkestBg,
           height: 44, 
           width:40, 
           marginRight: 0, 
@@ -259,10 +253,14 @@ export default function ListView(props) {
 
   return (
     <View style={styles.View}>
-      {DrawerScreen(defaultTitle, true, headerRight)}     
+      {DrawerScreen(defaultTitle)}     
       <View style={styles.header}>           
-        <Sort query={query} update={update} />
-        <Search placeholder={'Search'} update={update} />
+        <Sort
+          fields={filters.sort.fields}
+          query={{direction: query.sortDirection, property: query.sortProperty}} 
+          update={update}
+        />
+        <Search placeholder={filters.placeholder} update={update} />
       </View>
 
       <FlatList
@@ -275,8 +273,8 @@ export default function ListView(props) {
       /> 
 
       <View style={styles.footer}>                  
-          <Input onSubmit={create} placeholder={placeholder}/>
-          <Talk />          
+        <Input onSubmit={create} placeholder={actions.placeholder}/>
+        <Talk />          
       </View>
     </View>
   );

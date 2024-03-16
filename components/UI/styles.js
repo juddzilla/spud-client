@@ -46,19 +46,20 @@ const inputs = {
 const View = { flex: 1 };
 
 const footer = {
-    backgroundColor: 'transparent',
-    flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'space-between', 
-    borderTopWidth: 1,
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingVertical: 10,                
+    backgroundColor: 'transparent',
     borderColor: colors.darkBg,
     borderLeftWidth: 1,
-    borderWidth: 1,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
+    borderTopWidth: 1,
+    borderWidth: 1,
+    flexDirection: 'row', 
+    height: 72,
+    justifyContent: 'flex-end', 
+    paddingLeft: 16,
+    paddingRight: 16,
+    // paddingVertical: 10,                
 };
 
 export default {

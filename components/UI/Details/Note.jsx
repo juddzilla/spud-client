@@ -13,14 +13,17 @@ import Icon from '../icons';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 
-import ActionBar from '../actions/Input';
+import Input from '../../UI/actions/Input';
+import Talk from '../../UI/actions/Talk';
+
+import styles from '../styles';
 
 export default function Note() {
   const [title, setTitle] = useState('List');
   const [note, setNote] = useState('');
   const [showOptions, setShowOptions] = useState(false);
 
-  const styles = StyleSheet.create({
+  const styled = StyleSheet.create({
     centeredView: {
       flex: 1,
       justifyContent: 'center',
@@ -94,14 +97,14 @@ export default function Note() {
             
             setShowOptions(!showOptions);
           }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>              
-              <Bold style={styles.modalText}>Delete</Bold>
-              <Bold style={styles.modalText}>Rename</Bold>
+          <View style={styled.centeredView}>
+            <View style={styled.modalView}>              
+              <Bold style={styled.modalText}>Delete</Bold>
+              <Bold style={styled.modalText}>Rename</Bold>
               <Pressable
-                style={[styles.button, styles.buttonClose]}
+                style={[styled.button, styled.buttonClose]}
                 onPress={() => setShowOptions(!showOptions)}>
-                <Bold style={styles.textStyle}>Hide Modal</Bold>
+                <Bold style={styled.textStyle}>Hide Modal</Bold>
               </Pressable>
             </View>
           </View>
@@ -114,28 +117,33 @@ export default function Note() {
   }
   
   return (
-    <View style={{ flex: 1}}>
+    <View style={styles.View}>
       
-      {DrawerScreen(title, true, headerRight)}
-      <View style={styles.date.container}>
-        <Light style={styles.date.body}>Last Updated: Today, 12:34pm</Light>
+      {DrawerScreen(title, headerRight)}
+      <View style={styled.date.container}>
+        <Light style={styled.date.body}>Last Updated: Today, 12:34pm</Light>
       </View>
-      <TextInput
-        style={{
-          flex: 1,
-          margin: 12,
-          padding: 10,
-          flexWrap: 'wrap',
-          fontSize: 20,
-          fontFamily: 'Inter-Regular',
-        }}
-        onChangeText={(text) => setNote(text)}
-        value={note}
-        placeholder="type here"
-        editable={true}
-        multiline={true}
-      />
-      <ActionBar hideInput={true}/>
+      <View style={{flex: 1}}>
+        <TextInput
+          style={{
+            // flex: 1,
+            margin: 12,
+            padding: 10,
+            flexWrap: 'wrap',
+            fontSize: 20,
+            fontFamily: 'Inter-Regular',
+          }}
+          onChangeText={(text) => setNote(text)}
+          value={note}
+          placeholder="type here"
+          editable={true}
+          multiline={true}
+        />
+      </View>
+      <View style={styles.footer}>
+        {/* <Input create={() => {}} placeholder='' /> */}
+        <Talk />
+      </View>
     </View>
   )
 }
