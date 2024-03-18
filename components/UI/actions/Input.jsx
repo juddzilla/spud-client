@@ -6,8 +6,6 @@ import Bold from '../text/Bold';
 
 import CustomModal from './Modal';
 
-import styles from '../styles';
-
 // import TalkButton from './Talk';
 
 export default function Input({ onSubmit, placeholder, hideModal }) {
@@ -98,12 +96,13 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
         },
         modal: {
             container: {
-                backgroundColor: 'red', 
                 flex: 1,
-                ...styles.centered
+                paddingTop: 100,
+                paddingHorizontal: 16,
             },
             content: {
-
+                fontSize: 36, 
+                textAlign: 'center',
             }
         }
       });
@@ -115,7 +114,7 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
                 toggleShow={toggleModal}
             >
                 <View style={styled.modal.container}>
-                    <Bold>Creating {message}</Bold>
+                    <Bold style={styled.modal.content}>Creating {message}</Bold>
                 </View>
 
             </CustomModal>
