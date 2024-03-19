@@ -38,9 +38,9 @@
             "./assets/fonts/Inter-Regular.otf"
           ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   },
   "scheme": "spud"
-
 }

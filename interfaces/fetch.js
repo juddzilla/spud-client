@@ -1,3 +1,4 @@
+import environment from "./environment";
 // send any combo of text + audio + image
 
 const CONVOS = [
@@ -255,26 +256,93 @@ const LIST = {
   updated: 3423423424
 };
 
-const Fetch = {
-    get: async (url) => { 
-      // console.log('URL', url);
-        const dataMap = {
-          convos: { results: CONVOS, totalResultsCount: 23 },
-          collections: { results: COLLECTIONS, totalResultsCount: COLLECTIONS.length },
-          lists: { results: LISTS, totalResultsCount: LISTS.length },
-          notes: { results: NOTES, totalResultsCount: NOTES.length },
-          collection: { results: COLLECTION, totalResultsCount: COLLECTION.children.length },
-          convo: CONVO,
-          list: LIST,
-          note: NOTE,
-        };
-        // console.log('dataMap[url]', dataMap[url]);
+// const Fetch = {
+//     get: async (url) => { 
+//       // console.log('URL', url);
+//         const dataMap = {
+//           convos: { results: CONVOS, totalResultsCount: 23 },
+//           collections: { results: COLLECTIONS, totalResultsCount: COLLECTIONS.length },
+//           lists: { results: LISTS, totalResultsCount: LISTS.length },
+//           notes: { results: NOTES, totalResultsCount: NOTES.length },
+//           collection: { results: COLLECTION, totalResultsCount: COLLECTION.children.length },
+//           convo: CONVO,
+//           list: LIST,
+//           note: NOTE,
+//         };
+//         // console.log('dataMap[url]', dataMap[url]);
 
-        if (dataMap[url]) {
-          return dataMap[url];
-        }
-        return { results: [], totalResultsCount: 0 };
-    }
-};
+//         if (dataMap[url]) {
+//           return dataMap[url];
+//         }
+//         return { results: [], totalResultsCount: 0 };
+//     }
+// };
 
-export default Fetch;
+// export default Fetch;
+
+
+class Fetch {
+  constructor() {
+      this.api = environment.apiHost;
+  }
+
+  // getCSRFToken() {
+  //     var cookieValue = null;
+  //     if (document.cookie && document.cookie !== '') {
+  //         var cookies = document.cookie.split(';');
+  //         for (var i = 0; i < cookies.length; i++) {
+  //             var cookie = cookies[i].trim();
+  //             if (cookie.substring(0, 10) === ('csrftoken=')) {
+  //                 cookieValue = decodeURIComponent(cookie.substring(10));
+  //                 break;
+  //             }
+  //         }
+  //     }
+  //     return cookieValue;
+  // }
+
+
+  async get(url) {
+      return fetch(`${this.api}/${url}`, 
+          { 
+              credentials: 'include',
+              mode: 'cors', // no-cors, cors, *same-origin
+              // 'X-CSRFToken': this.getCSRFToken(),
+          }
+      )
+      .then(async (res) => {            
+          if ([400, 401, 403, 404, 420].includes(res.status)) {
+              return [{ error: 'Not Authorized', statusCode: res.status }, null];
+          }
+          return [null, await res.json()];
+      })   
+      .catch(err => {
+          console.log('FETCH GET ERR', err);
+          return [{ error: err }, null];
+      });
+  }
+
+  async post(url, data) {        
+      return fetch(`${this.api}/${url}`, 
+          { 
+              body: JSON.stringify(data),
+              credentials: 'include',
+              headers: {
+                  "Content-Type": "application/json",
+                  // 'X-CSRFToken': this.getCSRFToken(),
+              },
+              method: 'POST',
+          }
+      )
+      .then(res => res.json())        
+      .then(res => [null, res])
+      .catch(err => {
+          console.log('FETCH POST ERR', err);
+          return [err, null];
+      });
+  }
+}
+
+const fetcher = new Fetch();
+
+export default fetcher;

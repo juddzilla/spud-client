@@ -1,5 +1,19 @@
-import { Redirect } from 'expo-router';
+import { View } from 'react-native';
+import { Redirect, Stack } from 'expo-router';
 
-export default function OnLoad() {
-  return <Redirect href={"/(drawer)/home"} />;
+import Bold from '../components/UI/text/Bold';
+
+export default function Index() {
+  
+  return (
+    <View style={{ backgroundColor: 'transparent', flex: 1 }}>    
+      { true ? (
+        <Redirect href={"/login"} />
+      ) : (
+        <View><Bold>Juddhhhh</Bold></View>
+      )      
+      }
+    </View>
+  )
+  // return <Redirect href={"/(drawer)/home"} />;
 }
