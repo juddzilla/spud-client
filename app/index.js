@@ -1,16 +1,18 @@
 import { View } from 'react-native';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect } from 'expo-router';
+import { useSession } from './_layout';
 
 import Bold from '../components/UI/text/Bold';
 
 export default function Index() {
+  const { session } = useSession();  
   
   return (
-    <View style={{ backgroundColor: 'transparent', flex: 1 }}>    
-      { true ? (
+    <View >    
+      { !session ? (
         <Redirect href={"/login"} />
       ) : (
-        <View><Bold>Juddhhhh</Bold></View>
+        <Redirect href={"/(drawer)/home"} />
       )      
       }
     </View>

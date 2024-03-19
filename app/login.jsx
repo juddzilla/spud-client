@@ -1,7 +1,18 @@
 import React from "react";
-
-import { View, Text } from 'react-native';
-
+import { router } from 'expo-router';
+import { View, Pressable, Text } from 'react-native';
+import Bold from "../components/UI/text/Bold";
+import { useSession } from './_layout';
 export default function Login() {
-    return (<View style={{backgroundColor: 'red', flex: 1, height: '100%'}}><Text>Login</Text></View>)
+    const { signIn } = useSession();
+    return (
+    <View style={{backgroundColor: 'blue', height: '100%'}}>
+        <Pressable onPress={() => {
+            signIn();
+            router.replace('/');
+        }}>
+
+            <Bold>Login</Bold>
+        </Pressable>
+    </View>)
 }
