@@ -55,29 +55,37 @@ export default function ListView({options}) {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [list, setList] = useState([]);
   const [query, setQuery] = useState(initialQuery);
+  const [total, setTotal] = useState(null);
 
-  useEffect(() => {        
-    getData();
-  }, [endOfList, query]);
+  // useEffect(() => {        
+  //   getData();
+  //   console.log('q', query);
+  // }, [endOfList, query]);
 
-  function getData() {          
-    // console.log('getData', query);  
-    // TODO remove settimeout  
-      setTimeout(() => {
-        if (!endOfList) {
-          Fetch.get(uri, query)
-          .then(({ results, totalResultsCount }) => { 
-            setInitialLoadComplete(true);
-            const newList = Array.isArray(results) ? results : results.children; 
-            if (newList.length < query.per) {
-              setEndOfList(true);
-            }
-            setList(newList);
-            setTotal(totalResultsCount);
-          })
-          .catch(err => {})
+  useEffect(() => {           
+    // TODO remove setTimeout
+    setTimeout(() => {
+      getData();
+    }, 3000);
+  }, []);
+
+  function getData() {              
+    // if (!endOfList) {
+    if (true) {
+      Fetch.get(uri, query)
+      .then(([err, res]) => { 
+        console.log('results', res);
+        setInitialLoadComplete(true);
+
+        
+        if (res.results.length < query.per) {
+          setEndOfList(true);
         }
-      }, 3000);
+        setList(res.results);
+        setTotal(res.total);
+      })
+      .catch(err => { console.warn(`List ${uri} error: ${err}`)})
+    }      
   }
 
   function remove(ids) {
@@ -86,8 +94,15 @@ export default function ListView({options}) {
     setList(newList);
   }
 
-  function create(title) {
-    router.push(`${detail}/create?title=${title}`);
+  async function create(title) {
+    const request = await Fetch.post(uri, { title });
+    const [err, res] = request;
+    if (err) {
+      console.warn(`Host Error - POST ${uri} - ${JSON.stringify(err)}`)
+    } else if (res) {
+      console.log('results', res);
+    }
+    // router.push(`${detail}/create?title=${title}`);
   }
 
   function onTalk() {
@@ -298,7 +313,12 @@ export default function ListView({options}) {
         refreshing={false}
       /> 
 
-      <View style={styles.footer}>                  
+      <View style={styles.footer}>  
+        <View style={{height: 50, backgroundColor: 'red'}}>
+          <Pressable onPress={getData}>
+            <Bold>GD</Bold>
+          </Pressable>
+        </View>
         <Input onSubmit={create} placeholder={actions.placeholder}/>
         <Talk />          
       </View>

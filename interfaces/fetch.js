@@ -311,9 +311,11 @@ class Fetch {
           }
       )
       .then(async (res) => {            
+        console.log('GET', res);
           if ([400, 401, 403, 404, 420].includes(res.status)) {
               return [{ error: 'Not Authorized', statusCode: res.status }, null];
           }
+          // console.log("res.json()", res.json());
           return [null, await res.json()];
       })   
       .catch(err => {
@@ -334,8 +336,14 @@ class Fetch {
               method: 'POST',
           }
       )
-      .then(res => res.json())        
-      .then(res => [null, res])
+      .then(async (res) => {      
+        console.log('POST', res);      
+        if ([400, 401, 403, 404, 420].includes(res.statusCode)) {
+            return [{ error: 'Not Authorized', statusCode: res.statusCode }, null];
+        }
+        // console.log("res.json()", res.json());
+        return [null, await res.json()];
+    })  
       .catch(err => {
           console.log('FETCH POST ERR', err);
           return [err, null];

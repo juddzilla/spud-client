@@ -15,7 +15,7 @@ export default function Lists() {
         fields: ['name', 'updated'],
       },
     },
-    uri: 'lists',
+    uri: 'lists/',
   };
 
   return (<ListView options={{...options}} />);
