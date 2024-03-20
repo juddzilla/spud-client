@@ -9,15 +9,14 @@
 //
 
 import { useEffect, useState, useCallback } from 'react';
-import { Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { Pressable, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
 
 import { BaseButton } from 'react-native-gesture-handler';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import  { router, useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
+import  { router, useLocalSearchParams } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
@@ -35,49 +34,19 @@ import Input from '../actions/Input';
 
 import Options from '../actions/Options';
 
-function sortByUpdated(direction) {
-  return function(a, b) {
-    const dateAWithoutOffset = a.updated.replace(/-\d{2}$/, '');
-    const dateBWithoutOffset = b.updated.replace(/-\d{2}$/, '');        
-    const dateA = new Date(dateAWithoutOffset);        
-    const dateB = new Date(dateBWithoutOffset);
-    
-    if (direction === 'asc') {
-        return dateA - dateB;
-    } else if (direction === 'desc') {
-        return dateB - dateA;
-    }
-  };
-}
-
-function sortByIndex(direction) {
-  return function(a, b) {
-      if (direction === 'asc') {
-          return a.index - b.index;
-      } else if (direction === 'desc') {
-          return b.index - a.index;
-      }
-  };
-}
-
-
 export default function List() {
-  // id or new
-  // 
-  const glob = useGlobalSearchParams();
   const local = useLocalSearchParams();
-
-  // console.log("Local:", local, "Global:", glob.params);
 
   const initialTitle = local.title ? local.title : 'List';
   
   let initialList = [];
-  const sortOn = ['order', 'updated'];
+  const sortOn = ['order', 'updated_at'];
   const [title, setTitle] = useState(initialTitle);
   const [newTitle, setNewTitle] = useState(initialTitle);  
   const [initialListItems, setInitialListItems] = useState(initialList);
   const [listItems, setListItems] = useState(initialList);
   const [filter, setFilter] = useState('');
+  const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState({ property: 'order', direction: 'desc' });
 
   const [showOptions, setShowOptions] = useState(false);
@@ -95,49 +64,74 @@ export default function List() {
   }, [showOptions, setAction]);
 
   useEffect(() => {
-    const sortMap = {
-      order: sortByIndex,
-      updated: sortByUpdated
-    };
-
-    let items = initialListItems;
-    
-    if (filter.trim().length) {
-      items = items.filter(item => item.body.toLowerCase().includes(filter.toLowerCase()));      
-    }
-    items = items.sort(sortMap[sort.property](sort.direction));
-    
-    setListItems([...items]);
-
-
-  }, [filter, sort, initialListItems, setListItems]);
+    getData();
+  }, [sort, filter, showCompleted]);
 
   useEffect(() => {
     if (local.slug) {
-      // console.log('local', local.slug);
-      Fetch.get('list')
-      .then(res => {            
-        setInitialListItems(res.children);
-        // setTitle(res.title);
-      })
-      .catch(err => { console.warn('List Error', err)});
+      getData();
     }
   }, []);
 
-  function toggleCompleted({id}) {        
-      const newListItems = initialListItems.map(li => {
-        if (li.id === id) {
-          li.completed = !li.completed;
-        }
-        return li;
-      });
-      setListItems(newListItems);
+  function getData() {
+    if (!local.slug) {
+      return;
+    }
+    const uri = `lists/${local.slug}/`;
+    Fetch.get(uri, {
+      search: filter,
+      sortDirection: sort.direction,
+      sortProperty: sort.property,
+      showCompleted,
+    })
+      .then(res => {            
+        const [err, list] = res;
+        setListItems(list.children);        
+      })
+      .catch(err => { console.warn('List Error', err)});
+  }
+
+  function updateItem(id, data) {
+    const uri = `lists/${local.slug}/item/${id}/`;
+    Fetch.put(uri, data)
+      .then(res => {            
+        const [err, item] = res;
+        const itemIndex = listItems.findIndex(listItem => item.id === listItem.id);
+        const newListItems = [...listItems];
+        newListItems[itemIndex] = item;
+        setListItems([...newListItems]);
+      })
+      .catch(err => {
+        console.warn('updateItem err', err);
+      })
+  }
+
+  function toggleCompleted({id, completed}) {   
+      updateItem(id, { completed: !completed});
+  }
+
+  function toggleShowCompleted() {
+    if (showCompleted === null) {
+      setShowCompleted(true);
+    } else if (showCompleted === true) {
+      setShowCompleted(false);
+    } else {
+      setShowCompleted(null);
+    }
   }
 
   function removeItem(id) {
-    // make api request, onsuccess
-    const newList = initialListItems.filter(i => i.id !== id);
-    setListItems(newList);    
+    const uri = `lists/${local.slug}/items/${id}/`;
+    Fetch.remove(uri)
+      .then(res => {             
+        const [err, item] = res;
+        if (!err) {
+          getData();
+        }
+      })
+      .catch(err => {
+        console.warn('updateItem err', err);
+      });    
   }
 
   function removeList() {
@@ -148,11 +142,13 @@ export default function List() {
   function update(index, text) {
     const newListItems = [...initialListItems];
     newListItems[index].body = text;
-    setInitialListItems(newListItems)
+    setListItems(newListItems)
   }
 
+  
   function onSortUpdate({ sortProperty, sortDirection }) {
-    setSort({direction: sortDirection, property: sortProperty});    
+    const newSort = {direction: sortDirection, property: sortProperty};
+    setSort(newSort);      
   }
 
   function onFilterUpdate({search}) {
@@ -160,12 +156,34 @@ export default function List() {
   }
 
   function onDragEnd({data}) {
-    const reordered = data.map((item, index) => {
-      item.index = index;
-      return item;
-    });
+    // const reordered = data.map((item, index) => {
+    //   item.order = index;
+    //   return item;
+    // });
 
-    setInitialListItems(reordered);
+    const reordered = data.reduce((acc, cur, index) => {
+      cur.order = index;
+      acc.items.push(cur);
+      acc.ids.push(cur.id);
+      return acc;
+    }, { items: [], ids: []});
+
+    setListItems(reordered.items);
+
+    const uri = `lists/${local.slug}/items/`;
+    const reqData = {
+      order: reordered.ids,
+    };
+    
+    Fetch.put(uri, reqData)
+    .then(res => {                  
+      const [err, items] = res;
+
+      if (!err) {
+        setListItems(items.results);
+      }
+    })
+    .catch(err => { console.warn('List Error', err)});
   }
 
   function updateTitle() {
@@ -177,20 +195,27 @@ export default function List() {
     if (!text.trim().length) {
       return;
     }
-    setInitialListItems([
-      ...initialListItems, 
-      { 
-        id: `ss23w2323${initialListItems.length}`, 
-        index: initialListItems.length,
-        body: text.trim(), 
-        updated: `2024-02-20 07:37:27.06557${initialListItems.length}-08`,
-      }])    
+    const uri = `lists/${local.slug}/`;
+    const data = {
+      body: text.trim(), 
+      order: listItems.length,
+    };
+    
+    Fetch.post(uri, data)
+    .then(res => {            
+      const [err, item] = res;
+      
+      if (!err) {
+        getData();
+      }
+    })
+    .catch(err => { console.warn('List Error', err)});    
   }
 
   const EmptyState = () => {
     return (
       <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>
-        { initialListItems.length !== 0 ? (
+        { listItems.length !== 0 ? (
           <View style={{...Styles.row}}>
             <Light style={{marginRight: 2}}>No list items containing</Light>
             <Bold>"{filter}"</Bold>
@@ -203,275 +228,6 @@ export default function List() {
       </View>
     )
   }
-
-  const HeaderRight = () => {
-    const styles = StyleSheet.create({
-      background: {
-        flex: 1,
-        backgroundColor: 'rgba(255,255,255,0.4)',
-      },    
-      confirmation: {
-        container: {
-          flex: 1, 
-          alignItems: 'center',
-          padding: 16,
-        },
-        content: {
-          backgroundColor: colors.white,
-          padding: 16,          
-          borderRadius: 8,
-          shadowColor: colors.darkestBg,
-          shadowOffset: {
-            width: 0,
-            height: 5,
-          },
-          shadowOpacity: 0.2,
-          shadowRadius: 6.27,
-          elevation: 10,
-          width: '100%',
-          option: {
-            alignItems: 'center',            
-            child: {
-              marginBottom: 12,
-            },
-            body: {
-              flexDirection: 'row', 
-              flexWrap: 'wrap',
-              textAlign: 'center',
-              marginBottom: 16,
-            }
-          },
-        },
-        button: {
-          ...Styles.centered,
-          // paddingHorizontal: 16,
-          // paddingVertical: 8,
-          borderWidth: 1,          
-          borderRadius: 8,
-          marginBottom: 8,
-          height: 44,
-          ...Styles.centered
-        },
-        actions : {
-          cancel: {
-            backgroundColor: colors.black,     
-            borderColor: colors.black,        
-          },
-          remove: {            
-            backgroundColor: colors.remove,     
-            borderColor: colors.remove,        
-          },
-        }
-      },
-      options: {
-        display: action === '' ? 'flex' : 'none',
-        close: {
-          ...Styles.centered,
-          backgroundColor: colors.white,
-          height: 48,
-          paddingRight: 16,
-          paddingTop: 4,
-        },
-        container: {
-          alignItems: 'flex-end',           
-          backgroundColor: 'rgba(255,255,255,0.4)',
-          paddingTop: getStatusBarHeight() + 35, 
-        },
-        option: {
-          ...Styles.row, 
-          flexDirection: 'row-reverse', 
-          // backgroundColor: 'white', 
-          paddingLeft: 4, 
-          paddingRight: 16,
-          paddingVertical: 8, 
-          borderRadius: 4,
-          marginBottom: 4,
-          overflow: 'hidden',
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 2,
-          elevation: 5,
-          icon : {
-            container: {
-              ...Styles.buttons.icon, 
-              ...Styles.centered, 
-              backgroundColor: colors.black, 
-              borderRadius: 999, 
-              marginLeft: 16,
-            },
-            image: {
-              color: colors.white,
-            }
-          },
-          text: {
-            container: {
-              backgroundColor: colors.white,
-              padding: 8,
-              paddingHorizontal: 16,
-              borderRadius: 8,
-            },
-            text: {
-              fontSize: 16,
-            },
-          },
-        },
-      },
-    });
-
-    const actions = [
-      {        
-        display: 'Delete',
-        icon: 'trash',
-      },
-      {        
-        display: 'Rename',
-        icon: 'pencil',
-      },
-      // {
-      //   display: 'Add To Collection',
-      //   icon: 'plus',
-      //   onPress: () => {}
-      // },
-    ];
-
-    return (
-      <View>        
-        <Modal
-          transparent={true}
-          visible={showOptions}
-          onRequestClose={() => setShowOptions(!showOptions)}
-        >
-            <View style={styles.background}>
-              <View style={styles.options.container}>
-                <Pressable
-                    style={styles.options.close}
-                    onPress={() => setShowOptions(!showOptions)}>
-                  <Icon name='close' />
-                </Pressable>
-                
-                <View style={styles.options}> 
-                  { actions.map(action => {
-                    return (
-                      <Pressable key={action.icon} onPress={() => setAction(action.icon)}>
-                        <View style={styles.options.option}>
-                          <View style={styles.options.option.icon.container}>
-                            <Icon name={action.icon} styles={styles.options.option.icon.image} />
-                          </View>
-                          <View style={styles.options.option.text.container}>
-                            <Bold style={styles.options.option.text.text}>{action.display}</Bold>
-                          </View>
-                        </View>                
-                      </Pressable>         
-                    )
-                  })}                                                          
-                </View>
-              </View>
-
-              <View style={styles.confirmation.container}>
-                {
-                  action === 'trash' &&
-                  <View style={styles.confirmation.content}>
-                    <View style={styles.confirmation.content.option}>
-                      <View style={{...Styles.centered, ...Styles.buttons.icon, backgroundColor: colors.remove, borderRadius: 999, ...styles.confirmation.content.option.child}}>
-                        <Icon name='trash' styles={{color: colors.white}} />
-                      </View>
-                      <Bold style={styles.confirmation.content.option.child}>Confirmation Required</Bold>
-                      <View style={{ ...styles.confirmation.content.option.child, ...styles.confirmation.content.option.body}}>
-                        <Light style={{textAlign: 'center'}}>Are you certain you want to delete this List? This action cannot be reversed.</Light>                                            
-                      </View>
-                      <View style={{width: '100%'}}>
-                        <Pressable style={{ ...styles.confirmation.actions.remove, ...styles.confirmation.button}}>
-                          <Bold style={{color: colors.white}}>Delete</Bold>
-                        </Pressable>
-                        <Pressable style={styles.confirmation.button} onPress={() => setAction('')}>
-                          <Bold>Cancel</Bold>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </View>
-                }
-                
-                {
-                  action === 'pencil' &&
-                  <View style={styles.confirmation.content}>
-                    <View style={{...styles.confirmation.content.option, width: '100%'}}>
-                      <View style={{...Styles.centered, ...Styles.buttons.icon, backgroundColor: colors.black, borderRadius: 999, ...styles.confirmation.content.option.child}}>
-                        <Icon name='pencil' styles={{color: colors.white}}/>
-                      </View>
-                      <Bold style={styles.confirmation.content.option.child}>Change Title</Bold>
-                      <View style={{ ...styles.confirmation.content.option.child, ...styles.confirmation.content.option.body}}>
-                        <Light style={{textAlign: 'center'}}>What would you like to rename this List to?</Light>                      
-                      </View>
-                      <TextInput
-                        value={newTitle}
-                        onChangeText={(text) => setNewTitle(text)}
-                        style={{
-                          textAlign: 'center',
-                          ...styles.confirmation.content.option.child, 
-                          borderWidth: 1, 
-                          borderColor: colors.darkBg,
-                          width: '100%',
-                          height: 44,
-                          borderRadius: 8,
-                          marginBottom: 16,
-                          fontFamily: 'Inter-Bold',                        
-                        }}
-                      />
-                      <View style={{width: '100%'}}>
-                        <Pressable
-                          onPress={updateTitle}
-                          style={{ ...styles.confirmation.actions.cancel, ...styles.confirmation.button}}
-                        >
-                          <Bold style={{color: colors.white}}>Save</Bold>
-                        </Pressable>                        
-                        <Pressable style={styles.confirmation.button} onPress={() => setAction('')}>
-                          <Bold>Cancel</Bold>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </View>
-                }
-
-                {/* {
-                  action === 'plus' &&
-                  <View style={styles.confirmation.content}>
-                    <View style={{...styles.confirmation.content.option, width: '100%'}}>
-                      <View style={{...Styles.centered, ...Styles.buttons.icon, backgroundColor: colors.black, borderRadius: 999, ...styles.confirmation.content.option.child}}>
-                        <Icon name='plus' styles={{color: colors.white}}/>
-                      </View>
-                      <Bold style={styles.confirmation.content.option.child}>Change Title</Bold>
-                      <View style={{ ...styles.confirmation.content.option.child, ...styles.confirmation.content.option.body}}>
-                        <Light style={{textAlign: 'center'}}>Choose a Collection you would like to add this List to</Light>                      
-                      </View>                      
-                      <View style={{width: '100%'}}>
-                        <Pressable
-                          onPress={updateTitle}
-                          style={{ ...styles.confirmation.actions.cancel, ...styles.confirmation.button}}
-                        >
-                          <Bold style={{color: colors.white}}>Save</Bold>
-                        </Pressable>                        
-                        <Pressable style={styles.confirmation.button} onPress={() => setAction('')}>
-                          <Bold>Cancel</Bold>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </View>
-                } */}
-
-              </View>
-            </View>
-            
-        </Modal>
-        <Pressable onPress={ () => setShowOptions(!showOptions)}>
-          <Icon name='dots' />
-        </Pressable>
-      </View>
-    )
-  };
 
   const ListItem = useCallback(({ drag, isActive, item}) => {    
     const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
@@ -560,7 +316,7 @@ export default function List() {
             disabled={isActive}          
           >
             <View style={styled.container}>            
-              <Pressable style={styled.checkbox} onPress={() => toggleCompleted({id: item.id})}>
+              <Pressable style={styled.checkbox} onPress={() => toggleCompleted(item)}>
                 <Icon name={iconName} styles={styled.icon} />
               </Pressable>
               <View style={styled.body}>
@@ -570,7 +326,7 @@ export default function List() {
                   ) : (
                     <TextInput              
                       multiline={true}
-                      onChangeText={(text) => update(index, text)}
+                      onChangeText={(text) => update(item.order, text)}
                       style={styled.input}
                     >{ item.body }</TextInput>
                   )
@@ -594,14 +350,26 @@ export default function List() {
     }
 ];
 
+const checkboxToggleIconMap = {
+  null: 'completedAll',
+  true: 'completedOnly',
+  false: 'completedNot'
+};
 
-{/* <HeaderRight toggleShow={setShowOptions} options={[]}/> */}
+
+
   return (
     <>
       {DrawerScreen(title, () => <Options options={headerOptions} />)}    
       <View style={Styles.View}>        
           
-          <View style={Styles.header}>           
+          <View style={Styles.header}>
+            <Pressable
+              onPress={toggleShowCompleted}
+              style={{ width: 48, height: 64, alignItems: 'center', justifyContent: 'center'}}
+            >
+              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
+            </Pressable>          
             <Sort fields={sortOn} query={sort} update={onSortUpdate} />
             <Search placeholder={'Filter'} update={onFilterUpdate} />
           </View>

@@ -11,8 +11,8 @@ export default function Notes() {
     filters: {
       placeholder: 'Search Notes',
       sort: {
-        defaults: { property: 'updated', direction: 'desc'},
-        fields: ['name', 'updated'],
+        defaults: { property: 'updated_at', direction: 'desc'},
+        fields: ['name', 'updated_at'],
       },
     },
     uri: 'notes'

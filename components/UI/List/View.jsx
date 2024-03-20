@@ -56,23 +56,19 @@ export default function ListView({options}) {
   const [list, setList] = useState([]);
   const [query, setQuery] = useState(initialQuery);
   const [total, setTotal] = useState(null);
-
-  // useEffect(() => {        
-  //   getData();
-  //   console.log('q', query);
-  // }, [endOfList, query]);
-
-  useEffect(() => {           
-    // TODO remove setTimeout
-    setTimeout(() => {
-      getData();
-    }, 3000);
+  
+  useEffect(() => {               
+    getData();    
   }, []);
 
   function getData() {              
     // if (!endOfList) {
     if (true) {
-      Fetch.get(uri, query)
+      
+      // console.log(data, loading, error);
+      
+
+      Fetch.get(uri)
       .then(([err, res]) => { 
         console.log('results', res);
         setInitialLoadComplete(true);
@@ -95,14 +91,16 @@ export default function ListView({options}) {
   }
 
   async function create(title) {
+    console.log('title', title);
+    // return;
     const request = await Fetch.post(uri, { title });
     const [err, res] = request;
     if (err) {
       console.warn(`Host Error - POST ${uri} - ${JSON.stringify(err)}`)
     } else if (res) {
       console.log('results', res);
+      router.push(`${detail}/${res.uuid}`);
     }
-    // router.push(`${detail}/create?title=${title}`);
   }
 
   function onTalk() {
@@ -131,7 +129,9 @@ export default function ListView({options}) {
   //   setSelected([...selected]);
   // }
   
-  function onPress(type, {id, title}) {
+  function onPress(type, item) {
+    console.log('item', item);
+    // return;
     let route = '';
     if (nestingChildren) {
         route = `${nestingChildren}/${local.slug}/`;
@@ -143,7 +143,9 @@ export default function ListView({options}) {
         List: 'lists',
         Note: 'notes'
     };    
-    route += `${typeToRouteMap[type]}/${id}?title=${title}`;    
+    route += `${typeToRouteMap[type]}/${item.uuid}`;    
+    console.log('route', route);
+    // return;
     router.push(route);
   }
 

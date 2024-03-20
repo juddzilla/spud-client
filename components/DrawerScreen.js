@@ -4,11 +4,7 @@ import { useNavigation } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
 import Icon from './UI/icons';
 
-export default function(title, headerRight) {
-    // const segments = useSegments();
-    // console.log('segments', segments);
-    // useEffect(() => {
-    // }, [segments])
+export default function DrawerScreen(title, headerRight) {    
     const navigation = useNavigation();
 
     function goBack() {

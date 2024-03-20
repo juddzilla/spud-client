@@ -9,7 +9,7 @@ import colors from '../colors';
 import Icon, { sorting } from '../icons';
 
 export default function Sort({ disabled, fields, query, update }) {  
-  const sortIcon = (property) => {        
+  const sortIcon = (property) => {      
     const active = query.property === property;
     const activeColor = colors.sort.active;
     const inactiveColor = colors.sort.inactive;
@@ -26,15 +26,14 @@ export default function Sort({ disabled, fields, query, update }) {
     return { color, name, size };
   };
     
-  function chooseSort(property) {  
+  function chooseSort(property) {      
     if (disabled) {
       return;
     }
     let direction = 'desc';
     if (query.property === property) {
-      direction = ['asc', 'desc'].filter(dir => dir !== query.direction)[0];        
+      direction = ['asc', 'desc'].filter(dir => dir !== query.direction)[0];
     }
-    // setSort({ property, direction });
     update({ sortProperty: property, sortDirection: direction});
   }
   

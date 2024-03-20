@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, SafeAreaView, Text } from 'react-native';
 import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,7 +11,7 @@ import Regular from '../assets/fonts/Inter-Regular.otf';
 
 import { useStorageState } from '../interfaces/storage';
 
-const AuthContext = React.createContext({
+export const AuthContext = React.createContext({
   signIn: () => {},
   signOut: () => {},
   session: null,
@@ -19,7 +19,7 @@ const AuthContext = React.createContext({
 });
 
 export function useSession() {
-  const value = React.useContext(AuthContext);
+  const value = useContext(AuthContext);
   if (process.env.NODE_ENV !== 'production') {
     if (!value) {
       throw new Error('useSession must be wrapped in a <SessionProvider />');
@@ -31,7 +31,6 @@ export function useSession() {
 
 export function SessionProvider(props) {
   const [[isLoading, session], setSession] = useStorageState('session');
-
   return (
     <AuthContext.Provider
       value={{
@@ -52,7 +51,6 @@ export function SessionProvider(props) {
 
 
 export default function RootLayout() {
-    
     const [fontsLoaded, fontError] = useFonts({
       'Inter-Black': Black,        
       'Inter-Bold': Bold,

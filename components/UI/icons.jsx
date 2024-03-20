@@ -2,6 +2,7 @@
 import { FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const icons = {        
+    
     alphabeticalAsc: { library: MaterialCommunityIcons, name: 'sort-alphabetical-ascending'},
     alphabeticalDesc: { library: MaterialCommunityIcons, name: 'sort-alphabetical-descending'},
     alphabeticalInactive: { library: MaterialCommunityIcons, name: 'sort-alphabetical-variant'},
@@ -9,6 +10,9 @@ const icons = {
     checkedOutline: { library: MaterialCommunityIcons, name: 'checkbox-outline'},
     checkOutline: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},
     close: { library: Ionicons, name: 'close'},
+    completedAll: { library: MaterialCommunityIcons, name: 'dots-square'},
+    completedNot: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},
+    completedOnly: { library: MaterialCommunityIcons, name: 'checkbox-marked-outline'},
     collection: { library: MaterialIcons, name: 'collections-bookmark' },
     convo: { library: Ionicons, name: 'chatbubble-outline'},
 
@@ -18,6 +22,7 @@ const icons = {
     
     dateInactive: { library: MaterialCommunityIcons, name: 'calendar-range'},        
     dots: { library: MaterialCommunityIcons, name: 'dots-vertical'},
+    
     leftArrowLong: { library: FontAwesome, name: 'long-arrow-left'},
     list: { library: Ionicons, name: 'list'},
     listItem: { library: '', name: ''},
@@ -76,7 +81,7 @@ export const sorting = {
         desc: 'numericSortDesc',
         inactive: 'numericSortInactive'
     },
-    updated: {
+    updated_at: {
         asc: 'dateAsc',
         desc: 'dateDesc',
         inactive: 'dateInactive',

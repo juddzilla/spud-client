@@ -11,8 +11,8 @@ export default function Lists() {
     filters: {
       placeholder: 'Search Lists',
       sort: {
-        defaults: { property: 'updated', direction: 'desc'},
-        fields: ['name', 'updated'],
+        defaults: { property: 'updated_at', direction: 'desc'},
+        fields: ['name', 'updated_at'],
       },
     },
     uri: 'lists/',

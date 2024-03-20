@@ -6,7 +6,12 @@ export default function DrawerLayout() {
     <View style={{flex: 1}}>
 
         <Drawer
-          screenOptions={{ headerShown: false }}      
+          screenOptions={{
+            drawerStyle: {              
+              // backgroundColor: 'green',
+            },
+            headerShown: false
+          }}      
         >
           <Drawer.Screen
             name="home"
@@ -43,6 +48,7 @@ export default function DrawerLayout() {
               title: "T",
             }}
           />
+     
           <Drawer.Screen
             name="collections"
             options={{
@@ -50,7 +56,19 @@ export default function DrawerLayout() {
               title: "T",
             }}
           />
+          <Drawer.Screen
+            name="account"
+            options={{
+              drawerLabel: "Account",
+              title: "Account",
+            }}
+          />
+     
         </Drawer>
+          {/* <View >
+
+            <Black>Logout</Black>
+          </View> */}
     </View>
       // </GestureHandlerRootView>
     

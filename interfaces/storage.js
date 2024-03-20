@@ -16,11 +16,12 @@ export async function setStorageItemAsync(key, value) {
       }
 }
 
-export function useStorageState(key) {
+export function useStorageState(key) {    
+  console.log('useStorageState', key);
   const [state, setState] = useAsyncState();
 
   React.useEffect(() => {
-    SecureStore.getItemAsync(key).then(value => {
+    SecureStore.getItemAsync(key).then(value => {        
         setState(value);
       });
   }, [key]);
@@ -34,4 +35,18 @@ export function useStorageState(key) {
   );
 
   return [state, setValue];
+}
+
+
+export const Storage = {
+  get: async (key) => {
+    return await SecureStore.getItemAsync(key);
+  },
+  remove: async (key) => {
+    await SecureStore.deleteItemAsync(key);
+    return true;
+  },
+  set: async (key, value) => {
+    await SecureStore.setItemAsync(key, value);
+  }
 }

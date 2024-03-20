@@ -1,5 +1,5 @@
 import environment from "./environment";
-// send any combo of text + audio + image
+import { Storage } from './storage';
 
 const CONVOS = [
     {
@@ -158,33 +158,6 @@ const NOTES = [
 
 ]
 
-const LISTS = [
-  {
-    id: '23123242343345',
-    title: 'Groceries',
-    children: 4,
-    subtitle: '4 items',
-    updated: 12345636789,
-    type: 'List',
-  },
-  {
-    id: '231232423433245',
-    title: 'ToDO',
-    children: 44,
-    subtitle: '44 items',
-    updated: 15234566789,
-    type: 'List',
-  },
-  {
-    id: '233123242343345',
-    title: 'Dog Name Ideas',
-    children: 9050,
-    subtitle: '9050 items',
-    updated: 17234566789,
-    type: 'List',
-  },  
-];
-
 const COLLECTIONS = [
   {
     id: '23123242343345',
@@ -245,69 +218,32 @@ const NOTE = {
   updated: 3423423424
 };
 
-const LIST = {
-  id: '342342424',
-  children: [
-    { id: '232323', index: 0, body: 'List Item 1', updated: '2024-01-20 07:37:27.065578-08', completed: true},
-    { id: '2w32323', index: 1, body: 'List Item 2', updated: '2024-01-21 10:38:27.065578-08', completed: false},
-    { id: '23w2323', index: 2, body: 'List Item 3', updated: '2024-01-24 15:37:27.065578-08', completed: false}
-  ],
-  title: 'List Title Goes Here',
-  updated: 3423423424
-};
-
-// const Fetch = {
-//     get: async (url) => { 
-//       // console.log('URL', url);
-//         const dataMap = {
-//           convos: { results: CONVOS, totalResultsCount: 23 },
-//           collections: { results: COLLECTIONS, totalResultsCount: COLLECTIONS.length },
-//           lists: { results: LISTS, totalResultsCount: LISTS.length },
-//           notes: { results: NOTES, totalResultsCount: NOTES.length },
-//           collection: { results: COLLECTION, totalResultsCount: COLLECTION.children.length },
-//           convo: CONVO,
-//           list: LIST,
-//           note: NOTE,
-//         };
-//         // console.log('dataMap[url]', dataMap[url]);
-
-//         if (dataMap[url]) {
-//           return dataMap[url];
-//         }
-//         return { results: [], totalResultsCount: 0 };
-//     }
-// };
-
-// export default Fetch;
-
-
 class Fetch {
   constructor() {
       this.api = environment.apiHost;
   }
 
-  // getCSRFToken() {
-  //     var cookieValue = null;
-  //     if (document.cookie && document.cookie !== '') {
-  //         var cookies = document.cookie.split(';');
-  //         for (var i = 0; i < cookies.length; i++) {
-  //             var cookie = cookies[i].trim();
-  //             if (cookie.substring(0, 10) === ('csrftoken=')) {
-  //                 cookieValue = decodeURIComponent(cookie.substring(10));
-  //                 break;
-  //             }
-  //         }
-  //     }
-  //     return cookieValue;
-  // }
+  async token() {
+    const token = await Storage.get('session');
+    console.log('token', token);
+    return `Token ${token}`;
+  }
 
+  async get(url, query) {
+    const headers = {
+      Authorization: await this.token(),
+    };
+    let target = `${this.api}/${url}`;
+    
+    if (query && Object.keys(query).length) {
+      target += `?${new URLSearchParams(query).toString()}`;
+    }
 
-  async get(url) {
-      return fetch(`${this.api}/${url}`, 
+      return fetch(target, 
           { 
               credentials: 'include',
               mode: 'cors', // no-cors, cors, *same-origin
-              // 'X-CSRFToken': this.getCSRFToken(),
+              headers
           }
       )
       .then(async (res) => {            
@@ -315,7 +251,7 @@ class Fetch {
           if ([400, 401, 403, 404, 420].includes(res.status)) {
               return [{ error: 'Not Authorized', statusCode: res.status }, null];
           }
-          // console.log("res.json()", res.json());
+          
           return [null, await res.json()];
       })   
       .catch(err => {
@@ -324,15 +260,18 @@ class Fetch {
       });
   }
 
-  async post(url, data) {        
-      return fetch(`${this.api}/${url}`, 
+  async post(url, data) {  
+      const target =  `${this.api}/${url}`;     
+      const body = JSON.stringify(data);    
+      const headers = {
+        Authorization: await this.token(),
+        "Content-Type": "application/json",
+      };  
+      return fetch(target, 
           { 
-              body: JSON.stringify(data),
+              body,
               credentials: 'include',
-              headers: {
-                  "Content-Type": "application/json",
-                  // 'X-CSRFToken': this.getCSRFToken(),
-              },
+              headers,
               method: 'POST',
           }
       )
@@ -347,6 +286,64 @@ class Fetch {
       .catch(err => {
           console.log('FETCH POST ERR', err);
           return [err, null];
+      });
+  }
+
+  async put(url, data) {
+    const target =  `${this.api}/${url}`;     
+      const body = JSON.stringify(data);    
+      const headers = {
+        Authorization: await this.token(),
+        "Content-Type": "application/json",
+      };  
+      return fetch(target, 
+          { 
+              body,
+              credentials: 'include',
+              headers,
+              method: 'PUT',
+          }
+      )
+      .then(async (res) => {      
+        console.log('POST', res);      
+        if ([400, 401, 403, 404, 420].includes(res.statusCode)) {
+            return [{ error: 'Not Authorized', statusCode: res.statusCode }, null];
+        }
+        // console.log("res.json()", res.json());
+        return [null, await res.json()];
+    })  
+      .catch(err => {
+          console.log('FETCH POST ERR', err);
+          return [err, null];
+      });
+  }
+
+  async remove(url) {
+    const headers = {
+      Authorization: await this.token(),
+    };
+    let target = `${this.api}/${url}`;
+    
+
+      return fetch(target, 
+          { 
+              credentials: 'include',
+              mode: 'cors', // no-cors, cors, *same-origin
+              headers,
+              method: 'DELETE'
+          }
+      )
+      .then(async (res) => {            
+        console.log('DELETE', res);
+          if ([400, 401, 403, 404, 420].includes(res.status)) {
+              return [{ error: 'Not Authorized', statusCode: res.status }, null];
+          }
+          
+          return [null, await res.json()];
+      })   
+      .catch(err => {
+          console.log('FETCH GET ERR', err);
+          return [{ error: err }, null];
       });
   }
 }
