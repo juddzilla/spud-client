@@ -37,12 +37,15 @@ import Options from '../actions/Options';
 export default function List() {
   const local = useLocalSearchParams();
 
+  const baseUri = `lists/${local.slug}/`;
+  const itemsUri = `${baseUri}items/`;
+  const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
   const initialTitle = local.title ? local.title : 'List';
   
   let initialList = [];
   const sortOn = ['order', 'updated_at'];
   const [title, setTitle] = useState(initialTitle);
-  const [newTitle, setNewTitle] = useState(initialTitle);  
+  // const [newTitle, setNewTitle] = useState(initialTitle);  
   const [initialListItems, setInitialListItems] = useState(initialList);
   const [listItems, setListItems] = useState(initialList);
   const [filter, setFilter] = useState('');
@@ -53,9 +56,9 @@ export default function List() {
   const [action, setAction] = useState('');
   
   
-  useEffect(() => {
-    setNewTitle(title);
-  }, [title, setNewTitle]);
+  // useEffect(() => {
+  //   setNewTitle(title);
+  // }, [title, setNewTitle]);
   
   useEffect(() => {
     if (!showOptions) {
@@ -77,8 +80,7 @@ export default function List() {
     if (!local.slug) {
       return;
     }
-    const uri = `lists/${local.slug}/`;
-    Fetch.get(uri, {
+    Fetch.get(baseUri, {
       search: filter,
       sortDirection: sort.direction,
       sortProperty: sort.property,
@@ -86,14 +88,15 @@ export default function List() {
     })
       .then(res => {            
         const [err, list] = res;
+        console.log('list', list);
+        setTitle(list.title);
         setListItems(list.children);        
       })
       .catch(err => { console.warn('List Error', err)});
   }
 
-  function updateItem(id, data) {
-    const uri = `lists/${local.slug}/item/${id}/`;
-    Fetch.put(uri, data)
+  function updateItem(id, data) {  
+    Fetch.put(itemUri(id), data)
       .then(res => {            
         const [err, item] = res;
         const itemIndex = listItems.findIndex(listItem => item.id === listItem.id);
@@ -121,8 +124,7 @@ export default function List() {
   }
 
   function removeItem(id) {
-    const uri = `lists/${local.slug}/items/${id}/`;
-    Fetch.remove(uri)
+    Fetch.remove(itemUri(id))
       .then(res => {             
         const [err, item] = res;
         if (!err) {
@@ -139,10 +141,19 @@ export default function List() {
     router.back();    
   }
 
-  function update(index, text) {
-    const newListItems = [...initialListItems];
-    newListItems[index].body = text;
-    setListItems(newListItems)
+  function updateItemBody(item, text) {
+    const itemIndex = listItems.findIndex(i => i.id = item.id);
+    const newListItems = [...listItems];
+    newListItems[itemIndex].body = text;
+    setListItems(newListItems);
+    Fetch.put(itemUri(item.id), { body: text})
+      .then(res => {
+        const [err, item] = res;
+        if (!err) {
+          console.log('item', item);
+        }
+      })
+      .catch(err => {})    
   }
 
   
@@ -170,12 +181,11 @@ export default function List() {
 
     setListItems(reordered.items);
 
-    const uri = `lists/${local.slug}/items/`;
     const reqData = {
       order: reordered.ids,
     };
     
-    Fetch.put(uri, reqData)
+    Fetch.put(itemsUri, reqData)
     .then(res => {                  
       const [err, items] = res;
 
@@ -186,27 +196,28 @@ export default function List() {
     .catch(err => { console.warn('List Error', err)});
   }
 
-  function updateTitle() {
+  function updateTitle(newTitle) {
     setTitle(newTitle);
     setShowOptions(false);
+    Fetch.put(baseUri, {title: newTitle});
   }
 
   function create(text) {
     if (!text.trim().length) {
       return;
     }
-    const uri = `lists/${local.slug}/`;
     const data = {
       body: text.trim(), 
       order: listItems.length,
     };
     
-    Fetch.post(uri, data)
+    Fetch.post(baseUri, data)
     .then(res => {            
-      const [err, item] = res;
+      const [err, items] = res;
+      console.log("res", res);
       
       if (!err) {
-        getData();
+        setListItems(items.results);
       }
     })
     .catch(err => { console.warn('List Error', err)});    
@@ -326,7 +337,7 @@ export default function List() {
                   ) : (
                     <TextInput              
                       multiline={true}
-                      onChangeText={(text) => update(item.order, text)}
+                      onChangeText={(text) => updateItemBody(item, text)}
                       style={styled.input}
                     >{ item.body }</TextInput>
                   )
@@ -342,7 +353,7 @@ export default function List() {
   const headerOptions = [
     {
         name: 'rename',
-        cb: setTitle,
+        cb: updateTitle,
     },
     {
         name: 'remove',
