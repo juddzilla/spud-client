@@ -337,12 +337,7 @@ export default function ListView({options}) {
         refreshing={false}
       /> 
 
-      <View style={styles.footer}>  
-        <View style={{height: 50, backgroundColor: 'red'}}>
-          <Pressable onPress={getData}>
-            <Bold>GD</Bold>
-          </Pressable>
-        </View>
+      <View style={styles.footer}>          
         <Input onSubmit={create} placeholder={actions.placeholder}/>
         <Talk />          
       </View>
