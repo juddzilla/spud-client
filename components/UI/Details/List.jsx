@@ -8,7 +8,7 @@
 // add to collection
 //
 
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
 
 import { BaseButton } from 'react-native-gesture-handler';
@@ -16,7 +16,7 @@ import { BaseButton } from 'react-native-gesture-handler';
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import  { router, useLocalSearchParams } from 'expo-router';
+import  { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
@@ -34,6 +34,8 @@ import Input from '../actions/Input';
 
 import Options from '../actions/Options';
 
+import { useDebouncedValue } from '../../../utils/debounce';
+
 export default function List() {
   const local = useLocalSearchParams();
 
@@ -44,21 +46,16 @@ export default function List() {
   
   let initialList = [];
   const sortOn = ['order', 'updated_at'];
-  const [title, setTitle] = useState(initialTitle);
-  // const [newTitle, setNewTitle] = useState(initialTitle);  
-  const [initialListItems, setInitialListItems] = useState(initialList);
-  const [listItems, setListItems] = useState(initialList);
+  
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filter, setFilter] = useState('');
+  const [listItems, setListItems] = useState(initialList);
   const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState({ property: 'order', direction: 'desc' });
+  const [title, setTitle] = useState(initialTitle);  
 
   const [showOptions, setShowOptions] = useState(false);
   const [action, setAction] = useState('');
-  
-  
-  // useEffect(() => {
-  //   setNewTitle(title);
-  // }, [title, setNewTitle]);
   
   useEffect(() => {
     if (!showOptions) {
@@ -66,16 +63,23 @@ export default function List() {
     }
   }, [showOptions, setAction]);
 
-  useEffect(() => {
-    getData();
-  }, [sort, filter, showCompleted]);
+  useFocusEffect(
+    useCallback(() => {
+      setInitialLoadComplete(true);
+      getData();    
+      return () => {
+        setInitialLoadComplete(false);
+      };
+    }, [])
+  );
 
   useEffect(() => {
-    if (local.slug) {
+    if (initialLoadComplete) {
       getData();
     }
-  }, []);
+  }, [filter, sort])
 
+  // LIST OPERATIONS
   function getData() {
     if (!local.slug) {
       return;
@@ -88,47 +92,67 @@ export default function List() {
     })
       .then(res => {            
         const [err, list] = res;
-        console.log('list', list);
-        setTitle(list.title);
-        setListItems(list.children);        
+        if (!err) {          
+          setTitle(list.title);
+          setListItems(list.children);        
+        }
       })
       .catch(err => { console.warn('List Error', err)});
   }
 
-  function updateItem(id, data) {  
-    Fetch.put(itemUri(id), data)
-      .then(res => {            
-        const [err, item] = res;
-        const itemIndex = listItems.findIndex(listItem => item.id === listItem.id);
-        const newListItems = [...listItems];
-        newListItems[itemIndex] = item;
-        setListItems([...newListItems]);
-      })
-      .catch(err => {
-        console.warn('updateItem err', err);
-      })
+
+  function removeList() {    
+    Fetch.remove(baseUri)
+      .then((res) => {
+        const [err] = res;
+        if (!err) {
+          router.back();    
+        }
+      });
   }
 
-  function toggleCompleted({id, completed}) {   
-      updateItem(id, { completed: !completed});
+  function updateTitle(newTitle) {
+    setTitle(newTitle);
+    setShowOptions(false);
+    Fetch.put(baseUri, {title: newTitle});
   }
 
-  function toggleShowCompleted() {
-    if (showCompleted === null) {
-      setShowCompleted(true);
-    } else if (showCompleted === true) {
-      setShowCompleted(false);
-    } else {
-      setShowCompleted(null);
+
+  // LIST ITEM OPERATIONS
+  function createItem(text) {
+    if (!text.trim().length) {
+      return;
     }
-  }
+    const data = {
+      body: text.trim(), 
+    };
+    setListItems([
+      ...listItems, 
+      { 
+        ...data, 
+        id: `temp${data.order}`,
+        order: listItems.length,
+      }]);
+    
+    Fetch.post(baseUri, data)
+      .then(res => {            
+        const [err, items] = res;
+        
+        if (!err) {
+          setListItems([...listItems, items.results]);
+        }
+      })
+      .catch(err => { console.warn('List Error', err)});    
+  }  
 
   function removeItem(id) {
     Fetch.remove(itemUri(id))
       .then(res => {             
-        const [err, item] = res;
+        const [err] = res;
         if (!err) {
-          getData();
+          const itemIndex = listItems.indexOf(l => l.id === id);
+          listItems.splice(itemIndex, 1);
+          setListItems([...listItems]);        
         }
       })
       .catch(err => {
@@ -136,9 +160,24 @@ export default function List() {
       });    
   }
 
-  function removeList() {
-    console.log('slig', local.slug);
-    router.back();    
+  function toggleCompleted({id, completed}) {   
+    updateItem(id, { completed: !completed});
+  }
+
+  function updateItem(id, data) {  
+    Fetch.put(itemUri(id), data)
+      .then(res => {            
+        const [err, item] = res;
+        if (!err) {
+          const itemIndex = listItems.findIndex(listItem => item.id === listItem.id);
+          const newListItems = [...listItems];
+          newListItems[itemIndex] = item;
+          setListItems(newListItems);
+        }
+      })
+      .catch(err => {
+        console.warn('updateItem err', err);
+      })
   }
 
   function updateItemBody(item, text) {
@@ -156,22 +195,13 @@ export default function List() {
       .catch(err => {})    
   }
 
-  
-  function onSortUpdate({ sortProperty, sortDirection }) {
-    const newSort = {direction: sortDirection, property: sortProperty};
-    setSort(newSort);      
-  }
 
+  // UI OPERATIONS
   function onFilterUpdate({search}) {
     setFilter(search);
   }
 
-  function onDragEnd({data}) {
-    // const reordered = data.map((item, index) => {
-    //   item.order = index;
-    //   return item;
-    // });
-
+  function onReorderUpdate({data}) {
     const reordered = data.reduce((acc, cur, index) => {
       cur.order = index;
       acc.items.push(cur);
@@ -181,11 +211,7 @@ export default function List() {
 
     setListItems(reordered.items);
 
-    const reqData = {
-      order: reordered.ids,
-    };
-    
-    Fetch.put(itemsUri, reqData)
+    Fetch.put(itemsUri, {order: reordered.ids})
     .then(res => {                  
       const [err, items] = res;
 
@@ -196,33 +222,23 @@ export default function List() {
     .catch(err => { console.warn('List Error', err)});
   }
 
-  function updateTitle(newTitle) {
-    setTitle(newTitle);
-    setShowOptions(false);
-    Fetch.put(baseUri, {title: newTitle});
+  function onSortUpdate({ sortProperty, sortDirection }) {
+    const newSort = {direction: sortDirection, property: sortProperty};
+    setSort(newSort);      
   }
 
-  function create(text) {
-    if (!text.trim().length) {
-      return;
+  function toggleShowCompleted() {
+    if (showCompleted === null) {
+      setShowCompleted(true);
+    } else if (showCompleted === true) {
+      setShowCompleted(false);
+    } else {
+      setShowCompleted(null);
     }
-    const data = {
-      body: text.trim(), 
-      order: listItems.length,
-    };
-    
-    Fetch.post(baseUri, data)
-    .then(res => {            
-      const [err, items] = res;
-      console.log("res", res);
-      
-      if (!err) {
-        setListItems(items.results);
-      }
-    })
-    .catch(err => { console.warn('List Error', err)});    
   }
 
+
+  // UI ELEMENTS
   const EmptyState = () => {
     return (
       <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>
@@ -240,7 +256,7 @@ export default function List() {
     )
   }
 
-  const ListItem = useCallback(({ drag, isActive, item}) => {    
+  const ListItem = useCallback(({drag, isActive, item}) => {    
     const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
     const styled = StyleSheet.create({
       container: {
@@ -350,6 +366,14 @@ export default function List() {
     )
   });
 
+
+  // UI CONFIG
+  const checkboxToggleIconMap = {
+    null: 'completedAll',
+    true: 'completedOnly',
+    false: 'completedNot'
+  };
+
   const headerOptions = [
     {
         name: 'rename',
@@ -360,14 +384,6 @@ export default function List() {
         cb: removeList
     }
 ];
-
-const checkboxToggleIconMap = {
-  null: 'completedAll',
-  true: 'completedOnly',
-  false: 'completedNot'
-};
-
-
 
   return (
     <>
@@ -391,14 +407,14 @@ const checkboxToggleIconMap = {
               data={listItems}
               keyExtractor={item => item.id}   
               ListEmptyComponent={<EmptyState />}
-              onDragEnd={onDragEnd}
+              onDragEnd={onReorderUpdate}
               renderItem={ListItem}
               refreshing={true}
             />
           </View>
           
           <View style={Styles.footer}>                  
-            <Input hideModal={true} onSubmit={create} placeholder='Create New List Item'/>
+            <Input hideModal={true} onSubmit={createItem} placeholder='Create New List Item'/>
             <Talk />          
           </View>       
         </View>

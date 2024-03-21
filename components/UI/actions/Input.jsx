@@ -16,12 +16,9 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
     function onSubmitMessage() {
         if (!hideModal) {
             toggleModal(true);
-        }
-        // TODO remore setimtout
-        setTimeout(() => {
-            onSubmit(message);
-            setMessage('');
-        }, 2000);
+        }        
+        onSubmit(message);
+        setMessage('');        
     }
 
     const styled = StyleSheet.create({

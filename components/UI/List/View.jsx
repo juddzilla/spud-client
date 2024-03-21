@@ -1,5 +1,5 @@
 // list of convos
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import {
   Dimensions,
@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-import { useLocalSearchParams, router } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { BaseButton } from 'react-native-gesture-handler';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -57,9 +57,31 @@ export default function ListView({options}) {
   const [query, setQuery] = useState(initialQuery);
   const [total, setTotal] = useState(null);
   
-  useEffect(() => {               
-    getData();    
-  }, []);
+  // useFocusEffect(() => {               
+  //   getData();    
+  // });
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Screen is focused');
+      getData();    
+      return () => {
+        console.log('Screen is unfocused');
+      };
+    }, [])
+  );
+
+  // useFocusEffect(() => {
+  //   useCallback(() => {
+  //     console.log('Screen is focused');
+  //     if (local.slug) {
+  //       getData();
+  //     }
+  //     return () => {
+  //       console.log('Screen is unfocused');
+  //     };
+  //   }, [])
+  // }, []);
 
   function getData() {              
     // if (!endOfList) {
@@ -307,7 +329,7 @@ export default function ListView({options}) {
         data={list}
         // data={[]}
         renderItem={ListItem}
-        keyExtractor={item => item.id}                      
+        keyExtractor={item => item.uuid}                      
         ListEmptyComponent={ListEmptyComponent}
         onRefresh={onRefresh}
         onEndReached={onEndReached}
