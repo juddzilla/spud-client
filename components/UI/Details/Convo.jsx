@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import  { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import moment from 'moment';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 
@@ -102,7 +103,7 @@ export default function Convo() {
       <View style={styled.message}>
         <View style={styled.header}>
           <Bold style={styled.user}>{ displayNameMap[item.type] }</Bold>
-          <Light style={styled.date}>{item.created_at}</Light>
+          <Light style={styled.date}>{formattedDate(item.created_at)}</Light>
         </View>
         <Regular style={styled.body}>{ item.body }</Regular>
       </View>
@@ -116,6 +117,7 @@ export default function Convo() {
     Fetch.get(baseUri)
       .then(res => {            
         const [err, convo] = res;
+        console.log('convo.messages', convo.messages);
         // TODO ERROR HANDLING
         if (!err) {          
           setTitle(convo.title);
@@ -164,22 +166,38 @@ export default function Convo() {
     
   }
 
-const flatlist = StyleSheet.create({
-  container: {
-    flex: 1,
-  }  
-})
+  const flatlist = StyleSheet.create({
+    container: {
+      flex: 1,
+    }  
+  })
 
-const headerOptions = [
-  {
-      name: 'rename',
-      cb: updateTitle
-  },
-  {
-      name: 'remove',
-      cb: removeConvo
-  }
-];
+  const headerOptions = [
+    {
+        name: 'rename',
+        cb: updateTitle
+    },
+    {
+        name: 'remove',
+        cb: removeConvo
+    }
+  ];
+
+  const formattedDate = (date) => {
+    const now = moment();
+    const diffInDays = now.diff(date, 'days');
+
+    if (diffInDays === 0) {
+      // Date is from today, display time only
+      return moment(date).format('LT');
+    } else if (diffInDays < 7) {
+      // Date is from the past 7 days, display day of the week and time
+      return  moment(date).format('ddd MMMM DD, hh:mma');
+    } else {
+      // Date is more than 7 days ago, display full date and time
+      return  moment(date).format('MMMM DD, hh:mma');
+    }
+  };
 
   return (
     <View style={styles.View}>
