@@ -16,8 +16,7 @@ export async function setStorageItemAsync(key, value) {
       }
 }
 
-export function useStorageState(key) {    
-  console.log('useStorageState', key);
+export function useStorageState(key) {      
   const [state, setState] = useAsyncState();
 
   React.useEffect(() => {

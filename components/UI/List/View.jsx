@@ -22,7 +22,6 @@ import Search from '../filtering/Search';
 import Talk from '../actions/Talk';
 import Input from '../actions/Input';
 
-
 import Fetch from '../../../interfaces/fetch';
 
 import colors from '../colors';
@@ -56,46 +55,27 @@ export default function ListView({options}) {
   const [list, setList] = useState([]);
   const [query, setQuery] = useState(initialQuery);
   const [total, setTotal] = useState(null);
-  
-  // useFocusEffect(() => {               
-  //   getData();    
-  // });
+
+  useEffect(() => {
+    getData();
+  }, [query]);
 
   useFocusEffect(
     useCallback(() => {
-      console.log('Screen is focused');
       getData();    
       return () => {
-        console.log('Screen is unfocused');
+        setQuery(initialQuery);
       };
     }, [])
   );
 
-  // useFocusEffect(() => {
-  //   useCallback(() => {
-  //     console.log('Screen is focused');
-  //     if (local.slug) {
-  //       getData();
-  //     }
-  //     return () => {
-  //       console.log('Screen is unfocused');
-  //     };
-  //   }, [])
-  // }, []);
-
   function getData() {              
-    // if (!endOfList) {
+    // if (!endOfList) { TODO
     if (true) {
-      
-      // console.log(data, loading, error);
-      
-
-      Fetch.get(uri)
+      Fetch.get(uri, query)
       .then(([err, res]) => { 
-        console.log('results', res);
-        setInitialLoadComplete(true);
-
-        
+        setInitialLoadComplete(true);        
+    
         if (res.results.length < query.per) {
           setEndOfList(true);
         }
@@ -112,15 +92,12 @@ export default function ListView({options}) {
     setList(newList);
   }
 
-  async function create(title) {
-    console.log('title', title);
-    // return;
+  async function create(title) {        
     const request = await Fetch.post(uri, { title });
     const [err, res] = request;
     if (err) {
       console.warn(`Host Error - POST ${uri} - ${JSON.stringify(err)}`)
-    } else if (res) {
-      console.log('results', res);
+    } else if (res) {      
       router.push(`${detail}/${res.uuid}`);
     }
   }
@@ -133,8 +110,7 @@ export default function ListView({options}) {
     setEndOfList(false);
   }
 
-  function update(params) {    
-    // console.log('par', params);
+  function update(params) {      
     setQuery({...query, ...params});
   }
 
@@ -151,9 +127,7 @@ export default function ListView({options}) {
   //   setSelected([...selected]);
   // }
   
-  function onPress(type, item) {
-    console.log('item', item);
-    // return;
+  function onPress(type, item) {    
     let route = '';
     if (nestingChildren) {
         route = `${nestingChildren}/${local.slug}/`;
@@ -166,8 +140,6 @@ export default function ListView({options}) {
         Note: 'notes'
     };    
     route += `${typeToRouteMap[type]}/${item.uuid}`;    
-    console.log('route', route);
-    // return;
     router.push(route);
   }
 

@@ -100,7 +100,6 @@ export default function List() {
       .catch(err => { console.warn('List Error', err)});
   }
 
-
   function removeList() {    
     Fetch.remove(baseUri)
       .then((res) => {

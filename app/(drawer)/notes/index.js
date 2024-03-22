@@ -12,10 +12,10 @@ export default function Notes() {
       placeholder: 'Search Notes',
       sort: {
         defaults: { property: 'updated_at', direction: 'desc'},
-        fields: ['name', 'updated_at'],
+        fields: ['title', 'updated_at'],
       },
     },
-    uri: 'notes'
+    uri: 'notes/'
   };
 
   return (<ListView options={{...options}} />);

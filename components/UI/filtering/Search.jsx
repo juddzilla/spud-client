@@ -1,30 +1,25 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
-import { Text } from 'react-native';
+
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import colors from '../colors';
 import Icon from '../icons';
 import styles from '../styles';
 
-const useDebouncedValue = (inputValue, delay) => {
-    const [debouncedValue, setDebouncedValue] = useState(inputValue);
-  
-    useEffect(() => {
-      const handler = setTimeout(() => {
-        setDebouncedValue(inputValue);
-      }, delay);
-  
-      return () => {
-        clearTimeout(handler);
-      };
-    }, [inputValue, delay]);
-  
-    return debouncedValue;
-  };
+import { useDebouncedValue } from '../../../utils/debounce';
 
 export default function Search({ disabled, placeholder, update }) {        
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
+
+    useFocusEffect(
+        useCallback(() => {          
+          return () => {
+            setSearch('');
+          };
+        }, [])
+      );
 
     useEffect(() => {
         update({search});        

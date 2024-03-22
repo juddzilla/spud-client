@@ -15,7 +15,7 @@ export default function Convos() {
         fields: ['name', 'updated_at'],
       },
     },
-    uri:'convos'
+    uri:'convos/'
   };
 
   return (<ListView options={{...options}} />);

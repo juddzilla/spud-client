@@ -224,8 +224,7 @@ class Fetch {
   }
 
   async token() {
-    const token = await Storage.get('session');
-    console.log('token', token);
+    const token = await Storage.get('session');    
     return `Token ${token}`;
   }
 
@@ -305,7 +304,7 @@ class Fetch {
           }
       )
       .then(async (res) => {      
-        console.log('POST', res);      
+        console.log('PUT', res);      
         if ([400, 401, 403, 404, 420].includes(res.statusCode)) {
             return [{ error: 'Not Authorized', statusCode: res.statusCode }, null];
         }

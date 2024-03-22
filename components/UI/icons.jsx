@@ -71,7 +71,7 @@ export const sorting = {
         active: '',
         inactive: '',
     },
-    name: {
+    title: {
         asc: 'alphabeticalAsc',
         desc: 'alphabeticalDesc',
         inactive: 'alphabeticalInactive',
