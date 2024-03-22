@@ -12,7 +12,7 @@ export default function Lists() {
       placeholder: 'Search Lists',
       sort: {
         defaults: { property: 'updated_at', direction: 'desc'},
-        fields: ['name', 'updated_at'],
+        fields: ['title', 'updated_at'],
       },
     },
     uri: 'lists/',

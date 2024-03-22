@@ -12,7 +12,7 @@ export default function Convos() {
       placeholder: 'Search by Title',
       sort: {
         defaults: { property: 'updated_at', direction: 'desc'},
-        fields: ['name', 'updated_at'],
+        fields: ['title', 'updated_at'],
       },
     },
     uri:'convos/'

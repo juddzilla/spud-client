@@ -130,34 +130,6 @@ const CONVOS = [
     },
   ];
   
-const NOTES = [
-  {
-    id: 23123242343345,
-    title: 'sfffasdf sadfsdf asdf asdf df adf afd',
-    updated: 12345636789,
-    type: 'Note',
-  },
-  {
-    id: 231232423433245,
-    title: 'asdf sadf asdf assdfsddf df adf afd',
-    updated: 15234566789,
-    type: 'Note',
-  },
-  {
-    id: 233123242343345,
-    title: 'asdf sadf asddfsdff asdf df adf afd',
-    updated: 17234566789,
-    type: 'Note',
-  },
-  {
-    id: 2312355242343345,
-    title: 'asdf sawerdf asdf asdf df adf afd',
-    updated: 12345668789,
-    type: 'Note',
-  }
-
-]
-
 const COLLECTIONS = [
   {
     id: '23123242343345',
@@ -211,12 +183,6 @@ const CONVO = {
   updated: 3423423424
 };
 
-const NOTE = {
-  id: '342342424',
-  body: 'sdf fsdfa sfasdfasdfa dsfsd fadsfds fasfs dfsfasdfasfsdf asdf asdfasdfasdfadsfasdfdsfadsfdsfdsfsdfadfdsf f f',
-  title: 'Note Title Goes Here',
-  updated: 3423423424
-};
 
 class Fetch {
   constructor() {

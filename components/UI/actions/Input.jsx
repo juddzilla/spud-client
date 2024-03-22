@@ -18,7 +18,8 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
             toggleModal(true);
         }        
         onSubmit(message);
-        setMessage('');        
+        setMessage('');       
+        toggleModal(false); 
     }
 
     const styled = StyleSheet.create({

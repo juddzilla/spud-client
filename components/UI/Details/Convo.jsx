@@ -3,9 +3,10 @@
 // ability to summarize entire convo
 // archive
 // delete
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-// import { useLocalSearchParams, useGlobalSearchParams, Link } from 'expo-router';
+import  { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+
 import DrawerScreen from '../../../components/DrawerScreen';
 
 import Bold from '../text/Bold';
@@ -25,11 +26,43 @@ import styles from '../styles';
 import Options from '../actions/Options';
 
 export default function Convo() {  
-  const [messages, setMessages] = useState(null);
+  const local = useLocalSearchParams();
+
+  const baseUri = `convos/${local.slug}/`;    
+  const initialTitle = local.title ? local.title : 'Conversation';
+  const sortOn = ['order', 'updated_at'];
+
+  const [filter, setFilter] = useState('');  
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [showCompleted, setShowCompleted] = useState(null);
+  const [sort, setSort] = useState({ property: 'order', direction: 'desc' });
   const [title, setTitle] = useState('Convo');
   
-  // const glob = useGlobalSearchParams();
-  // const local = useLocalSearchParams();
+  const [showOptions, setShowOptions] = useState(false);
+  const [action, setAction] = useState('');
+
+  useEffect(() => {
+    if (!showOptions) {
+      setAction('');
+    }
+  }, [showOptions, setAction]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setInitialLoadComplete(true);
+      getData();    
+      return () => {
+        setInitialLoadComplete(false);
+      };
+    }, [])
+  );
+
+  useEffect(() => {
+    if (initialLoadComplete) {
+      getData();
+    }
+  }, [filter, sort])
 
   const Message = ({ index, item}) => {
     const styled = StyleSheet.create({
@@ -69,23 +102,67 @@ export default function Convo() {
       <View style={styled.message}>
         <View style={styled.header}>
           <Bold style={styled.user}>{ displayNameMap[item.type] }</Bold>
-          <Light style={styled.date}>Today, 11:23am</Light>
+          <Light style={styled.date}>{item.created_at}</Light>
         </View>
         <Regular style={styled.body}>{ item.body }</Regular>
       </View>
     )
   };
 
-useEffect(() => {
-  Fetch.get('convo')
-  .then(res => {
-    setMessages(res.messages);
-    setTitle(res.title);
-  })
-  .catch(err => { console.warn('Convo Error', err)});
-}, []);
+  function getData() {
+    if (!local.slug) {
+      return;
+    }
+    Fetch.get(baseUri)
+      .then(res => {            
+        const [err, convo] = res;
+        // TODO ERROR HANDLING
+        if (!err) {          
+          setTitle(convo.title);
+          setMessages(convo.messages);        
+        }
+      })
+      .catch(err => { console.warn('Convo Error', err)});
+  }
 
-// console.log("Local:", local, "Global:", glob.user);
+  function removeConvo() {    
+    Fetch.remove(baseUri)
+      .then((res) => {
+        const [err] = res;        
+        // TODO [{"error": "Not Authorized", "statusCode": 400}, null]
+        if (err) {
+          // do global error handling
+        }
+        if (!err) {
+          router.back();    
+        }
+      });
+  }
+
+  function updateTitle(newTitle) {
+    setTitle(newTitle);
+    setShowOptions(false);
+    Fetch.put(baseUri, {title: newTitle});
+  }
+
+  function create(text) {
+    if (!text.trim().length) {
+      return;
+    }
+    
+    //TODO below for dev only
+    messages.unshift( {id: messages.length+3, type: 'system', body: text}, {id: messages.length+2, type: 'user', body: text});
+    setMessages([...messages]);  
+    Fetch.post(baseUri, {body: text})
+    .then(res =>  {
+      const [err, message] = res;
+      
+      if (!err) {        
+        setMessages([...messages, message]);  
+      }
+    })
+    
+  }
 
 const flatlist = StyleSheet.create({
   container: {
@@ -93,33 +170,14 @@ const flatlist = StyleSheet.create({
   }  
 })
 
-function headerRight() {
-  return (
-    <View>
-      <Icon name="dots" />
-    </View>
-  )
-}
-
-function create(text) {
-  // console.log('create t', text);
-  if (!text.trim().length) {
-    return;
-  }
-  messages.unshift( {id: messages.length+3, type: 'system', body: text}, {id: messages.length+2, type: 'user', body: text});
-  setMessages([...messages]);  
-}
-
-function onChange() {}
-
 const headerOptions = [
   {
       name: 'rename',
-      cb: () => {}
+      cb: updateTitle
   },
   {
       name: 'remove',
-      cb: () => {}
+      cb: removeConvo
   }
 ];
 
