@@ -180,6 +180,10 @@ export default function Convo() {
     {
         name: 'remove',
         cb: removeConvo
+    },
+    {
+        name: 'summarize',
+        cb: () => { console.log('summ')}
     }
   ];
 

@@ -14,8 +14,8 @@ const icons = {
     completedNot: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},
     completedOnly: { library: MaterialCommunityIcons, name: 'checkbox-marked-outline'},
     collection: { library: MaterialIcons, name: 'collections-bookmark' },
-    convo: { library: Ionicons, name: 'chatbubble-outline'},
-
+    convoAdd: { library: MaterialCommunityIcons, name: 'chat-plus-outline'},
+    convo: { library: MaterialCommunityIcons, name: 'chat-processing-outline'},
     // the below 2 icons are named incorrectly at the source. below is visually correct.
     dateAsc: { library: MaterialCommunityIcons, name: 'sort-calendar-descending'},
     dateDesc: { library: MaterialCommunityIcons, name: 'sort-calendar-ascending'},
@@ -24,7 +24,8 @@ const icons = {
     dots: { library: MaterialCommunityIcons, name: 'dots-vertical'},
     
     leftArrowLong: { library: FontAwesome, name: 'long-arrow-left'},
-    list: { library: Ionicons, name: 'list'},
+    list: { library: MaterialIcons, name: 'list'},
+    listAdd: { library: MaterialCommunityIcons, name: 'playlist-plus'},
     listItem: { library: '', name: ''},
     mic: { library: Ionicons, name: 'mic-outline'},
     micOff: { library: Ionicons, name: 'mic-off'},
@@ -32,13 +33,15 @@ const icons = {
     numericSortAsc: { library: MaterialCommunityIcons, name: 'sort-numeric-ascending-variant'},
     numericSortDesc: { library: MaterialCommunityIcons, name: 'sort-numeric-descending-variant'},
     numericSortInactive: { library: MaterialCommunityIcons, name: 'sort-numeric-variant'},
-    notes: { library: Ionicons, name: 'documents-sharp'},
-    note: { library: '', name: ''},
+    noteAdd: { library: MaterialCommunityIcons, name: 'notebook-plus-outline'},
+    notes: { library: MaterialCommunityIcons, name: 'notebook-outline'},
     pencil: { library: Ionicons, name: 'pencil'},
     plus: { library: FontAwesome, name: 'plus'},
     plusCircleOutline: { library: MaterialCommunityIcons, name: 'plus-circle-outline'},
+    queue: { library: MaterialCommunityIcons, name: 'arrow-right-thin'},
     search: { library: FontAwesome, name: 'search'},
     send: { library: MaterialCommunityIcons, name: 'send'},
+    summarize: {library: MaterialCommunityIcons, name: 'note-plus-outline'},
     trash: { library: FontAwesome, name: 'trash'}
 };
 
@@ -67,9 +70,19 @@ export default function Icon({ name, styles }) {
 }
 
 export const sorting = {
+    body: {
+        asc: 'alphabeticalAsc',
+        desc: 'alphabeticalDesc',
+        inactive: 'alphabeticalInactive',
+    },      
     colors: {
         active: '',
         inactive: '',
+    },
+    created_at: {
+        asc: 'dateAsc',
+        desc: 'dateDesc',
+        inactive: 'dateInactive',
     },
     title: {
         asc: 'alphabeticalAsc',

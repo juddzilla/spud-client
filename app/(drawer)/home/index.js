@@ -1,30 +1,23 @@
-import { View, StyleSheet } from "react-native";
-import DrawerScreen from '../../../components/DrawerScreen';
-import Bold from '../../../components/UI/text/Bold';
-import Light from '../../../components/UI/text/Light';
-import Regular from '../../../components/UI/text/Regular';
+import ListView from '../../../components/UI/List/View';
 
-import styles from "../../../components/UI/styles";
+export default function Lists() {  
+  const options = {
+    actions: {
+      placeholder: 'Create New Queue Item',
+      talkUri: '',
+    },
+    createKey: 'body',
+    defaultTitle: 'Quick Queue',    
+    filters: {
+      placeholder: 'Search Queue',
+      sort: {
+        defaults: { property: 'created_at', direction: 'desc'},
+        fields: ['body', 'created_at'],
+      },
+    },
+    hasSwipeLTR: true,
+    uri: 'queue/',
+  };
 
-export default function Home() {  
-  return (
-    <>
-        <View style={styles.View}>
-          {DrawerScreen('Home')}
-          <View style={Styled.container}>
-            <Bold>Inter Bold</Bold>
-            <Regular>Inter Regular</Regular>
-            <Light>Inter Light</Light>        
-          </View>
-        </View>
-      {/* <View style={styles.container}>
-      </View>     */}
-    </>
-  );
+  return (<ListView options={{...options}} />);
 }
-
-const Styled = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

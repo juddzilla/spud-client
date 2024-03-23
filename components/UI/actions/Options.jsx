@@ -98,6 +98,16 @@ export default function Options({options}) {
             display: 'Rename',
             icon: 'pencil',
         },
+        summarize: {
+            component: () => Prompt({
+                cta: 'Summarize',
+                color: colors.black,
+                subtitle: 'Summarize this convo into a note. doing so will delete convo from history.',
+                title: 'Summarize', 
+            }),          
+            display: 'Summarize',
+            icon: 'summarize',
+        },
     };
 
     const styles = StyleSheet.create({ 

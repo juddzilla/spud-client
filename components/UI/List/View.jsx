@@ -1,5 +1,9 @@
 // list of convos
-import { useCallback, useState, useEffect } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+ } from 'react';
 
 import {
   Dimensions,
@@ -11,7 +15,7 @@ import {
 
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { BaseButton } from 'react-native-gesture-handler';
-import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
+import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import DrawerScreen from '../../../components/DrawerScreen';
@@ -35,9 +39,11 @@ import Light from '../text/Light';
 export default function ListView({options}) {
   const {
     actions,
+    createKey = 'title',
     defaultTitle,
     detail,
     filters,
+    hasSwipeLTR,
     nestingChildren,    
     uri,
    } = options;
@@ -93,19 +99,18 @@ export default function ListView({options}) {
   }
 
   async function create(title) {        
-    const request = await Fetch.post(uri, { title });
-    const [err, res] = request;
+    const request = await Fetch.post(uri, { [createKey]: title });
+    const [err, res] = request;    
     if (err) {
       console.warn(`Host Error - POST ${uri} - ${JSON.stringify(err)}`)
-    } else if (res) {      
-      router.push(`${detail}/${res.uuid}`);
+    } else if (res) {
+      if (detail) {
+        router.push(`${detail}/${res.uuid}`);
+      } else {
+        setList([...list, res]);
+      }
     }
   }
-
-  function onTalk() {
-
-  }
-
   function onRefresh() {    
     setEndOfList(false);
   }
@@ -127,22 +132,6 @@ export default function ListView({options}) {
   //   setSelected([...selected]);
   // }
   
-  function onPress(type, item) {    
-    let route = '';
-    if (nestingChildren) {
-        route = `${nestingChildren}/${local.slug}/`;
-    }
-
-    const typeToRouteMap = {
-        Collection: 'collections',
-        Convo: 'convos',
-        List: 'lists',
-        Note: 'notes'
-    };    
-    route += `${typeToRouteMap[type]}/${item.uuid}`;    
-    router.push(route);
-  }
-
   function onEndReached() {
     if (!endOfList) {
       update({ page: query.page + 1})
@@ -150,7 +139,7 @@ export default function ListView({options}) {
   }
 
   const ListItem = ({ item }) => {
-    const { id, subtitle, title, type } = item;
+    const { id, subtitle, type } = item;
 
     const styled = StyleSheet.create({
       pressable: {
@@ -191,7 +180,29 @@ export default function ListView({options}) {
       title: { backgroundColor: 'transparent', fontSize: 14, color: colors.darkText, marginBottom: 4 },
     });
 
-    const RenderRightActions = () => {
+    function toDetail() {          
+      const typeToRouteMap = {
+        Collection: 'collections',
+        Convo: 'convos',
+        List: 'lists',
+        Note: 'notes'
+      };  
+  
+      if (!typeToRouteMap[type]) {
+        return;
+        
+      }
+      let route = '';
+      if (nestingChildren) {
+          route = `${nestingChildren}/${local.slug}/`;
+      }
+  
+    
+      route += `${typeToRouteMap[type]}/${item.uuid}`;    
+      router.push(route);
+    }
+
+    const RenderUnderlayLeftActions = () => {
       const { percentOpen } = useSwipeableItemParams();
 
       const animStyle = useAnimatedStyle(
@@ -218,32 +229,73 @@ export default function ListView({options}) {
       );
     };
     
+    let RenderUnderlayRightActions = () => {};
+
+    if (hasSwipeLTR) {      
+      RenderUnderlayRightActions = () => {
+        const { percentOpen } = useSwipeableItemParams();
+  
+        const animStyle = useAnimatedStyle(
+          () => ({
+            opacity: percentOpen.value,
+          }),
+          [percentOpen]
+        );
+  
+        return (
+          <BaseButton style={{ justifyContent: 'center', alignItems: 'flex-start', height: 64}}>
+            <Animated.View
+              style={{                
+                flexDirection:'row',                
+                width: 180,
+                display: 'flex',                
+                ...animStyle,
+              }}>
+                <View style={styles.row}>
+                  <View style={{width: 60, height: 60, ...styles.centered}}>                  
+                    <Icon name='convoAdd' styles={{}} />
+                  </View>
+                  <View style={{width: 60, height: 60, ...styles.centered}}>                  
+                    <Icon name='listAdd' styles={{}} />
+                  </View>
+                  <View style={{width: 60, height: 60, ...styles.centered}}>                  
+                    <Icon name='noteAdd' styles={{}} />
+                  </View>
+                </View>
+            </Animated.View>
+          </BaseButton>
+        );
+      };
+    }
+
     const typeToIconMap = {
       Collection: 'collection',
       Convo: 'convo',
       List: 'list',
       Note: 'notes',
+      Queue: 'queue',
     };
 
-    return (
-      
+    return (      
         <SwipeableItem
           key={item.id}
           item={item}
-          renderUnderlayLeft={() => <RenderRightActions />}
+          renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
+          renderUnderlayRight={() => <RenderUnderlayRightActions />}
           snapPointsLeft={[60]}
+          snapPointsRight={[180]}
           overSwipe={20}              
         >          
         <Pressable
             style={styled.pressable}
-            onPress={() => onPress(type, item)} 
+            onPress={toDetail} 
         >      
             <View style={styled.content}>
                 <View style={styled.icon.container}>
                     <Icon name={typeToIconMap[type]} styles={styled.icon.image} />                        
                 </View>
                 <View style={styled.info}>
-                    <Bold style={styled.title}>{title}</Bold>
+                    <Bold style={styled.title}>{item[createKey]}</Bold>
                     <Light style={styled.subtitle}>{ subtitle || "Thse lsast bit on convo goes here..." }</Light>
                 </View>
             </View>
@@ -253,11 +305,8 @@ export default function ListView({options}) {
 
   const ListEmptyComponent = () => {
     const Empty = (props) => (
-      <View style={{        
-        // height: Dimensions.get('window').width,
-        // padding: 16, 
+      <View style={{                
         flex: 1, 
-        // backgroundColor: 'red',
         ...styles.centered
       }}>
         <View style={{          
