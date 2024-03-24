@@ -19,14 +19,16 @@ const header = {
     flexDirection: 'row-reverse',
     height: 64,
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    // paddingVertical: 8,
+    // backgroundColor: 'red',
     paddingHorizontal: 16,
-    marginBottom: 8,
+    // marginBottom: 8,
     input: {
         container: {
             ...row,
             flex: 1,
-            marginRight: 16,
+            
+            // marginRight: 16,
         }
     }
 };

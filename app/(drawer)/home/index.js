@@ -1,5 +1,7 @@
 import ListView from '../../../components/UI/List/View';
 
+const Item = () => null;
+
 export default function Lists() {  
   const options = {
     actions: {
@@ -16,6 +18,9 @@ export default function Lists() {
       },
     },
     hasSwipeLTR: true,
+    hideSort: true,
+    Item,
+    localSearch: true,
     uri: 'queue/',
   };
 

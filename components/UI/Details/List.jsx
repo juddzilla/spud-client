@@ -188,7 +188,7 @@ export default function List() {
       .then(res => {
         const [err, item] = res;
         if (!err) {
-          console.log('item', item);
+          // console.log('item', item);
         }
       })
       .catch(err => {})    

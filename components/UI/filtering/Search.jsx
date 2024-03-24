@@ -29,7 +29,7 @@ export default function Search({ disabled, placeholder, update }) {
         container: {
             ...styles.row,            
             flex: 1,
-            marginRight: 16,
+            // marginRight: 16,
         },
         search: { 
             color: colors.input.dark.icon, 

@@ -116,8 +116,7 @@ export default function Convo() {
     }
     Fetch.get(baseUri)
       .then(res => {            
-        const [err, convo] = res;
-        console.log('convo.messages', convo.messages);
+        const [err, convo] = res;        
         // TODO ERROR HANDLING
         if (!err) {          
           setTitle(convo.title);

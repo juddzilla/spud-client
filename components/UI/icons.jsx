@@ -42,7 +42,8 @@ const icons = {
     search: { library: FontAwesome, name: 'search'},
     send: { library: MaterialCommunityIcons, name: 'send'},
     summarize: {library: MaterialCommunityIcons, name: 'note-plus-outline'},
-    trash: { library: FontAwesome, name: 'trash'}
+    trash: { library: FontAwesome, name: 'trash'},
+    webSearch: {library: MaterialCommunityIcons, name: 'search-web'},
 };
 
 export default function Icon({ name, styles }) {
@@ -63,7 +64,7 @@ export default function Icon({ name, styles }) {
         const { color, size, ...rest } = styles;
         icon.color = color || icon.color;
         icon.size = size || icon.size;
-        icon.style = {...rest};
+        icon.style = {...icon.style, ...rest};
     }
 
     return (<Component name={icon.name} size={icon.size} color={icon.color} style={icon.style} />)

@@ -15,6 +15,7 @@ export default function Lists() {
         fields: ['title', 'updated_at'],
       },
     },
+    subtitle: 'children',
     uri: 'lists/',
   };
 
