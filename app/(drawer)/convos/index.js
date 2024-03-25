@@ -6,7 +6,7 @@ export default function Convos() {
       placeholder: 'Create New Conversation',
       talkUri: '',
     },
-    defaultTitle:'Your Conversations',
+    viewTitle:'Your Conversations',
     detail:'/convos',
     filters: {
       placeholder: 'Search by Title',

@@ -20,6 +20,7 @@ const zinc = {
 };
 
 const red = {
+    light: '#fca5a5', // red 300
     primary: '#ef4444' // red 900
 };
 
@@ -62,6 +63,7 @@ const colors = {
         text: ''
     },
     remove: red.primary,
+    removeHint: red.light
 }
 
 export default colors;

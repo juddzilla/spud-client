@@ -6,7 +6,7 @@ export default function Lists() {
       placeholder: 'Create New List',
       talkUri: '',
     },
-    defaultTitle: 'Your Lists',
+    viewTitle: 'Your Lists',
     detail:'/lists',
     filters: {
       placeholder: 'Search Lists',

@@ -41,14 +41,7 @@ export default function DrawerLayout() {
               title: "Collections",
             }}
           />
-          <Drawer.Screen
-            name="talk"
-            options={{
-              drawerLabel: "Talssks",
-              title: "T",
-            }}
-          />
-     
+             
           <Drawer.Screen
             name="collections"
             options={{

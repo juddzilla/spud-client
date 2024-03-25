@@ -1,13 +1,3 @@
-// list with list items
-// do items have meta context?
-// add to list via voice
-// importance
-// list timeline view
-
-// delete
-// add to collection
-//
-
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
 
@@ -33,8 +23,6 @@ import Talk from '../actions/Talk';
 import Input from '../actions/Input';
 
 import Options from '../actions/Options';
-
-import { useDebouncedValue } from '../../../utils/debounce';
 
 export default function List() {
   const local = useLocalSearchParams();
@@ -73,13 +61,13 @@ export default function List() {
     }, [])
   );
 
-  useEffect(() => {
+  useEffect(() => {    
     if (initialLoadComplete) {
       getData();
     }
-  }, [filter, sort])
+  }, [filter, showCompleted, sort])
 
-  // LIST OPERATIONS
+
   function getData() {
     if (!local.slug) {
       return;
@@ -88,10 +76,11 @@ export default function List() {
       search: filter,
       sortDirection: sort.direction,
       sortProperty: sort.property,
-      showCompleted,
+      completed: showCompleted,
     })
       .then(res => {            
         const [err, list] = res;
+        
         if (!err) {          
           setTitle(list.title);
           setListItems(list.children);        
@@ -259,12 +248,11 @@ export default function List() {
     const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
     const styled = StyleSheet.create({
       container: {
-        backgroundColor: item.completed ? '#f8fafc' : 'white',        
-        flexDirection: 'row',      
-        paddingRight: 48,              
-        marginHorizontal: 4,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.darkBg,      
+        // backgroundColor: item.completed ? '#f8fafc' : 'white',        
+        flexDirection: 'row',              
+        marginHorizontal: 0,
+        // borderBottomWidth: 1,
+        // borderBottomColor: colors.darkBg,      
         shadowColor: "#e2e8f0",
         shadowOffset: {
             width: 0,
@@ -279,12 +267,16 @@ export default function List() {
         height: 44, 
         justifyContent: 'center', 
         width: 44,
+        marginLeft: 2,
       },
       icon: {
         color: item.completed ? colors.lightText : colors.text,        
       },
       body: {
         paddingTop: 10,        
+        backgroundColor: item.completed ? 'transparent' : 'white',  
+        paddingHorizontal: 8,   
+        flex: 1,
       },
       input: {
         color: colors.text,

@@ -212,7 +212,7 @@ class Fetch {
           }
       )
       .then(async (res) => {            
-        console.log('GET', res);
+        // console.log('GET', res);
           if ([400, 401, 403, 404, 420].includes(res.status)) {
               return [{ error: 'Not Authorized', statusCode: res.status }, null];
           }
@@ -241,7 +241,7 @@ class Fetch {
           }
       )
       .then(async (res) => {      
-        console.log('POST', res);      
+        // console.log('POST', res);      
         if ([400, 401, 403, 404, 420].includes(res.statusCode)) {
             return [{ error: 'Not Authorized', statusCode: res.statusCode }, null];
         }
@@ -270,7 +270,7 @@ class Fetch {
           }
       )
       .then(async (res) => {      
-        console.log('PUT', res);      
+        // console.log('PUT', res);      
         if ([400, 401, 403, 404, 420].includes(res.statusCode)) {
             return [{ error: 'Not Authorized', statusCode: res.statusCode }, null];
         }
@@ -299,7 +299,7 @@ class Fetch {
           }
       )
       .then(async (res) => {            
-        console.log('DELETE', res);
+        // console.log('DELETE', res);
           if ([400, 401, 403, 404, 420].includes(res.status)) {
               return [{ error: 'Not Authorized', statusCode: res.status }, null];
           }

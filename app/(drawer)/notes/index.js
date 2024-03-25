@@ -6,7 +6,7 @@ export default function Notes() {
       placeholder: 'Create New Note',
       talkUri: '',
     },
-    defaultTitle: 'Your Notes',
+    viewTitle: 'Your Notes',
     detail: '/notes',
     filters: {
       placeholder: 'Search Notes',
