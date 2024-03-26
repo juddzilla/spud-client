@@ -244,12 +244,16 @@ export default function List() {
     )
   }
 
-  const ListItem = useCallback(({drag, isActive, item}) => {    
+  const ListItem = useCallback((props) => {    
+    const {drag, getIndex, isActive, item} = props;     
     const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
+
+    const marginBottom = getIndex() === listItems.length - 1 ? 64 : 0;
+    // console.log('marginBottom', index, listItems.length);
     const styled = StyleSheet.create({
       container: {
-        // backgroundColor: item.completed ? '#f8fafc' : 'white',        
-        flexDirection: 'row',              
+        flexDirection: 'row',
+        marginBottom,
         marginHorizontal: 0,
         // borderBottomWidth: 1,
         // borderBottomColor: colors.darkBg,      
@@ -274,7 +278,7 @@ export default function List() {
       },
       body: {
         paddingTop: 10,        
-        backgroundColor: item.completed ? 'transparent' : 'white',  
+        // backgroundColor: item.completed ? 'transparent' : 'white',  
         paddingHorizontal: 8,   
         flex: 1,
       },

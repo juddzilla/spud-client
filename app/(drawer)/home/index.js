@@ -10,6 +10,7 @@ import styles from '../../../components/UI/styles';
 import Icon from '../../../components/UI/icons';
 import ListView from '../../../components/UI/List/View';
 
+import Light from '../../../components/UI/text/Light';
 import Regular from '../../../components/UI/text/Regular';
 
 const ItemTemplate = ({remove},{item}) => {
@@ -21,7 +22,7 @@ const ItemTemplate = ({remove},{item}) => {
       flexDirection: 'row',
       alignItems: 'center', 
       
-      backgroundColor: 'white',
+      // backgroundColor: 'white',s
       borderRightWidth: 4,
       borderRightColor: colors.removeHint,
       
@@ -37,9 +38,12 @@ const ItemTemplate = ({remove},{item}) => {
     },        
     info: {
       flexDirection: 'row',
-      paddingLeft: 12,
+      // paddingLeft: 12,
       paddingRight: 8,
       paddingVertical: 12,
+    },
+    itemDot: {
+      marginRight: 10
     },
     title: { fontSize: 14, letterSpacing: 0.1, color: colors.darkText },
   });
@@ -132,9 +136,8 @@ const ItemTemplate = ({remove},{item}) => {
       >          
       <View style={styled.content}>                  
           <View style={styled.info}>                  
-              <View style={{ }}>
-                <Regular style={styled.title}>{item.headline}</Regular>
-              </View>
+              <Light style={styled.itemDot}>&#x2022;</Light>
+              <Regular style={styled.title}>{item.headline}</Regular>              
           </View>
       </View>
     </SwipeableItem>        

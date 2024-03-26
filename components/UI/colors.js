@@ -24,6 +24,50 @@ const red = {
     primary: '#ef4444' // red 900
 };
 
+const theme = {
+    backgroundColor: 'rgb(249,249,249)',
+    color: 'rgb(34,34,34)',
+    text: {
+        darkest: 'rgb(77,77,78)',
+        dark: 'rgb(34,34,34)',
+        // light: 'rgb(170,171,172)',
+        light: 'rgb(212,212,212)',
+        lightest: 'rgb(228,229,230)',
+        medium: 'rgb(136,136,136)',
+    },
+    inputs: {
+        light: {
+            backgroundColor: 'rgb(239,241,242)',
+            color: 'rgb(34,34,34)',
+            text: {
+                dark: 'rgb(34,34,34)',
+                light: 'rgb(90,90,90)'
+            }
+        },
+        dark: {
+            backgroundColor: 'rgb(34,37,39)',
+            color: 'rgb(212,212,212)',
+            text: {
+                dark: 'rgb(88,91,92)',
+                light: 'rgb(211,211,211)'
+            }
+        }
+
+    },
+    light: {
+        background: {
+            primary: '',
+            secondary: '',
+            tertiary: '',            
+        },
+        text: {
+            primary: '',
+            secondary: '',
+            tertiary: '',            
+        }
+    }
+}
+
 const colors = {
     brand: teal.medium, // teal 400
     
@@ -63,7 +107,8 @@ const colors = {
         text: ''
     },
     remove: red.primary,
-    removeHint: red.light
+    removeHint: red.light,
+    theme,
 }
 
 export default colors;

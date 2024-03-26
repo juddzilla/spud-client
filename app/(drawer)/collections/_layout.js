@@ -6,7 +6,7 @@ export default function CollectionsLayout() {
     <Stack 
       screenOptions={{
         contentStyle: {
-          backgroundColor: colors.lightBg,
+          backgroundColor: colors.theme.backgroundColor,
         }
       }}
     />

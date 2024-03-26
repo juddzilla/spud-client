@@ -38,38 +38,41 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
         },
         input: {
             container: {
-                backgroundColor: focus ? 'white' : colors.lightWhite,
+                backgroundColor: colors.theme.inputs.dark.backgroundColor,
+                // backgroundColor: focus ? 'white' : colors.lightWhite,
                 flexDirection: 'row', 
                 alignItems: 'center', 
                 justifyContent: 'space-between',                                             
                 flex: 1,       
                 
-                borderWidth: 1,
-                borderColor: colors.darkBg,
+                // borderWidth: 1,
+                borderColor: colors.darkestBg,
                 borderRadius: 32,
                 paddingLeft: 32,
                 marginRight: 70,            
                 opacity: 1,
-                paddingRight: 48,
+                paddingRight: 48,            
 
                 shadowColor: colors.darkestBg,
                 shadowOffset: {
                     width: 0,
                     height: 7,
                 },
-                shadowOpacity: focus ? 0.1 : 0,
+                shadowOpacity: focus ? 0.6 : 0.5,
                 shadowRadius: 12.00,
                 elevation: 24,
             },
             field: {                    
                 height: 48,    
+                
                 marginRight: 0, 
-                flex: 1,                
+                flex: 1,     
+                color: colors.theme.inputs.dark.text.light,                            
             },
             icons: {
                 leading: {
                     size:12, 
-                    color: focus ? 'transparent' : colors.darkBg, 
+                    color: focus ? 'transparent' : colors.theme.inputs.dark.text.light, 
                     position: 'absolute',
                     zIndex: 1, 
                     left: 12,
@@ -122,9 +125,11 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
                     value={message}
                     onBlur={() => setFocus(false)}
                     onChangeText={(text) => setMessage(text)}
+
                     onFocus={() => setFocus(true)}
                     placeholder={placeholder || 'NEW'}
                     style={styled.input.field}
+                    placeholderTextColor={colors.theme.inputs.dark.text.light}
                 />
                 <Pressable
                     onPress={onSubmitMessage}

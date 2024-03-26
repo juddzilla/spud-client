@@ -45,22 +45,25 @@ const inputs = {
     },
 };
 
-const View = { flex: 1 };
+const View = { flex: 1, backgroundColor: 'white' };
 
 const footer = {
     alignItems: 'center', 
     backgroundColor: 'transparent',
-    borderColor: colors.darkBg,
-    borderLeftWidth: 1,
+    // borderColor: colors.darkBg,
+    // borderLeftWidth: 1,
     // borderTopLeftRadius: 4,
     // borderTopRightRadius: 4,
-    borderTopWidth: 1,
-    borderWidth: 1,
+    // borderTopWidth: 1,
+    // borderWidth: 1,
     flexDirection: 'row', 
     height: 72,
     justifyContent: 'flex-end', 
     paddingLeft: 16,
     paddingRight: 16,
+    position: 'absolute',
+    width: '100%',
+    bottom: 0,
     // paddingVertical: 10,                
 };
 

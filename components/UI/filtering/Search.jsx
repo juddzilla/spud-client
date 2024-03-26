@@ -9,6 +9,7 @@ import styles from '../styles';
 
 import { useDebouncedValue } from '../../../utils/debounce';
 
+
 export default function Search({ disabled, placeholder, update }) {        
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
@@ -29,7 +30,6 @@ export default function Search({ disabled, placeholder, update }) {
         container: {
             ...styles.row,            
             flex: 1,
-            // marginRight: 16,
         },
         search: { 
             color: colors.input.dark.icon, 
@@ -39,8 +39,10 @@ export default function Search({ disabled, placeholder, update }) {
          },
         input: {
             ...styles.inputs.size.small,
-            backgroundColor: colors.input.dark.backgroundColor,                
-            color: colors.input.dark.color,
+            // backgroundColor: colors.input.dark.backgroundColor,                
+            // color: colors.input.dark.color,
+            backgroundColor: colors.theme.inputs.light.backgroundColor,
+            color: colors.theme.inputs.light.text.dark,
             paddingRight: 44,
         },
         close: { 
@@ -51,8 +53,8 @@ export default function Search({ disabled, placeholder, update }) {
                 ...styles.centered,
             },
             icon: {
-                color: disabled ? colors.white : colors.input.dark.icon, 
-                size: 14,
+                color: disabled ? colors.white : colors.theme.inputs.light.text.dark, 
+                size: 12,
             },
          }
     })

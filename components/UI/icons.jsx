@@ -22,7 +22,7 @@ const icons = {
     
     dateInactive: { library: MaterialCommunityIcons, name: 'calendar-range'},        
     dots: { library: MaterialCommunityIcons, name: 'dots-vertical'},
-    
+    home: { library: MaterialCommunityIcons, name: 'home-lightning-bolt-outline'},
     leftArrowLong: { library: FontAwesome, name: 'long-arrow-left'},
     list: { library: MaterialIcons, name: 'list'},
     listAdd: { library: MaterialCommunityIcons, name: 'playlist-plus'},

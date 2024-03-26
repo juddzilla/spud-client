@@ -23,7 +23,7 @@ import Light from '../../../../components/UI/text/Light';
 const ItemTemplate = ({remove}, {item}) => {
   // const local = useLocalSearchParams();
   const local = {slug: '1'};
-  console.log('item', item);
+  
   const { id, type } = item;
 
   const styled = StyleSheet.create({
@@ -79,7 +79,6 @@ const ItemTemplate = ({remove}, {item}) => {
     }
     const route = `collections/${local.slug}/${typeToRouteMap[type]}/${item.uuid}`;
     
-    console.log('route', route);
     // return;
     router.push(route);
   }

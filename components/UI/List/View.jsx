@@ -54,9 +54,9 @@ export default function ListView({options}) {
   const [query, setQuery] = useState(initialQuery);
   const [total, setTotal] = useState(null);
 
-  useEffect(() => {
-    getData();
-  }, [query]);
+  // useEffect(() => {
+  //   getData();
+  // }, [query]);
 
   useFocusEffect(
     useCallback(() => {
@@ -77,7 +77,7 @@ export default function ListView({options}) {
         if (res.results.length < query.per) {
           setEndOfList(true);
         }        
-        setList(res.results);
+        setList(res.results.map((result, index, arr) => { result.last = index === arr.length -1; return result; }));
         setTotal(res.total);
       })
       .catch(err => { console.warn(`List ${uri} error: ${err}`)})
@@ -165,22 +165,23 @@ export default function ListView({options}) {
   }
 
   return (
-    <View style={styles.View}>
+    <View style={{...styles.View}}>
       {DrawerScreen(viewTitle)}     
       <View style={styles.header}>   
         { Object.hasOwn(filters, 'sort') &&
-        <View style={{marginLeft: 16}}>
-          <Sort
-            disabled={list.length === 0}
-            fields={filters.sort.fields}
-            query={{direction: query.sortDirection, property: query.sortProperty}} 
-            update={update}
-          />
+          <View style={{marginLeft: 16}}>
+            <Sort
+              disabled={list.length === 0}
+              fields={filters.sort.fields}
+              query={{direction: query.sortDirection, property: query.sortProperty}} 
+              update={update}
+            />
           </View>
         }        
         <Search
           disabled={list.length === 0}
           placeholder={filters.placeholder} 
+          value={query.search}
           update={update} 
         />
       </View>
@@ -190,6 +191,7 @@ export default function ListView({options}) {
         renderItem={ItemTemplate.bind(null, {remove})}
         keyExtractor={item => item.uuid}                      
         ListEmptyComponent={ListEmptyComponent}
+        
         onRefresh={onRefresh}
         onEndReached={onEndReached}
         //if set to true, the UI will show a loading indicator

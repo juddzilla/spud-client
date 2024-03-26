@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { Drawer } from 'expo-router/drawer';
+import Icon from '../../components/UI/icons';
 
 export default function DrawerLayout() {
   return (    
@@ -16,6 +17,7 @@ export default function DrawerLayout() {
           <Drawer.Screen
             name="home"
             options={{
+              drawerIcon: () => <Icon name='home' />,
               drawerLabel: "Home",
               title: "Home",
             }}          
@@ -23,20 +25,22 @@ export default function DrawerLayout() {
           <Drawer.Screen
             name="lists"
             options={{
-              drawerLabel: "Lists",
-              title: "Listss",
+              drawerIcon: () => <Icon name='list' />,
+              drawerLabel: "Lists",              
             }}
           />
           <Drawer.Screen
             name="convos"
             options={{
-              drawerLabel: "Cosnvos",
+              drawerIcon: () => <Icon name='convo' />,
+              drawerLabel: "Convos",
               title: "Cornvors",
             }}
           />
           <Drawer.Screen
             name="notes"
             options={{
+              drawerIcon: () => <Icon name='notes' />,
               drawerLabel: "Notes",
               title: "Collections",
             }}
@@ -45,6 +49,7 @@ export default function DrawerLayout() {
           <Drawer.Screen
             name="collections"
             options={{
+              drawerIcon: () => <Icon name='collection' />,
               drawerLabel: "Collections",
               title: "T",
             }}
@@ -52,6 +57,7 @@ export default function DrawerLayout() {
           <Drawer.Screen
             name="account"
             options={{
+              drawerIcon: () => <Icon name='trash' />,
               drawerLabel: "Account",
               title: "Account",
             }}

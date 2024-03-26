@@ -1,9 +1,10 @@
 import { Text } from 'react-native';
+import colors from '../colors';
 
 export default function Regular(props) {
     return (
         <Text
-            style={{ ...props.style, fontFamily: 'Inter-Regular' }}
+            style={{ color: colors.theme.color, ...props.style, fontFamily: 'Inter-Regular' }}
         >
             {props.children}
         </Text>

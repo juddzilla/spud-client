@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
 import colors from "../../../components/UI/colors";
 
-export default function HomeLayout() {
+export default function NotesLayout() {
   return (
     <Stack 
       screenOptions={{
         contentStyle: {
-          backgroundColor: colors.lightBg,
+          backgroundColor: colors.theme.backgroundColor,
         }
       }}
     />

@@ -15,22 +15,28 @@ import Icon from '../icons';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 
+import styles from '../styles';
+
 import { relativeDate } from '../../../utils/dates';
 
-export default function DefaultListItem({remove}, {item}) { 
+export default function DefaultListItem({remove}, props) { 
+    const {item} = props;
+    
     const { type } = item;
 
     const styled = StyleSheet.create({
         pressable: {
-            backgroundColor: 'white',
-            borderRightWidth: 4,
-            borderRightColor: colors.removeHint,
+            // backgroundColor: 'white',
+            // borderRightWidth: 4,
+            // borderRightColor: colors.removeHint,
+            borderBottomWidth: 1,
+            borderBottomColor: '#f1f5f9',
             marginVertical: 4,
             marginLeft: 16,
             borderRadius: 2,
             flexDirection: 'row',
             alignItems: 'center', 
-            
+            marginBottom: item.last ? 64 : 0,
             shadowColor: colors.darkBg,
             shadowOffset: {
                 width: 0,
@@ -44,21 +50,21 @@ export default function DefaultListItem({remove}, {item}) {
             flexDirection: 'row',             
         },
         info: {
-            paddingTop: 13,
-            paddingBottom: 9,
+            justifyContent: 'center'
+            // paddingTop: 13,
+            // paddingBottom: 9,
         },
         icon: {
-        container: {
-            height: 44, 
-            width:40, 
-            marginRight: 0, 
-            alignItems: 'center', 
-            justifyContent: 'center',
+            container: {
+                height: 40, 
+                width: 40, 
+                marginRight: 8, 
+                ...styles.centered,
+            },
+            image: { color: colors.theme.text.medium, size: 16}
         },
-        image: { color: colors.darkText, size: 20 }
-        },
-        subtitle: { fontSize: 12, color: colors.lightText, },
-        title: { backgroundColor: 'transparent', fontSize: 14, color: colors.darkText, marginBottom: 4 },
+        subtitle: { fontSize: 12, color: colors.theme.text.light, },
+        title: { backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 0 },
     });
 
     function toDetail() {               
@@ -136,7 +142,7 @@ export default function DefaultListItem({remove}, {item}) {
                 </View>
                 <View style={styled.info}>
                     <Bold style={styled.title}>{item.headline}</Bold>
-                    <Light style={styled.subtitle}>{ subheadline }</Light>
+                    {/* <Light style={styled.subtitle}>{ subheadline }</Light> */}
                 </View>
             </View>
         </Pressable>            

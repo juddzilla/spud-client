@@ -7,7 +7,7 @@ export default function HomeLayout() {
     <Stack 
       screenOptions={{
         contentStyle: {
-          backgroundColor: colors.lightBg,
+          backgroundColor: colors.theme.backgroundColor,
         }
       }}
     />
