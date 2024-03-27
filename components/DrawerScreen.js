@@ -20,6 +20,9 @@ export default function DrawerScreen(title, headerRight) {
           options={{
             title,
             headerShown: true,
+            headerStyle: {
+              backgroundColor: 'transparent',
+            },
             headerLeft: () => {
               if (!router.canGoBack()) {
                 return (

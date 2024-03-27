@@ -33,38 +33,15 @@ const header = {
     }
 };
 
-const inputs = {
-    size: {
-        small: {                    
-            height: 40,                      
-            marginRight: 0, 
-            flex: 1,
-            paddingLeft: 32,
-            paddingRight: 8,
-        },
-    },
-};
-
-const View = { flex: 1, backgroundColor: 'white' };
+const View = { flex: 1, backgroundColor: colors.theme.inputs.light.backgroundColor, };
 
 const footer = {
-    alignItems: 'center', 
-    backgroundColor: 'transparent',
-    // borderColor: colors.darkBg,
-    // borderLeftWidth: 1,
-    // borderTopLeftRadius: 4,
-    // borderTopRightRadius: 4,
-    // borderTopWidth: 1,
-    // borderWidth: 1,
+    alignItems: 'center',   
     flexDirection: 'row', 
-    height: 72,
+    height: 56,
     justifyContent: 'flex-end', 
-    paddingLeft: 16,
-    paddingRight: 16,
-    position: 'absolute',
-    width: '100%',
-    bottom: 0,
-    // paddingVertical: 10,                
+    paddingHorizontal: 16,
+    width: '100%',    
 };
 
 export default {
@@ -72,7 +49,7 @@ export default {
     centered,
     footer,
     header,
-    inputs,
+
     row,
     View,
 }

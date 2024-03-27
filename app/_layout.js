@@ -1,5 +1,11 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, SafeAreaView, Text } from 'react-native';
+import { 
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Text,
+  View,
+ } from 'react-native';
 import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
@@ -10,7 +16,7 @@ import Light from '../assets/fonts/Inter-Light.otf';
 import Regular from '../assets/fonts/Inter-Regular.otf';
 
 import { useStorageState } from '../interfaces/storage';
-
+import colors from '../components/UI/colors';
 export const AuthContext = React.createContext({
   signIn: () => {},
   signOut: () => {},
@@ -66,10 +72,15 @@ export default function RootLayout() {
     }, [fontsLoaded, fontError]);
 
     return (
-      <GestureHandlerRootView style={{ backgroundColor: 'transparent', flex: 1 }}  onLayout={onLayoutRootView}>
+      <GestureHandlerRootView style={{ backgroundColor: colors.theme.inputs.light.backgroundColor, flex: 1 }}  onLayout={onLayoutRootView}>
           { fontsLoaded ? (
           <SessionProvider>
             <SafeAreaView style={{ flex: 1}}>
+              {/* <KeyboardAvoidingView
+                behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1}}
+              >
+              </KeyboardAvoidingView> */}
               <Slot />
             </SafeAreaView>
           </SessionProvider>

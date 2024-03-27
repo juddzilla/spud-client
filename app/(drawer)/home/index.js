@@ -43,7 +43,8 @@ const ItemTemplate = ({remove},{item}) => {
       paddingVertical: 12,
     },
     itemDot: {
-      marginRight: 10
+      marginRight: 10,
+      color: colors.theme.text.medium
     },
     title: { fontSize: 14, letterSpacing: 0.1, color: colors.darkText },
   });
@@ -136,7 +137,7 @@ const ItemTemplate = ({remove},{item}) => {
       >          
       <View style={styled.content}>                  
           <View style={styled.info}>                  
-              <Light style={styled.itemDot}>&#x2022;</Light>
+              <Light style={styled.itemDot}>&#x25e6;</Light>
               <Regular style={styled.title}>{item.headline}</Regular>              
           </View>
       </View>

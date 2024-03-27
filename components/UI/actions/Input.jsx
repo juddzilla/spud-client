@@ -23,51 +23,36 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
     }
 
     const styled = StyleSheet.create({
-        container: {
-            alignItems: 'center',             
-            borderColor: colors.darkBg,
-            borderWidth: 1,
-            borderBottomWidth: 0,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            flexDirection: 'row', 
-            justifyContent: 'space-between',             
-            paddingLeft: 16,
-            paddingRight: 16,
-            paddingVertical: 12,
-        },
         input: {
             container: {
-                backgroundColor: colors.theme.inputs.dark.backgroundColor,
+                backgroundColor: 'white',
                 // backgroundColor: focus ? 'white' : colors.lightWhite,
                 flexDirection: 'row', 
                 alignItems: 'center', 
-                justifyContent: 'space-between',                                             
-                flex: 1,       
+                // justifyContent: 'space-between',                                             
+                flex: 1,  
+                // width: '100%'     ,
                 
-                // borderWidth: 1,
-                borderColor: colors.darkestBg,
-                borderRadius: 32,
-                paddingLeft: 32,
-                marginRight: 70,            
-                opacity: 1,
-                paddingRight: 48,            
-
-                shadowColor: colors.darkestBg,
-                shadowOffset: {
-                    width: 0,
-                    height: 7,
-                },
-                shadowOpacity: focus ? 0.6 : 0.5,
-                shadowRadius: 12.00,
-                elevation: 24,
+                borderWidth: 1,
+                borderColor: colors.theme.text.lightest,
+                borderRadius: 12,
+                // paddingLeft: 32,
+                marginVertical: focus ? 0 : 2,
+                position: focus ? 'absolute' : 'relative',
+                right: focus ? 16 : 0,
+                top: focus ? 6 : 0,
+                width: '100%',
+                // marginLeft: 64,
+                height:  44,    
+                zIndex: 10
             },
             field: {                    
-                height: 48,    
-                
-                marginRight: 0, 
+                height: 44,    
+                paddingHorizontal: 16,
+                // backgroundColor: 'red',
+                // marginRight: 0, mnmnm
                 flex: 1,     
-                color: colors.theme.inputs.dark.text.light,                            
+                color: colors.theme.inputs.dark.text.darkest,                            
             },
             icons: {
                 leading: {
@@ -88,8 +73,8 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
                 width: 40,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: colors.darkBg, 
-                borderRadius: 40,
+                // backgroundColor: colors.darkBg, 
+                // borderRadius: 40,
                 opacity: (focus && message.trim().length) ? 1 : 0,
                 position: 'absolute', 
                 right: 4
@@ -120,7 +105,7 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
 
             </CustomModal>
             <View style={styled.input.container}>          
-                <Icon name='plus' styles={styled.input.icons.leading} />
+                {/* <Icon name='plus' styles={styled.input.icons.leading} /> */}
                 <TextInput
                     value={message}
                     onBlur={() => setFocus(false)}

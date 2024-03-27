@@ -386,15 +386,16 @@ export default function List() {
       <View style={Styles.View}>        
           
           <View style={Styles.header}>
-            <Pressable
-              onPress={toggleShowCompleted}
-              style={{ width: 48, height: 64, alignItems: 'center', justifyContent: 'center'}}
-            >
-              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
-            </Pressable>          
+         
             <Sort fields={sortOn} query={sort} update={onSortUpdate} />
             <Search placeholder={'Filter'} update={onFilterUpdate} />
-          </View>
+            <Pressable
+              onPress={toggleShowCompleted}
+              style={{ width: 48, height: 40, right: -12, alignItems: 'center', justifyContent: 'center'}}
+            >
+              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
+            </Pressable>   
+          </View>          
 
           <View style={{flex: 1}}>
             <DraggableFlatList

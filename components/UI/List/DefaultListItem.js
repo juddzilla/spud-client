@@ -19,52 +19,28 @@ import styles from '../styles';
 
 import { relativeDate } from '../../../utils/dates';
 
-export default function DefaultListItem({remove}, props) { 
-    const {item} = props;
-    
+export default function DefaultListItem({remove}, {item}) {         
     const { type } = item;
 
     const styled = StyleSheet.create({
         pressable: {
-            // backgroundColor: 'white',
-            // borderRightWidth: 4,
-            // borderRightColor: colors.removeHint,
-            borderBottomWidth: 1,
-            borderBottomColor: '#f1f5f9',
-            marginVertical: 4,
-            marginLeft: 16,
-            borderRadius: 2,
-            flexDirection: 'row',
-            alignItems: 'center', 
-            marginBottom: item.last ? 64 : 0,
-            shadowColor: colors.darkBg,
-            shadowOffset: {
-                width: 0,
-                height: 12,
-            },
-            shadowOpacity: 0.58,
-            shadowRadius: 16.00,
-            elevation: 24,
+            marginBottom: 2,
+            marginLeft: 12,
+            ...styles.row,
+            padding: 12,
         },
         content: {
-            flexDirection: 'row',             
+            flex: 1,
+        },
+        date: {
+            color: colors.theme.text.medium,
+            fontSize: 12, 
         },
         info: {
-            justifyContent: 'center'
-            // paddingTop: 13,
-            // paddingBottom: 9,
+            ...styles.row,
         },
-        icon: {
-            container: {
-                height: 40, 
-                width: 40, 
-                marginRight: 8, 
-                ...styles.centered,
-            },
-            image: { color: colors.theme.text.medium, size: 16}
-        },
-        subtitle: { fontSize: 12, color: colors.theme.text.light, },
-        title: { backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 0 },
+        subtitle: { fontSize: 12, color: colors.theme.text.medium, marginRight: 6 },
+        title: { backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 6 },
     });
 
     function toDetail() {               
@@ -117,13 +93,6 @@ export default function DefaultListItem({remove}, props) {
         Queue: 'queue',
     };
 
-    const subtitleMap = {
-        children_count: `${item.children_count} Items`,
-        created_at: relativeDate(item.created_at)
-    };
-
-    const subheadline = Object.hasOwn(item, 'children_count') ? subtitleMap.children_count : subtitleMap.created_at;
-
     return (      
         <SwipeableItem
             key={item.id}
@@ -137,12 +106,12 @@ export default function DefaultListItem({remove}, props) {
             onPress={toDetail} 
         >      
             <View style={styled.content}>
-                <View style={styled.icon.container}>
-                    <Icon name={typeToIconMap[type]} styles={styled.icon.image} />                        
-                </View>
+                <Bold style={styled.title}>{item.headline}</Bold>
                 <View style={styled.info}>
-                    <Bold style={styled.title}>{item.headline}</Bold>
-                    {/* <Light style={styled.subtitle}>{ subheadline }</Light> */}
+                    { item.subheadline &&
+                        <Light style={styled.subtitle}>{ item.subheadline }</Light>
+                    }
+                    <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
                 </View>
             </View>
         </Pressable>            

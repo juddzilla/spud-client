@@ -10,11 +10,6 @@ import styles from '../styles';
 export default function TalkButton() {
   const [showModal, setShowModal] = useState(false);
 
-  const micIcon = {
-    backgroundColor: '',
-    color: !showModal ? 'white' : 'black', 
-    name: !showModal ? 'mic' : 'micOff',
-  }
     return (
       <View
         style={{          
@@ -25,20 +20,27 @@ export default function TalkButton() {
           <Pressable            
             onPress={() => {setShowModal(!showModal)}}
             style={({ pressed }) => ({
-              justifyContent: 'center',               
-              // shadowColor: colors.darkestBg,
-              // shadowOffset: {
-              //   width: 0,
-              //   height: 5,
-              // },
-              // shadowOpacity: 0.3,
-              // shadowRadius: 6.27,
+              
+              // borderWidth: 1, 
+              // borderColor: (pressed || showModal) ? 'black' : 'white',  
+              
+            //   alignItems: 'center', 
+            // paddingLeft: 16,
+              
 
-              // elevation: 10,
-              // zIndex: 10,
-              // position: 'absolute',
-              // bottom: 40,
-              // right: 0,
+              shadowColor: colors.darkestBg,
+              shadowOffset: {
+                width: 0,
+                height: 5,
+              },
+              shadowOpacity: 0.3,
+              shadowRadius: 6.27,
+
+              elevation: 10,
+              zIndex: 10,
+            //   position: 'absolute',
+            //   bottom: 0,
+            //   right: 40,
               // backgroundColor: 'black',
               // height: 48,
               // overflow: 'hidden'
@@ -46,26 +48,25 @@ export default function TalkButton() {
           >
             <View
                 style={{
-                  backgroundColor: showModal ? 'black' : colors.brand,
-                  borderBottomLeftRadius: '50%',
-                  borderBottomRightRadius: 4,
-                  borderTopLeftRadius: '50%',
-                  borderTopRightRadius: '50%',
-                  // borderRadius: '50%',                     
-                  width: 40, 
-                  height: 40, 
-                  ...styles.centered,
-                  marginLeft: 8,
+                    backgroundColor: 'black',
+                    borderTopLeftRadius: '50%',
+                    borderTopRightRadius: 2,
+                    borderBottomLeftRadius: '50%',
+                    borderBottomRightRadius: '50%',
+                    // borderRadius: '50%',                     
+                    width: 54, 
+                    height: 54,                     
+                    ...styles.centered,
                 }}
             >
               <Icon
-                name={micIcon.name}
+                name='plus'
                 styles={{
                   size: 24, 
                   // position: 'absolute', 
                   // bottom: 36, 
                   // left: 6, 
-                  // color: 'white',
+                  color: 'white',
                   // transform: [{ rotate: "-90deg" }]
                 }}
               />

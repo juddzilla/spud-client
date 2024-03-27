@@ -6,7 +6,6 @@ export default function HomeLayout() {
     <Stack 
       screenOptions={{
         contentStyle: {
-          backgroundColor: colors.theme.backgroundColor,
           // height: '100%',
           // flex: 1,
         }
