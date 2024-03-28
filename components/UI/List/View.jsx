@@ -263,7 +263,7 @@ export default function ListView({options}) {
     <View style={styles.View}>
       {DrawerScreen(viewTitle)}     
       <View style={styles.header}>   
-        <View style={{...styles.row, paddingLeft: 32,}}>
+        <View style={{...styles.row}}>
     
 
           <Search

@@ -267,11 +267,12 @@ export default function List() {
         elevation: 24,
       },
       checkbox: {
+        // backgroundColor: 'green', 
         alignItems: 'center',
         height: 44, 
         justifyContent: 'center', 
-        width: 44,
-        marginLeft: 2,
+        width: 48,
+        marginLeft: 5,
       },
       icon: {
         color: item.completed ? colors.lightText : colors.text,        
@@ -391,7 +392,7 @@ export default function List() {
             <Search placeholder={'Filter'} update={onFilterUpdate} />
             <Pressable
               onPress={toggleShowCompleted}
-              style={{ width: 48, height: 40, right: -12, alignItems: 'center', justifyContent: 'center'}}
+              style={{width: 40, height: 40, right: -7, alignItems: 'center', justifyContent: 'center'}}
             >
               <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
             </Pressable>   

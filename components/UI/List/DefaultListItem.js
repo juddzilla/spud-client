@@ -5,7 +5,7 @@ View,
 } from 'react-native';
 
 import { router } from 'expo-router';
-import { BaseButton } from 'react-native-gesture-handler';
+import { BaseButton, RectButton } from 'react-native-gesture-handler';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -27,10 +27,10 @@ export default function DefaultListItem({remove}, {item}) {
             marginBottom: 2,
             marginLeft: 12,
             ...styles.row,
-            padding: 12,
+            padding: 12,            
         },
         content: {
-            flex: 1,
+            flex: 1,            
         },
         date: {
             color: colors.theme.text.medium,
@@ -61,27 +61,35 @@ export default function DefaultListItem({remove}, {item}) {
     const RenderUnderlayLeftActions = () => {
         const { percentOpen } = useSwipeableItemParams();
 
-        const animStyle = useAnimatedStyle(
-        () => ({
-            opacity: percentOpen.value,
-        }),
-        [percentOpen]
-        );
+        // const animStyle = useAnimatedStyle(
+        // () => ({
+        //     opacity: percentOpen.value,
+
+        // }),
+        // [percentOpen]
+        // );
 
         return (
-        <BaseButton style={{ justifyContent: 'center', alignItems: 'flex-end', height: 64}} onPress={() => { remove(item.uuid)}}>
+        <RectButton
+            onPress={() => { remove(item.uuid)}}
+            style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'flex-end', 
+                
+            }}
+        >
             <Animated.View
-            style={{                
-                backgroundColor: 'green',
-                justifyContent: 'flex-end',
-                // alignItems: 'flex-end',
-                width: 60,
-                // flex: 1,
-                ...animStyle,
-            }}>
-            <Icon name='trash' styles={{transform: [{ translateX: -24 }]}} />
+                style={{                            
+                    backgroundColor: colors.remove,
+                    ...styles.centered,
+                    height: 48,
+                    width: 60,
+                    // ...animStyle
+                }}>
+                    <Icon name='trash' />
             </Animated.View>
-        </BaseButton>
+        </RectButton>
         );
     };
 
