@@ -6,8 +6,8 @@ import Icon from './UI/icons';
 
 export default function DrawerScreen(title, headerRight) {    
     const navigation = useNavigation();
-    console.log('navigation', navigation);
-    console.log('router', router);
+    // console.log('navigation', navigation);
+    // console.log('router', router);
     function goBack() {
       // navigation.reset();
       router.back();   

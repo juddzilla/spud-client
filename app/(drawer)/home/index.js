@@ -20,29 +20,35 @@ import Fetcher from '../../../interfaces/fetch';
 const ItemTemplate = ({remove},{item}) => {  
   const styled = StyleSheet.create({        
     content: {
-      marginVertical: 1,                  
-      marginLeft: 16,
+      marginVertical: 2, 
       flexDirection: 'row',
       alignItems: 'center', 
       borderRightWidth: 4,
       borderRightColor: colors.removeHint,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.darkestBg,
       
     },
     icon: {
       container: {
         minHeight: 44, 
-        width:44, 
+        width:44,         
         marginRight: 0, 
         alignItems: 'center', 
         justifyContent: 'center',
         ...styles.row,
+        
 
       },
     },        
     info: {
       flexDirection: 'row',
       paddingRight: 8,
+      paddingLeft: 20,
+      // marginLeft: 8,
       paddingVertical: 12,
+      backgroundColor: colors.lightWhite,      
+      flex: 1,
     },
     itemDot: {
       marginRight: 10,
@@ -62,15 +68,29 @@ const ItemTemplate = ({remove},{item}) => {
     );
 
     return (
-      <BaseButton style={{ justifyContent: 'center', alignItems: 'flex-end', height: 44}} onPress={() => { remove(item.uuid)}}>
+      <BaseButton
+        style={{
+          justifyContent: 'center', 
+          alignItems: 'flex-end', 
+        }} 
+        
+      >
         <Animated.View
-          style={{                
-            
-            justifyContent: 'flex-end',            
-            width: 60,
-            ...animStyle,
-          }}>
-          <Icon name='trash' styles={{transform: [{ translateX: -24 }]}} />
+          style={animStyle}>
+            <View
+              style={{                
+                ...styles.row,
+                paddingLeft: 8,
+                backgroundColor: colors.remove,
+              }}
+            >
+              <BaseButton onPress={() => { remove(item.uuid)}}>
+                <View style={styled.icon.container}>
+
+                  <Icon name='trash' />
+                </View>
+              </BaseButton>
+            </View>
         </Animated.View>
       </BaseButton>
     );
@@ -98,8 +118,7 @@ const ItemTemplate = ({remove},{item}) => {
       Fetcher.post(`queue/${item.uuid}/`, {type})
       .then(res => {
         const [err, to] = res;
-        console.log('err', err);
-        console.log('item', to);
+        
         if (!err) {
           const typeMap = {
             'Convo': 'convos',
@@ -107,36 +126,38 @@ const ItemTemplate = ({remove},{item}) => {
             'Note': 'notes'
           }
 
-          const target = `./${typeMap[to.type]}/${to.uuid}`;
-          console.log('target', target);
+          const target = `/\(drawer\)/${typeMap[to.type]}/${to.uuid}`;          
 
-          router.navigate(target);
+          // https://stackoverflow.com/a/77883629
+          // below regex is to compensate for know bug when using a router method and a dynamic route
+          router.push(target.replace(/\((.*?)\)/g, "[$1]"));
         }
       })
     }
 
     return (
-      <BaseButton style={{ justifyContent: 'center', alignItems: 'flex-start'}}>
+      <BaseButton
+        style={{           
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
+      >
         <Animated.View
-          style={{                
-            ...styles.row,
-            width: 260,
-            ...styles.centered,          
-            ...animStyle,
-          }}>
+          style={animStyle}>
             <View
-          style={{                
-            ...styles.row,
-            // width: 540,
-            // ...styles.centered,          
-          }}>
+              style={{                
+                ...styles.row,
+                paddingLeft: 8,
+                backgroundColor: colors.darkText,
+              }}
+            >
 
             <BaseButton onPress={webSearch}>
                 <View style={styled.icon.container}>
-                  <Icon name='webSearch' />
+                  <Icon name='webSearch' styles={{color: 'white'}}/>
                 </View>
               </BaseButton>    
-              <BaseButton onPress={() => createConversion('convo')}>
+              {/* <BaseButton onPress={() => createConversion('convo')}>
                 <View style={styled.icon.container}>
                   <Icon name='convoAdd' />
                 </View>
@@ -150,7 +171,7 @@ const ItemTemplate = ({remove},{item}) => {
                 <View style={styled.icon.container}>
                 <Icon name='listAdd' />
                 </View>
-              </BaseButton>
+              </BaseButton> */}
           </View>
             
         </Animated.View>
@@ -164,13 +185,13 @@ const ItemTemplate = ({remove},{item}) => {
         item={item}
         renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
         renderUnderlayRight={() => <RenderUnderlayRightActions />}
-        snapPointsLeft={[60]}
-        snapPointsRight={[164]}
+        snapPointsLeft={[48]}
+        snapPointsRight={[48]}
         overSwipe={20}              
       >          
       <View style={styled.content}>                  
           <View style={styled.info}>                  
-              <Light style={styled.itemDot}>&#x25e6;</Light>
+              {/* <Light style={styled.itemDot}>&#x25e6;</Light> */}
               <Regular style={styled.title}>{item.headline}</Regular>              
           </View>
       </View>

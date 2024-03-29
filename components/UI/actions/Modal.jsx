@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import {useSegments} from 'expo-router';
+import { useSegments } from 'expo-router';
 
 export default function CustomModal({ show, toggleShow, children }) {
-    const segments = useSegments();    
+    const segments = useSegments();
     const compensateForTopBar = getStatusBarHeight() + 35;
     const paddingTop = compensateForTopBar + 48; // ios specifc size?
 
