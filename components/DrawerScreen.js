@@ -1,4 +1,4 @@
-import  {router } from 'expo-router'
+import { router } from 'expo-router'
 import { Drawer } from 'expo-router/drawer';
 import { useNavigation } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
@@ -6,9 +6,12 @@ import Icon from './UI/icons';
 
 export default function DrawerScreen(title, headerRight) {    
     const navigation = useNavigation();
-
+    console.log('navigation', navigation);
+    console.log('router', router);
     function goBack() {
-      router.back();      
+      // navigation.reset();
+      router.back();   
+      // navigation.goBack   
     }
 
     function toggleMenu() {

@@ -275,7 +275,8 @@ export default function List() {
         marginLeft: 5,
       },
       icon: {
-        color: item.completed ? colors.lightText : colors.text,        
+        color: item.completed ? colors.lightText : colors.text,    
+        size:14,    
       },
       body: {
         paddingTop: 10,        
@@ -340,7 +341,15 @@ export default function List() {
           >
             <View style={styled.container}>            
               <Pressable style={styled.checkbox} onPress={() => toggleCompleted(item)}>
-                <Icon name={iconName} styles={styled.icon} />
+                <Icon name={'checkOutline'} styles={styled.icon} />
+                { item.completed &&
+                  <Icon name={'check'} styles={{
+                    position: 'absolute', 
+                    size: 20,
+                    top: 9,
+                    left: 17
+                  }}/>
+                }
               </Pressable>
               <View style={styled.body}>
                 {

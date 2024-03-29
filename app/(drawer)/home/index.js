@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
-
-import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
+import * as WebBrowser from 'expo-web-browser';
+import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { BaseButton } from 'react-native-gesture-handler';
+import { router } from 'expo-router';
 
 import colors from '../../../components/UI/colors';
 import styles from '../../../components/UI/styles';
@@ -13,16 +14,16 @@ import ListView from '../../../components/UI/List/View';
 import Light from '../../../components/UI/text/Light';
 import Regular from '../../../components/UI/text/Regular';
 
-const ItemTemplate = ({remove},{item}) => {
+
+import Fetcher from '../../../interfaces/fetch';
+
+const ItemTemplate = ({remove},{item}) => {  
   const styled = StyleSheet.create({        
     content: {
-      marginVertical: 1,
-      // marginHorizontal: 4,                  
+      marginVertical: 1,                  
       marginLeft: 16,
       flexDirection: 'row',
       alignItems: 'center', 
-      
-      // backgroundColor: 'white',s
       borderRightWidth: 4,
       borderRightColor: colors.removeHint,
       
@@ -30,15 +31,16 @@ const ItemTemplate = ({remove},{item}) => {
     icon: {
       container: {
         minHeight: 44, 
-        width:60, 
+        width:44, 
         marginRight: 0, 
         alignItems: 'center', 
         justifyContent: 'center',
+        ...styles.row,
+
       },
     },        
     info: {
       flexDirection: 'row',
-      // paddingLeft: 12,
       paddingRight: 8,
       paddingVertical: 12,
     },
@@ -63,7 +65,7 @@ const ItemTemplate = ({remove},{item}) => {
       <BaseButton style={{ justifyContent: 'center', alignItems: 'flex-end', height: 44}} onPress={() => { remove(item.uuid)}}>
         <Animated.View
           style={{                
-            backgroundColor: 'green',
+            
             justifyContent: 'flex-end',            
             width: 60,
             ...animStyle,
@@ -84,11 +86,33 @@ const ItemTemplate = ({remove},{item}) => {
       [percentOpen]
     );
 
-    const webSearch = async () => {          
+    const webSearch = async () => {    
       remove(item.uuid)
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(item[createKey])}`;
-      await WebBrowser.openBrowserAsync(searchUrl);              
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(item.headline)}`;
+      await WebBrowser.openBrowserAsync(searchUrl);     
+      // show prompt if want to make note         
       getData();
+    };
+
+    const createConversion = (type) => {
+      Fetcher.post(`queue/${item.uuid}/`, {type})
+      .then(res => {
+        const [err, to] = res;
+        console.log('err', err);
+        console.log('item', to);
+        if (!err) {
+          const typeMap = {
+            'Convo': 'convos',
+            'List': 'lists',
+            'Note': 'notes'
+          }
+
+          const target = `./${typeMap[to.type]}/${to.uuid}`;
+          console.log('target', target);
+
+          router.navigate(target);
+        }
+      })
     }
 
     return (
@@ -96,30 +120,39 @@ const ItemTemplate = ({remove},{item}) => {
         <Animated.View
           style={{                
             ...styles.row,
-            width: 136,
+            width: 260,
             ...styles.centered,          
             ...animStyle,
           }}>
-            <View style={{...styles.row, 
-            paddingLeft: 16,}}>
-              <BaseButton onPress={webSearch}>
+            <View
+          style={{                
+            ...styles.row,
+            // width: 540,
+            // ...styles.centered,          
+          }}>
+
+            <BaseButton onPress={webSearch}>
                 <View style={styled.icon.container}>
                   <Icon name='webSearch' />
                 </View>
-              </BaseButton>                  
-              <View style={styled.icon.container}>
-                <Icon name='convoAdd' />
-              </View>
-            </View>
-            <View style={{...styles.row, 
-            paddingLeft: 16,}}>
-              <View style={styled.icon.container}>
-                <Icon name='listAdd' />
-              </View>
-              <View style={styled.icon.container}>                  
+              </BaseButton>    
+              <BaseButton onPress={() => createConversion('convo')}>
+                <View style={styled.icon.container}>
+                  <Icon name='convoAdd' />
+                </View>
+              </BaseButton>
+              <BaseButton onPress={() => createConversion('note')}>
+                <View style={styled.icon.container}>
                 <Icon name='noteAdd' />
-              </View>
-            </View>
+                </View>
+              </BaseButton>
+              <BaseButton onPress={() => createConversion('list')}>
+                <View style={styled.icon.container}>
+                <Icon name='listAdd' />
+                </View>
+              </BaseButton>
+          </View>
+            
         </Animated.View>
       </BaseButton>
     );
@@ -132,7 +165,7 @@ const ItemTemplate = ({remove},{item}) => {
         renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
         renderUnderlayRight={() => <RenderUnderlayRightActions />}
         snapPointsLeft={[60]}
-        snapPointsRight={[136]}
+        snapPointsRight={[164]}
         overSwipe={20}              
       >          
       <View style={styled.content}>                  
