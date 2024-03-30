@@ -121,12 +121,12 @@ const ItemTemplate = ({remove},{item}) => {
         
         if (!err) {
           const typeMap = {
-            'Convo': 'convos',
-            'List': 'lists',
-            'Note': 'notes'
+            'Convo': 'convo',
+            'List': 'list',
+            'Note': 'note'
           }
 
-          const target = `/\(drawer\)/${typeMap[to.type]}/${to.uuid}`;          
+          const target = `${typeMap[to.type]}?uuid=${to.uuid}`;          
 
           // https://stackoverflow.com/a/77883629
           // below regex is to compensate for know bug when using a router method and a dynamic route
@@ -157,7 +157,7 @@ const ItemTemplate = ({remove},{item}) => {
                   <Icon name='webSearch' styles={{color: 'white'}}/>
                 </View>
               </BaseButton>    
-              {/* <BaseButton onPress={() => createConversion('convo')}>
+              <BaseButton onPress={() => createConversion('convo')}>
                 <View style={styled.icon.container}>
                   <Icon name='convoAdd' />
                 </View>
@@ -171,7 +171,7 @@ const ItemTemplate = ({remove},{item}) => {
                 <View style={styled.icon.container}>
                 <Icon name='listAdd' />
                 </View>
-              </BaseButton> */}
+              </BaseButton>
           </View>
             
         </Animated.View>
@@ -186,10 +186,10 @@ const ItemTemplate = ({remove},{item}) => {
         renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
         renderUnderlayRight={() => <RenderUnderlayRightActions />}
         snapPointsLeft={[48]}
-        snapPointsRight={[48]}
+        snapPointsRight={[160]}
         overSwipe={20}              
       >          
-      <View style={styled.content}>                  
+      <View style={styled.content}>                
           <View style={styled.info}>                  
               {/* <Light style={styled.itemDot}>&#x25e6;</Light> */}
               <Regular style={styled.title}>{item.headline}</Regular>              

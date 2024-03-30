@@ -7,7 +7,7 @@ export default function Lists() {
       talkUri: '',
     },
     viewTitle: 'Your Lists',
-    detail:'/lists',
+    detail:'/list',
     filters: {
       placeholder: 'Search Lists',
       sort: {

@@ -9,6 +9,7 @@ const icons = {
     check: { library: MaterialCommunityIcons, name: 'check'},
     checkedOutline: { library: MaterialCommunityIcons, name: 'checkbox-outline'},
     checkOutline: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},
+    checkedFilled: { library: MaterialCommunityIcons, name: 'checkbox-blank-circle'},
     close: { library: Ionicons, name: 'close'},
     completedAll: { library: MaterialCommunityIcons, name: 'dots-square'},
     completedNot: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},

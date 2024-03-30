@@ -62,7 +62,7 @@ const NoteInput = ({ value, update }) => {
 
 export default function Note() {
   const local = useLocalSearchParams();
-  const baseUri = `notes/${local.slug}/`;
+  const baseUri = `notes/${local.uuid}/`;
 
   const [body, setBody] = useState('');
   const [title, setTitle] = useState('Note');
@@ -84,7 +84,7 @@ export default function Note() {
   );
 
   function getData() {
-    if (!local.slug) {
+    if (!local.uuid) {
       return;
     }
     Fetch.get(baseUri)

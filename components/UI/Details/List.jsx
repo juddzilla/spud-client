@@ -33,8 +33,9 @@ import Options from '../actions/Options';
 
 export default function List() {
   const local = useLocalSearchParams();
+  console.log('local',local);
 
-  const baseUri = `lists/${local.slug}/`;
+  const baseUri = `lists/${local.uuid}/`;
   const itemsUri = `${baseUri}items/`;
   const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
   const initialTitle = local.title ? local.title : 'List';
@@ -76,7 +77,7 @@ export default function List() {
 
 
   function getData() {
-    if (!local.slug) {
+    if (!local.uuid) {
       return;
     }
     Fetch.get(baseUri, {
@@ -253,17 +254,14 @@ export default function List() {
 
   const ListItem = useCallback((props) => {    
     const {drag, getIndex, isActive, item} = props;     
-    const iconName = item.completed ? 'checkedOutline' : 'checkOutline';
 
     const marginBottom = getIndex() === listItems.length - 1 ? 64 : 0;
-    // console.log('marginBottom', index, listItems.length);
+    
     const styled = StyleSheet.create({
       container: {
         flexDirection: 'row',
         marginBottom,
-        marginHorizontal: 0,
-        // borderBottomWidth: 1,
-        // borderBottomColor: colors.darkBg,      
+        marginHorizontal: 0,    
         shadowColor: "#e2e8f0",
         shadowOffset: {
             width: 0,
@@ -280,10 +278,11 @@ export default function List() {
         justifyContent: 'center', 
         width: 48,
         marginLeft: 5,
+        top: 1,
       },
       icon: {
         color: item.completed ? colors.lightText : colors.text,    
-        size:14,    
+        size:15,    
       },
       body: {
         paddingTop: 10,        
@@ -351,6 +350,7 @@ export default function List() {
                 <Icon name={'checkOutline'} styles={styled.icon} />
                 { item.completed &&
                   <Icon name={'check'} styles={{
+                    color: colors.lightText,
                     position: 'absolute', 
                     size: 20,
                     top: 9,

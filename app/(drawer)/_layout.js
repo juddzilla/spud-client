@@ -32,6 +32,14 @@ export default function DrawerLayout() {
             }}
           />
           <Drawer.Screen
+            name="list"
+            options={{
+              drawerIcon: () => <Icon name='list' />,
+              drawerLabel: "List", 
+              drawerItemStyle: { height: 0 }
+            }}
+          />
+          <Drawer.Screen
             name="convos"
             options={{
               drawerIcon: () => <Icon name='convo' />,
@@ -45,6 +53,15 @@ export default function DrawerLayout() {
               drawerIcon: () => <Icon name='notes' />,
               drawerLabel: "Notes",
               title: "Collections",
+            }}
+          />
+
+          <Drawer.Screen
+            name="note"
+            options={{
+              drawerIcon: () => <Icon name='list' />,
+              drawerLabel: "List", 
+              drawerItemStyle: { height: 0 }
             }}
           />
              

@@ -29,7 +29,7 @@ import Options from '../actions/Options';
 export default function Convo() {  
   const local = useLocalSearchParams();
 
-  const baseUri = `convos/${local.slug}/`;    
+  const baseUri = `convos/${local.uuid}/`;    
   const initialTitle = local.title ? local.title : 'Conversation';
   const sortOn = ['order', 'updated_at'];
 
@@ -111,7 +111,7 @@ export default function Convo() {
   };
 
   function getData() {
-    if (!local.slug) {
+    if (!local.uuid) {
       return;
     }
     Fetch.get(baseUri)

@@ -21,7 +21,7 @@ const header = {
     justifyContent: 'space-between',
     // paddingVertical: 8,
     // backgroundColor: 'red',
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     // marginBottom: 8,
     input: {
         container: {

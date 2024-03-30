@@ -70,6 +70,7 @@ export default function ListView({options}) {
      const [initialLoadComplete, setInitialLoadComplete] = useState(false);
      const [list, setList] = useState([]);
      const [loading, setLoading] = useState(true);
+     const [selected, setSelected] = useState([]);
      const [total, setTotal] = useState(null);
    
      const [query, setQuery] = useState(initialQuery);
@@ -115,6 +116,7 @@ export default function ListView({options}) {
          setInitialLoadComplete(true);     
          setLoading(false);   
          if (!err) {
+          console.log('res', res);
           setNext(res.next);
           setList(res.results);
           setTotal(res.count);
@@ -177,19 +179,6 @@ export default function ListView({options}) {
        setQuery({...query, ...params});
      }
    
-     // function onLongPress(index) {    
-     //   const id = list[index].id;
-     //   const selectedIndex = selected.indexOf(id);
-       
-     //   if (selectedIndex !== -1) {
-     //     selected.splice(selectedIndex, 1);
-     //   } else {
-     //     selected.push(id);
-     //   }
-       
-     //   setSelected([...selected]);
-     // }
-   
      function onSubmitMessage() {
        // if (!hideModal) {
        //     toggleModal(true);
@@ -224,6 +213,14 @@ export default function ListView({options}) {
          <Empty><Bold>Create Your First Below</Bold></Empty>
        )
      }
+
+     const ListHeaderComponent = () => (
+      <View style={{...styles.row, paddingLeft: 60, backgroundColor: colors.darkBg, height: 40, }}>        
+        { total &&
+          <Bold style={{fontSize: 12, color: colors.lightText}}>Showing {list.length} of {total}</Bold>
+        }
+      </View>
+     );
    
      const textInputStyled = StyleSheet.create({    
        input: {
@@ -287,28 +284,55 @@ export default function ListView({options}) {
            }
        }
      });
+
+
+    function toggleSelected(uuid) {      
+      const selectedIndex = selected.indexOf(uuid);
+      if (selectedIndex === -1) {
+        selected.push(uuid);
+      } else {
+        selected.splice(selectedIndex, 1);        
+      }
+      setSelected([...selected]);
+      const newList = [...list];
+      const itemIndex = newList.findIndex(item => item.uuid === uuid);      
+      newList[itemIndex].selected = !newList[itemIndex].selected;
+      setList(newList);
+    }    
    
      return (
        <View style={styles.View}>
          {DrawerScreen(viewTitle)}     
          <View style={styles.header}>   
            <View style={{...styles.row}}>
-             <Search
-               disabled={list.length === 0}
-               placeholder={filters.placeholder} 
-               value={query.search}
-               update={update} 
-             />
-             { Object.hasOwn(filters, 'sort') &&
-               // <View style={{marginLeft: 16}}>
-                 <Sort
-                   disabled={list.length === 0}
-                   fields={filters.sort.fields}
-                   query={{direction: query.sortDirection, property: query.sortProperty}} 
-                   update={update}
-                 />
-               // </View>
-             } 
+              <Pressable
+                onPress={toggleSelected}
+                style={{
+                  width: 40,
+                  height: 40,
+                  marginRight: 8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: selected.length ? 1 : 0,
+                }}
+              >
+                <Icon name={'trash'} styles={{size: 22, color: colors.sort.active }} />
+              </Pressable>   
+              <Search
+                disabled={list.length === 0}
+                placeholder={filters.placeholder} 
+                value={query.search}
+                update={update} 
+              />
+              { Object.hasOwn(filters, 'sort') &&
+                <Sort
+                  disabled={list.length === 0}
+                  fields={filters.sort.fields}
+                  query={{direction: query.sortDirection, property: query.sortProperty}} 
+                  update={update}
+                />
+              } 
+            
            </View> 
          </View>
 
@@ -336,10 +360,10 @@ export default function ListView({options}) {
           <>
             <FlatList
               data={list}
-              renderItem={ItemTemplate.bind(null, {remove})}
+              renderItem={ItemTemplate.bind(null, {remove, toggleSelected})}
               keyExtractor={item => item.uuid}                      
               ListEmptyComponent={ListEmptyComponent}
-              
+              ListHeaderComponent={ListHeaderComponent}
               onRefresh={onRefresh}
               onEndReached={getNext}
               //if set to true, the UI will show a loading indicator

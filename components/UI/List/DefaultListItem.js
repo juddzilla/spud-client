@@ -19,16 +19,25 @@ import styles from '../styles';
 
 import { relativeDate } from '../../../utils/dates';
 
-export default function DefaultListItem({remove}, {item}) {         
-    const { type } = item;
+export default function DefaultListItem({remove, toggleSelected}, {item}) {         
+    const { type, uuid } = item;
 
     const styled = StyleSheet.create({
-        pressable: {
+        container: {
             marginBottom: 2,
-            marginLeft: 12,
+            // marginLeft: 12,
             ...styles.row,
             padding: 12,            
+            // backgroundColor: 'green', 
+            flex: 1,
         },
+        checkbox: {
+            alignItems: 'center',
+            height: 40, 
+            justifyContent: 'center', 
+            width: 40,
+            top: 1,
+          },
         content: {
             flex: 1,            
         },
@@ -36,25 +45,30 @@ export default function DefaultListItem({remove}, {item}) {
             color: colors.theme.text.medium,
             fontSize: 12, 
         },
+        icon: {
+            color: item.selected ? colors.text : colors.darkestBg,    
+            size:15,    
+          },
         info: {
             ...styles.row,
+            flexWrap: 'wrap',
         },
         subtitle: { fontSize: 12, color: colors.theme.text.medium, marginRight: 6 },
-        title: { backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 6 },
+        title: { flexWrap: 'wrap', backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 6 },
     });
 
     function toDetail() {               
         const typeToRouteMap = {
             Collection: 'collections',
-            Convo: 'convos',
-            List: 'lists',
-            Note: 'notes'
+            Convo: 'convo',
+            List: 'list',
+            Note: 'note'
         };  
 
         if (!typeToRouteMap[type]) {
             return;
         }
-        const route = `${typeToRouteMap[type]}/${item.uuid}`;            
+        const route = `${typeToRouteMap[type]}?uuid=${item.uuid}`;            
         router.push(route);
     }
 
@@ -93,13 +107,12 @@ export default function DefaultListItem({remove}, {item}) {
         );
     };
 
-    const typeToIconMap = {
-        Collection: 'collection',
-        Convo: 'convo',
-        List: 'list',
-        Note: 'notes',
-        Queue: 'queue',
-    };
+    function onLongPress() {
+        console.log('onlongprrss', uuid);
+        toggleSelected(uuid)
+    }
+
+    const checkboxIcon = item.selected ? 'checkedFilled' : 'checkOutline';
 
     return (      
         <SwipeableItem
@@ -109,20 +122,27 @@ export default function DefaultListItem({remove}, {item}) {
             snapPointsLeft={[60]}
             overSwipe={20}              
         >          
-        <Pressable
-            style={styled.pressable}
-            onPress={toDetail} 
-        >      
-            <View style={styled.content}>
-                <Bold style={styled.title}>{item.headline}</Bold>
-                <View style={styled.info}>
-                    { item.subheadline &&
-                        <Light style={styled.subtitle}>{ item.subheadline }</Light>
-                    }
-                    <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
+        <View style={{...styles.row, paddingHorizontal: 8}}>
+            <Pressable style={styled.checkbox} onPress={() => toggleSelected(uuid)}>
+                <Icon name={checkboxIcon} styles={styled.icon} />                
+            </Pressable>  
+            <Pressable
+                style={styled.container}
+                onPress={toDetail} 
+                onLongPress={onLongPress}
+            >      
+                <View style={styled.content}>
+                    <Bold style={styled.title}>{item.headline}</Bold>
+                    <View style={styled.info}>
+                        { item.subheadline &&
+                            <Light style={styled.subtitle}>{ item.subheadline }</Light>
+                        }
+                        <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
+                    </View>
                 </View>
-            </View>
-        </Pressable>            
+            </Pressable>            
+
+        </View>
         </SwipeableItem>        
     )
 };
