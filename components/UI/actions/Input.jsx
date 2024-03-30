@@ -26,32 +26,21 @@ export default function Input({ onSubmit, placeholder, hideModal }) {
         input: {
             container: {
                 backgroundColor: 'white',
-                // backgroundColor: focus ? 'white' : colors.lightWhite,
                 flexDirection: 'row', 
                 alignItems: 'center', 
-                // justifyContent: 'space-between',                                             
                 flex: 1,  
-                // width: '100%'     ,
-                
                 borderWidth: 1,
                 borderColor: colors.theme.text.lightest,
                 borderRadius: 12,
-                // paddingLeft: 32,
                 marginVertical: focus ? 0 : 2,
                 position: focus ? 'absolute' : 'relative',
                 right: focus ? 16 : 0,
-                top: focus ? 6 : 0,
-                width: '100%',
-                // marginLeft: 64,
-                height:  44,    
+                width: focus ? '100%' : null,                
                 zIndex: 10
             },
             field: {                    
-                height: 44,    
-                paddingHorizontal: 16,
-                // backgroundColor: 'red',
-                // marginRight: 0, mnmnm
-                flex: 1,     
+                height: 48,
+                paddingHorizontal: 16,            
                 color: colors.theme.inputs.dark.text.darkest,                            
             },
             icons: {

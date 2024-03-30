@@ -48,7 +48,7 @@ export default function TalkButton() {
                 style={{
                   backgroundColor: showModal ? 'black' : colors.brand,
                   borderBottomLeftRadius: '50%',
-                  borderBottomRightRadius: 4,
+                  borderBottomRightRadius: 8,
                   borderTopLeftRadius: '50%',
                   borderTopRightRadius: '50%',
                   // borderRadius: '50%',                     

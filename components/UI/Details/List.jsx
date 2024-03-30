@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
+import {
+  Animated as RNAnimated,
+  Pressable, 
+  StyleSheet, 
+  TouchableOpacity, 
+  TextInput, 
+  View,
+} from 'react-native';
 
 import { BaseButton } from 'react-native-gesture-handler';
 
