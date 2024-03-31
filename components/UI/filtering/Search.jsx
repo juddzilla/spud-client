@@ -30,24 +30,18 @@ export default function Search({ disabled, placeholder, update }) {
     const style = StyleSheet.create({    
         container: {
             ...styles.row,   
-            backgroundColor: (focused || search.length > 0) ? colors.lightWhite : colors.theme.text.lightest,
+            backgroundColor: (focused || search.length > 0) ? colors.lightWhite : colors.theme.text.lightest,            
             borderWidth: 1,
             borderRadius: 8,
-            borderColor: colors.theme.text.lightest,   
+            borderColor: colors.theme.text.lightest,               
             flex: 1,
+            justifyContent: 'space-between',
             marginRight: 8,
-            // width: focused ? 44 : null,
-            // width: '90%',
             
         },
         search: { 
             color: colors.input.dark.icon, 
             size: 14,
-            // position: 'absolute',
-            // right: 12,
-            // bottom: 10,
-            // zIndex: 10,
-
          },
          icon: {
             container: {
@@ -59,18 +53,11 @@ export default function Search({ disabled, placeholder, update }) {
          },
         input: {            
             height: 40,                      
-            marginRight: 0, 
-            flex: 1,
+            marginRight: 0,                              
+            backgroundColor: 'transparent',
+            color: colors.theme.inputs.light.text.dark,                
             paddingLeft: 18,
-            // backgroundColor: colors.input.dark.backgroundColor,                
-            // color: colors.input.dark.color,
-            // backgroundColor: colors.theme.inputs.light.backgroundColor,
-            color: colors.theme.inputs.light.text.dark,
-            paddingRight: 44,
-
-            
-            // maxWidth: '75%',
-            // width: '75%',
+            paddingRight: 44,        
         },
         close: { 
             button: {
@@ -93,7 +80,10 @@ export default function Search({ disabled, placeholder, update }) {
         //     alignItems: 'center', 
         //     justifyContent: 'center',
         //  },
-    })
+    });
+    
+    let inputStyle = {};
+    
     return (
         <View style={style.container}>
             
@@ -104,7 +94,7 @@ export default function Search({ disabled, placeholder, update }) {
                 onBlur={() => setFocused(false)}
                 onFocus={() => setFocused(true)}
                 placeholder={placeholder}
-                style={style.input}
+                style={{...style.input, ...inputStyle}}
             />
             <View style={
                 style.icon.container

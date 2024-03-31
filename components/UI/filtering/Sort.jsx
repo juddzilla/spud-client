@@ -47,7 +47,7 @@ export default function Sort({ disabled, fields, query, update }) {
                 <Pressable
                   key={property}
                   onPress={() => chooseSort(property)}
-                  style={{ width: 48, height: 64, alignItems: 'center', justifyContent: 'center'}}
+                  style={{ width: 48, height: 40, alignItems: 'center', justifyContent: 'center'}}
                 >
                   <Icon name={properties.name} styles={{size: properties.size, color: properties.color }} />
                 </Pressable>

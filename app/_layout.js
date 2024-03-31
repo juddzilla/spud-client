@@ -7,6 +7,7 @@ import {
   View,
  } from 'react-native';
 import { Slot } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 

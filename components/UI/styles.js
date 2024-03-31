@@ -17,11 +17,11 @@ const row = { alignItems: 'center', flexDirection: 'row' };
 const header = {
     alignItems: 'center',
     flexDirection: 'row-reverse',
-    height: 64,
+    // height: 60,
     justifyContent: 'space-between',
     // paddingVertical: 8,
-    // backgroundColor: 'red',
-    paddingHorizontal: 8,
+    // backgroundColor: 'white',
+    padding: 8,
     // marginBottom: 8,
     input: {
         container: {

@@ -32,8 +32,7 @@ import Input from '../actions/Input';
 import Options from '../actions/Options';
 
 export default function List() {
-  const local = useLocalSearchParams();
-  console.log('local',local);
+  const local = useLocalSearchParams();  
 
   const baseUri = `lists/${local.uuid}/`;
   const itemsUri = `${baseUri}items/`;
@@ -270,18 +269,17 @@ export default function List() {
         shadowOpacity: 0.58,
         shadowRadius: 16.00,
         elevation: 24,
+        paddingLeft: 8,
       },
       checkbox: {
-        // backgroundColor: 'green', 
-        alignItems: 'center',
-        height: 44, 
-        justifyContent: 'center', 
-        width: 48,
-        marginLeft: 5,
-        top: 1,
+        ...Styles.centered,
+        // top: 1,
+        width: 40,
+        height: 40,
+        marginRight: 8,  
       },
       icon: {
-        color: item.completed ? colors.lightText : colors.text,    
+        color: item.completed ? colors.lightWhite : colors.text,    
         size:15,    
       },
       body: {
@@ -305,6 +303,8 @@ export default function List() {
         top: 3
       }
     });
+
+    const checkboxIcon = item.completed ? 'checkedFilled' : 'checkOutline';
 
     const RenderRightActions = () => {    
       const { percentOpen } = useSwipeableItemParams();
@@ -347,16 +347,8 @@ export default function List() {
           >
             <View style={styled.container}>            
               <Pressable style={styled.checkbox} onPress={() => toggleCompleted(item)}>
-                <Icon name={'checkOutline'} styles={styled.icon} />
-                { item.completed &&
-                  <Icon name={'check'} styles={{
-                    color: colors.lightText,
-                    position: 'absolute', 
-                    size: 20,
-                    top: 9,
-                    left: 17
-                  }}/>
-                }
+                <Icon name={checkboxIcon} styles={styled.icon} />
+                
               </Pressable>
               <View style={styled.body}>
                 {
@@ -408,7 +400,7 @@ export default function List() {
             <Search placeholder={'Filter'} update={onFilterUpdate} />
             <Pressable
               onPress={toggleShowCompleted}
-              style={{width: 40, height: 40, right: -7, alignItems: 'center', justifyContent: 'center'}}
+              style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}
             >
               <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
             </Pressable>   

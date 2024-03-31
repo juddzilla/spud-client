@@ -44,20 +44,6 @@ export default function ListView({options}) {
     viewTitle,
    } = options;
 
-  //  const navigator = useNavigation();
-  //  const routes = navigator.getState()?.routes;
-    // const prevRoute = routes[routes.length - 2]; 
-  //  console.log('prevRoute', routes);
-
-  //  const local = useLocalSearchParams();
-  //  console.log('local', local);
-
-  //  if (Object.hasOwn(local, 'redirect')) {
-  //     router.setParams({});
-  //    router.replace(`${detail}/${local.redirect}`);
-  //  }
-
-   
      const initialQuery = {
        page: 1,
        per: 20,
@@ -70,7 +56,7 @@ export default function ListView({options}) {
      const [initialLoadComplete, setInitialLoadComplete] = useState(false);
      const [list, setList] = useState([]);
      const [loading, setLoading] = useState(true);
-     const [selected, setSelected] = useState([]);
+    //  const [selected, setSelected] = useState([]);
      const [total, setTotal] = useState(null);
    
      const [query, setQuery] = useState(initialQuery);
@@ -81,7 +67,6 @@ export default function ListView({options}) {
      const unfocusedWidth = Dimensions.get('window').width-48-40;
      const focusedWidth = Dimensions.get('window').width-32;
      const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
-     
    
      useEffect(() => {
        if (initialLoadComplete) {
@@ -104,6 +89,7 @@ export default function ListView({options}) {
        useCallback(() => {
          getData();    
          return () => {
+          // setInitialLoadComplete(false);
            setQuery(initialQuery);
          };
        }, [])
@@ -115,14 +101,15 @@ export default function ListView({options}) {
        .then(([err, res]) => { 
          setInitialLoadComplete(true);     
          setLoading(false);   
-         if (!err) {
-          console.log('res', res);
+         if (!err) {          
           setNext(res.next);
           setList(res.results);
           setTotal(res.count);
          }
        })
-       .catch(err => { console.warn(`List ${uri} error: ${err}`)})
+       .catch(err => {
+        console.warn(`List ${uri} error: ${err}`);
+      })
      }      
       
      function getNext() {
@@ -142,18 +129,34 @@ export default function ListView({options}) {
         .catch(err => { console.warn(`List ${uri} error: ${err}`)})
       }            
      }
+
+    function removeFromList(uuids) {
+      const newList = list.filter(i => !uuids.includes(i.uuid));          
+      setList(newList);
+      setTotal(total - uuids.length);
+    }
    
      const remove = (id) => {
        Fetch.remove(`${uri}${id}/`)
          .then(res => {
            const [err, success] = res;
            if (!err) {
-             const newList = list.filter(i => i.uuid !== id);          
-             setList(newList);
+            removeFromList([id]);             
            }
          });
-       // make api request, onsuccess    
      }
+
+    //  const removeMany = () => {
+    //   const uuids = selected.map(id => encodeURIComponent(id)).join(',');
+    //   Fetch.remove(`${uri}?uuids=${uuids}/`)
+    //   .then(res => {
+    //     const [err, success] = res;
+    //     if (!err) {
+    //       removeFromList([...selected]);
+    //       setSelected([]);
+    //     }
+    //   });
+    //  }
    
      async function create(title) {        
        const request = await Fetch.post(uri, { [createKey]: title });
@@ -162,7 +165,7 @@ export default function ListView({options}) {
          console.warn(`Host Error - POST ${uri} - ${JSON.stringify(err)}`)
        } else if (res) {
          if (detail) {
-           router.push(`${detail}/${res.uuid}`);
+           router.push(`${detail}?uuid=${res.uuid}`);
          } else {
            setList([...list, res]);
          }
@@ -188,7 +191,7 @@ export default function ListView({options}) {
        // toggleModal(false); 
    }
    
-     const ListEmptyComponent = () => {
+     const ListEmptyComponent = () => {      
        const Empty = (props) => (
          <View style={{                
            flex: 1, 
@@ -209,18 +212,23 @@ export default function ListView({options}) {
            <Empty><Bold>Loading</Bold></Empty>  
          )
        }
+       
        return (
          <Empty><Bold>Create Your First Below</Bold></Empty>
        )
      }
 
-     const ListHeaderComponent = () => (
-      <View style={{...styles.row, paddingLeft: 60, backgroundColor: colors.darkBg, height: 40, }}>        
-        { total &&
-          <Bold style={{fontSize: 12, color: colors.lightText}}>Showing {list.length} of {total}</Bold>
-        }
-      </View>
-     );
+     const ListHeaderComponent = () => {
+      if ([0, null].includes(total)) {
+        return null;
+      }
+      
+      return (
+        <View style={{...styles.row, paddingLeft: 28, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>                
+            <Bold style={{fontSize: 12, color: colors.lightText}}>Showing {list.length} of {total}</Bold>
+        </View>
+      )
+    };
    
      const textInputStyled = StyleSheet.create({    
        input: {
@@ -286,27 +294,27 @@ export default function ListView({options}) {
      });
 
 
-    function toggleSelected(uuid) {      
-      const selectedIndex = selected.indexOf(uuid);
-      if (selectedIndex === -1) {
-        selected.push(uuid);
-      } else {
-        selected.splice(selectedIndex, 1);        
-      }
-      setSelected([...selected]);
-      const newList = [...list];
-      const itemIndex = newList.findIndex(item => item.uuid === uuid);      
-      newList[itemIndex].selected = !newList[itemIndex].selected;
-      setList(newList);
-    }    
+    // function toggleSelected(uuid) {      
+    //   const selectedIndex = selected.indexOf(uuid);
+    //   if (selectedIndex === -1) {
+    //     selected.push(uuid);
+    //   } else {
+    //     selected.splice(selectedIndex, 1);        
+    //   }
+    //   setSelected([...selected]);
+    //   const newList = [...list];
+    //   const itemIndex = newList.findIndex(item => item.uuid === uuid);      
+    //   newList[itemIndex].selected = !newList[itemIndex].selected;
+    //   setList(newList);
+    // }    
    
      return (
        <View style={styles.View}>
          {DrawerScreen(viewTitle)}     
          <View style={styles.header}>   
-           <View style={{...styles.row}}>
-              <Pressable
-                onPress={toggleSelected}
+           <View style={{paddingLeft:12, ...styles.row}}>
+              {/* <Pressable
+                onPress={removeMany}
                 style={{
                   width: 40,
                   height: 40,
@@ -317,7 +325,7 @@ export default function ListView({options}) {
                 }}
               >
                 <Icon name={'trash'} styles={{size: 22, color: colors.sort.active }} />
-              </Pressable>   
+              </Pressable>    */}
               <Search
                 disabled={list.length === 0}
                 placeholder={filters.placeholder} 
@@ -360,7 +368,7 @@ export default function ListView({options}) {
           <>
             <FlatList
               data={list}
-              renderItem={ItemTemplate.bind(null, {remove, toggleSelected})}
+              renderItem={ItemTemplate.bind(null, {remove})}
               keyExtractor={item => item.uuid}                      
               ListEmptyComponent={ListEmptyComponent}
               ListHeaderComponent={ListHeaderComponent}

@@ -9,6 +9,7 @@ export default function DrawerLayout() {
     <View style={{flex: 1}}>
 
         <Drawer
+          backBehavior="history"
           screenOptions={{
             drawerStyle: {              
               // backgroundColor: 'green',
@@ -44,7 +45,16 @@ export default function DrawerLayout() {
             options={{
               drawerIcon: () => <Icon name='convo' />,
               drawerLabel: "Convos",
-              title: "Cornvors",
+              title: "Convos",
+            }}
+          />
+          <Drawer.Screen
+            name="convo"
+            options={{
+              drawerIcon: () => <Icon name='convo' />,
+              drawerLabel: "Convo",
+              title: "Convo",
+              drawerItemStyle: { height: 0 }
             }}
           />
           <Drawer.Screen
