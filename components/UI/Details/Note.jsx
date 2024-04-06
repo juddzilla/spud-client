@@ -19,7 +19,7 @@ import Talk from '../../UI/actions/Talk';
 
 import styles from '../styles';
 
-import Options from '../actions/Options';
+import Options from './Options';
 
 import colors from '../colors';
 

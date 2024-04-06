@@ -29,7 +29,7 @@ import Search from '../filtering/Search';
 import Talk from '../actions/Talk';
 import Input from '../actions/Input';
 
-import Options from '../actions/Options';
+import Options from './Options';
 
 export default function List() {
   const local = useLocalSearchParams();  
@@ -380,12 +380,14 @@ export default function List() {
 
   const headerOptions = [
     {
-        name: 'rename',
         cb: updateTitle,
+        name: 'rename',
+        theme: 'dark',
     },
     {
+        cb: removeList,
         name: 'remove',
-        cb: removeList
+        theme: 'red',
     }
 ];
 
