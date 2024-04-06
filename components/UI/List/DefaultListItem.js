@@ -21,14 +21,14 @@ import styles from '../styles';
 import { relativeDate } from '../../../utils/dates';
 
 export default function DefaultListItem({remove}, {item}) {         
-    const { type, uuid } = item;
-    // const navigation = useNavigation();
+    const { type } = item;
+    
     const styled = StyleSheet.create({
         container: {
-            marginBottom: 2,
-            // marginLeft: 12,
+            // marginBottom: 2,
             ...styles.row,
             padding: 12,            
+            // marginLeft: 12,
             // backgroundColor: 'white', 
             flex: 1,
         },
@@ -41,7 +41,7 @@ export default function DefaultListItem({remove}, {item}) {
           },
         content: {
             flex: 1,       
-            paddingLeft: 12,     
+            paddingLeft: 8,     
         },
         date: {
             color: colors.theme.text.medium,
@@ -56,10 +56,11 @@ export default function DefaultListItem({remove}, {item}) {
             flexWrap: 'wrap',
         },
         row : {
-            backgroundColor: item.selected ? colors.lightWhite : 'transparent',
+            // backgroundColor: item.selected ? colors.lightWhite : 'transparent',
+            backgroundColor: colors.lightWhite,
             ...styles.row,
-            paddingHorizontal: 4,
-            marginBottom: 1,
+            // paddingHorizontal: 4,
+            marginBottom: 2,
         },
         subtitle: { fontSize: 12, color: colors.theme.text.medium, marginRight: 6 },
         title: { flexWrap: 'wrap', backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 4 },
@@ -83,13 +84,17 @@ export default function DefaultListItem({remove}, {item}) {
     const RenderUnderlayLeftActions = () => {
         const { percentOpen } = useSwipeableItemParams();
 
-        // const animStyle = useAnimatedStyle(
-        // () => ({
-        //     opacity: percentOpen.value,
+        const animStyle = useAnimatedStyle(
+        () => ({
+            ...styles.centered,
+            backgroundColor: colors.remove,
+            height: '100%',
+            width: 60,
+            opacity: percentOpen.value,
 
-        // }),
-        // [percentOpen]
-        // );
+        }),
+        [percentOpen]
+        );
 
         return (
         <RectButton
@@ -98,16 +103,14 @@ export default function DefaultListItem({remove}, {item}) {
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'flex-end', 
+                marginBottom: 2,
                 
             }}
         >
             <Animated.View
                 style={{                            
-                    backgroundColor: colors.remove,
-                    ...styles.centered,
-                    height: 48,
-                    width: 60,
-                    // ...animStyle
+                    
+                    ...animStyle
                 }}>
                     <Icon name='trash' />
             </Animated.View>
@@ -119,8 +122,6 @@ export default function DefaultListItem({remove}, {item}) {
     //     toggleSelected(uuid);
     // }
 
-    const checkboxIcon = item.selected ? 'checkedFilled' : 'checkOutline';
-
     return (      
         <SwipeableItem
             key={item.id}
@@ -129,14 +130,10 @@ export default function DefaultListItem({remove}, {item}) {
             snapPointsLeft={[60]}
             overSwipe={20}              
         >          
-        <View style={styled.row}>
-            {/* <Pressable style={styled.checkbox} onPress={() => toggleSelected(uuid)}>
-                <Icon name={checkboxIcon} styles={styled.icon} />                
-            </Pressable>   */}
+        <View style={styled.row}>            
             <Pressable
                 style={styled.container}
                 onPress={toDetail} 
-                // onLongPress={onLongPress}
             >      
                 <View style={styled.content}>
                     <Bold style={styled.title}>{item.headline}</Bold>

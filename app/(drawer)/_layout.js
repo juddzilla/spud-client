@@ -1,8 +1,6 @@
 import { View } from 'react-native';
 import { Drawer } from 'expo-router/drawer';
 import Icon from '../../components/UI/icons';
-import Home from './home';
-import Lists from './lists/_layout';
 
 export default function DrawerLayout() {
   return (    
@@ -38,6 +36,7 @@ export default function DrawerLayout() {
               drawerIcon: () => <Icon name='list' />,
               drawerLabel: "List", 
               drawerItemStyle: { height: 0 }
+              
             }}
           />
           <Drawer.Screen

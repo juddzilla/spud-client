@@ -40,7 +40,7 @@ const footer = {
     flexDirection: 'row', 
     height: 56,
     justifyContent: 'flex-end', 
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
     width: '100%',    
 };
 

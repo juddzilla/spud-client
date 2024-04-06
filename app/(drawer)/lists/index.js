@@ -18,6 +18,5 @@ export default function Lists() {
     subtitle: 'children',
     uri: 'lists/',
   };
-
   return (<ListView options={{...options}} />);
 }

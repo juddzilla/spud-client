@@ -21,8 +21,8 @@ import Bold from '../../../../components/UI/text/Bold';
 import Light from '../../../../components/UI/text/Light';
 
 const ItemTemplate = ({remove}, {item}) => {
-  // const local = useLocalSearchParams();
-  const local = {slug: '1'};
+  const local = useLocalSearchParams();
+
   
   const { id, type } = item;
 
@@ -77,7 +77,7 @@ const ItemTemplate = ({remove}, {item}) => {
       return;
       
     }
-    const route = `collections/${local.slug}/${typeToRouteMap[type]}/${item.uuid}`;
+    const route = `collections/${local.uuid}/${typeToRouteMap[type]}/${item.uuid}`;
     
     // return;
     router.push(route);

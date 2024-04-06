@@ -113,35 +113,37 @@ export default function Options({options}) {
     const styles = StyleSheet.create({ 
     confirmation: {
         container: {
-        flex: 1, 
-        alignItems: 'center',
-        padding: 16,
+            flex: 1, 
+            alignItems: 'center',
+            padding: 16,
         },
         content: {
-        backgroundColor: colors.white,
-        padding: 16,          
-        borderRadius: 8,
-        shadowColor: colors.darkestBg,
-        shadowOffset: {
-            width: 0,
-            height: 5,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 6.27,
-        elevation: 10,
-        width: '100%',
-        option: {
-            alignItems: 'center',            
-            child: {
-            marginBottom: 12,
+            backgroundColor: colors.white,
+            padding: 16,                      
+            borderRadius: 8,
+            shadowColor: colors.darkestBg,
+            shadowOffset: {
+                width: 0,
+                height: 5,
             },
-            body: {
-            flexDirection: 'row', 
-            flexWrap: 'wrap',
-            textAlign: 'center',
-            marginBottom: 16,
-            }
-        },
+            shadowOpacity: 0.2,
+            shadowRadius: 6.27,
+            elevation: 10,
+            width: '100%',
+            option: {
+                flex: 1,
+                backgroundColor: 'red',
+                alignItems: 'center',            
+                child: {
+                    marginBottom: 12,
+                },
+                body: {
+                    flexDirection: 'row', 
+                    flexWrap: 'wrap',
+                    textAlign: 'center',
+                    marginBottom: 16,
+                }
+            },
         },
         button: {
             ...Styles.centered,
@@ -166,23 +168,24 @@ export default function Options({options}) {
         close: {
             ...Styles.centered,
             backgroundColor: colors.white,
-            height: 48,
-            paddingRight: 16,
-            paddingTop: 4,
+            // backgroundColor: 'rgba(255,255,255,0.1)',
+            height: 36,
+            width: 36,
+            // paddingRight: 16,
+            // paddingTop: 4,
             position: 'absolute',
-            top: -48,
+            top: -40,
+            right: 10,
+            borderRadius: '50%',
         },
         container: {
             alignItems: 'flex-end',           
-            backgroundColor: 'rgba(255,255,255,0.4)',
-            // backgroundColor:  'green',
-            // paddingTop: getStatusBarHeight() + 35 + 48,
-            // paddingTop: 0, 
+            // backgroundColor: 'rgba(255,255,255,0.4)',
+            
         },
         option: {
             ...Styles.row, 
-            flexDirection: 'row-reverse', 
-            // backgroundColor: 'white', 
+            flexDirection: 'row-reverse',
             paddingLeft: 4, 
             paddingRight: 16,
             paddingVertical: 8, 
@@ -237,7 +240,7 @@ export default function Options({options}) {
                 <Icon name='close' />
                 </Pressable>
                 
-                <View style={styles.options}> 
+                <View> 
                 { !prompt.name && options.map(option => {
                     const action = actions[option.name];                        
                     return (

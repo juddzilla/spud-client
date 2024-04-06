@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 
 import { useNavigation, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-
+import { LinearGradient } from 'expo-linear-gradient';
 import DefaultListItem from './DefaultListItem';
 
 import colors from '../colors';
@@ -32,7 +32,6 @@ import Bold from '../text/Bold';
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 
-
 export default function ListView({options}) {
   const {
     actions,
@@ -44,36 +43,37 @@ export default function ListView({options}) {
     viewTitle,
    } = options;
 
-     const initialQuery = {
-       page: 1,
-       per: 20,
-       search: '',    
-     };
-     if (Object.hasOwn(filters, 'sort')) {
-       initialQuery.sortDirection = filters.sort.defaults.direction;
-       initialQuery.sortProperty = filters.sort.defaults.property;
-     }     
-     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-     const [list, setList] = useState([]);
-     const [loading, setLoading] = useState(true);
-    //  const [selected, setSelected] = useState([]);
-     const [total, setTotal] = useState(null);
-   
-     const [query, setQuery] = useState(initialQuery);
-     const [next, setNext] = useState(null);
-     const [focus, setFocus] = useState(false);
-     const [message, setMessage] = useState('');
-   
-     const unfocusedWidth = Dimensions.get('window').width-48-40;
-     const focusedWidth = Dimensions.get('window').width-32;
-     const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
-   
-     useEffect(() => {
-       if (initialLoadComplete) {
-        setNext('');
-         getData();
-       }
-     }, [query]);
+  const initialQuery = {
+    page: 1,
+    per: 20,
+    search: '',    
+  };
+  
+    if (Object.hasOwn(filters, 'sort')) {
+      initialQuery.sortDirection = filters.sort.defaults.direction;
+      initialQuery.sortProperty = filters.sort.defaults.property;
+    }     
+    const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+    const [list, setList] = useState([]);
+    const [loading, setLoading] = useState(true);
+  //  const [selected, setSelected] = useState([]);
+    const [total, setTotal] = useState(null);
+
+    const [query, setQuery] = useState(initialQuery);
+    const [next, setNext] = useState(null);
+    const [focus, setFocus] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const unfocusedWidth = Dimensions.get('window').width-48-40;
+    const focusedWidth = Dimensions.get('window').width-32;
+    const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
+
+    useEffect(() => {
+      if (initialLoadComplete) {
+      setNext('');
+        getData();
+      }
+    }, [query]);
    
      useEffect(() => {
        let toValue = focus ? focusedWidth : unfocusedWidth
@@ -212,6 +212,12 @@ export default function ListView({options}) {
            <Empty><Bold>Loading</Bold></Empty>  
          )
        }
+
+       if (query.search.trim().length > 0) {
+        return (
+          <Empty><Bold>No matches for "{query.search}"</Bold></Empty>
+        ) 
+       }
        
        return (
          <Empty><Bold>Create Your First Below</Bold></Empty>
@@ -224,7 +230,7 @@ export default function ListView({options}) {
       }
       
       return (
-        <View style={{...styles.row, paddingLeft: 28, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>                
+        <View style={{...styles.row, paddingLeft: 22, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>                
             <Bold style={{fontSize: 12, color: colors.lightText}}>Showing {list.length} of {total}</Bold>
         </View>
       )
@@ -312,22 +318,9 @@ export default function ListView({options}) {
        <View style={styles.View}>
          {DrawerScreen(viewTitle)}     
          <View style={styles.header}>   
-           <View style={{paddingLeft:12, ...styles.row}}>
-              {/* <Pressable
-                onPress={removeMany}
-                style={{
-                  width: 40,
-                  height: 40,
-                  marginRight: 8,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: selected.length ? 1 : 0,
-                }}
-              >
-                <Icon name={'trash'} styles={{size: 22, color: colors.sort.active }} />
-              </Pressable>    */}
+           <View style={{paddingLeft:12, ...styles.row}}>              
               <Search
-                disabled={list.length === 0}
+                disabled={query.search.trim().length === 0 && list.length === 0}
                 placeholder={filters.placeholder} 
                 value={query.search}
                 update={update} 
@@ -368,7 +361,7 @@ export default function ListView({options}) {
           <>
             <FlatList
               data={list}
-              renderItem={ItemTemplate.bind(null, {remove})}
+              renderItem={ItemTemplate.bind(null, {onPress: actions.onPress, remove})}
               keyExtractor={item => item.uuid}                      
               ListEmptyComponent={ListEmptyComponent}
               ListHeaderComponent={ListHeaderComponent}
@@ -377,8 +370,13 @@ export default function ListView({options}) {
               //if set to true, the UI will show a loading indicator
               refreshing={false}
             /> 
-      
             <View style={styles.footer}>
+              {/* <LinearGradient
+                // Background Linear Gradient
+                locations={[0.1, 0.15]}
+                colors={['#0000', colors.theme.backgroundColor]}
+                style={{position: 'absolute', bottom: 0, left: 0, width: '100%', height: 60}}
+              /> */}
               <Animated.View style={textInputStyled.input.container}>                            
                   <TextInput
                       value={message}

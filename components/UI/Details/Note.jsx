@@ -3,9 +3,9 @@
 // add to list via voice
 // importance
 // list timeline view
-
 import { useCallback, useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import  { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
@@ -20,6 +20,8 @@ import Talk from '../../UI/actions/Talk';
 import styles from '../styles';
 
 import Options from '../actions/Options';
+
+import colors from '../colors';
 
 const NoteInput = ({ value, update }) => {  
   const [body, setBody] = useState('');
@@ -43,9 +45,11 @@ const NoteInput = ({ value, update }) => {
   return (
     <TextInput
         style={{
-          // flex: 1,
-          margin: 12,
-          padding: 10,
+          backgroundColor: colors.lightWhite,
+          flex: 1,
+          // margin: 12,
+          paddingHorizontal: 16,
+          paddingTop: 16,
           flexWrap: 'wrap',
           fontSize: 20,
           fontFamily: 'Inter-Regular',
