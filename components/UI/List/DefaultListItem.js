@@ -77,7 +77,9 @@ export default function DefaultListItem({remove}, {item}) {
         if (!typeToRouteMap[type]) {
             return;
         }
-        const route = `/${typeToRouteMap[type]}?uuid=${item.uuid}&title=${item.headline}`;        
+
+        const route = `/${typeToRouteMap[type]}?uuid=${item.uuid}`;        
+        console.log('item', route);
         router.push(route);
     }
 

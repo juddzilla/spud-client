@@ -33,20 +33,32 @@ import Options from './Options';
 
 export default function List() {
   const local = useLocalSearchParams();  
+  
+  
 
-  const baseUri = `lists/${local.uuid}/`;
-  const itemsUri = `${baseUri}items/`;
-  const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
-  const initialTitle = local.title ? local.title : 'List';
+  const base = () => { 
+    console.log('LOCAL', local);
+    return `lists/${local.uuid}/`
+  };
+  // const baseUri = `lists/${local.uuid}/`;
+  const itemsUri = `${base()}items/`;
+  const itemUri = (itemId) => `${base()}item/${itemId}/`;
+  const initialTitle = 'Loading List';
+  // const initialTitle = () => {
+  //   const local = useLocalSearchParams();  
+  //   // return local.title ? local.title : 'List';
+  //   return 'Loading';
+  // }
   
   let initialList = [];
+  const initialSort = { property: 'order', direction: 'desc' };
   const sortOn = ['order', 'updated_at'];
   
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filter, setFilter] = useState('');
   const [listItems, setListItems] = useState(initialList);
   const [showCompleted, setShowCompleted] = useState(null);
-  const [sort, setSort] = useState({ property: 'order', direction: 'desc' });
+  const [sort, setSort] = useState(initialSort);
   const [title, setTitle] = useState(initialTitle);  
 
   const [showOptions, setShowOptions] = useState(false);
@@ -63,23 +75,34 @@ export default function List() {
       setInitialLoadComplete(true);
       getData();    
       return () => {
+        console.log('11111');
         setInitialLoadComplete(false);
+        setFilter('');
+        setListItems(initialList);        
+        setSort(initialSort);
+        setTitle(initialTitle);
+        setShowOptions(false);
+        setAction('');
       };
     }, [])
   );
 
   useEffect(() => {    
     if (initialLoadComplete) {
+      console.log(4);
       getData();
     }
   }, [filter, showCompleted, sort])
 
 
   function getData() {
-    if (!local.uuid) {
-      return;
-    }
-    Fetch.get(baseUri, {
+    
+    // if (!local.uuid) {
+    //   console.log(1);
+    //   return;
+    // }
+    console.log(2, base());
+    Fetch.get(base(), {
       search: filter,
       sortDirection: sort.direction,
       sortProperty: sort.property,
@@ -97,7 +120,7 @@ export default function List() {
   }
 
   function removeList() {    
-    Fetch.remove(baseUri)
+    Fetch.remove(base())
       .then((res) => {
         const [err] = res;
         if (!err) {
@@ -109,7 +132,7 @@ export default function List() {
   function updateTitle(newTitle) {
     setTitle(newTitle);
     setShowOptions(false);
-    Fetch.put(baseUri, {title: newTitle});
+    Fetch.put(base(), {title: newTitle});
   }
 
 
@@ -129,7 +152,7 @@ export default function List() {
         order: listItems.length,
       }]);
     
-    Fetch.post(baseUri, data)
+    Fetch.post(base(), data)
       .then(res => {            
         const [err, items] = res;
         
@@ -380,11 +403,17 @@ export default function List() {
 
   const headerOptions = [
     {
-        cb: updateTitle,
+        actions: [
+          { display: 'Renmae', cb: updateTitle }
+        ],
+        cb: updateTitle,        
         name: 'rename',
         theme: 'dark',
     },
     {
+        actions: [
+          { display: 'Remoov', cb: removeList }
+        ],
         cb: removeList,
         name: 'remove',
         theme: 'red',

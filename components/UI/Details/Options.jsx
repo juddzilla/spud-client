@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import Modal from '../actions/Modal';
+import Modal from '../modal/Modal';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 import Icon from '../icons';
@@ -9,8 +9,7 @@ import Icon from '../icons';
 import colors from '../colors';
 import Styles from '../styles';
 
-export default function Options({options}) {
-    console.log('opt', options);
+export default function Options({options}) {    
     const [showOptions, setShowOptions] = useState(false);
     const [prompt, setPrompt] = useState({});
     const [newTitle, setNewTitle] = useState('');
@@ -166,6 +165,7 @@ export default function Options({options}) {
             }),          
             display: 'Rename',
             icon: 'pencil',
+            
         },
         summarize: {
             component: () => Prompt({
@@ -256,7 +256,7 @@ export default function Options({options}) {
 
                 { prompt.name &&
                     <View style={modal.confirmation}>
-                        { actions[prompt.name].component() }
+                        { actions[prompt.name]().component() }
                     </View>
                 }
                 

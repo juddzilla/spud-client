@@ -4,7 +4,7 @@ import Icon from '../icons';
 import colors from '../colors';
 import Bold from '../text/Bold';
 
-import CustomModal from './Modal';
+import CustomModal from '../modal/Modal';
 
 // import TalkButton from './Talk';
 

@@ -98,18 +98,18 @@ export default function ListView({options}) {
      function getData() {
       setLoading(true);
        Fetch.get(uri, query)
-       .then(([err, res]) => { 
-         setInitialLoadComplete(true);     
-         setLoading(false);   
-         if (!err) {          
-          setNext(res.next);
-          setList(res.results);
-          setTotal(res.count);
-         }
-       })
-       .catch(err => {
-        console.warn(`List ${uri} error: ${err}`);
-      })
+        .then(([err, res]) => { 
+          setInitialLoadComplete(true);     
+          setLoading(false);   
+          if (!err) {          
+            setNext(res.next);
+            setList(res.results);
+            setTotal(res.count);
+          }
+        })
+        .catch(err => {
+          console.warn(`List ${uri} error: ${err}`);
+        })
      }      
       
      function getNext() {
