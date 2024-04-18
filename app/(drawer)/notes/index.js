@@ -15,6 +15,7 @@ export default function Notes() {
         fields: ['title', 'updated_at'],
       },
     },
+    storeKey: 'notes',
     uri: 'notes/'
   };
 

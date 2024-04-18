@@ -1,179 +1,118 @@
-// list with list items
-// do items have meta context?
-// add to list via voice
-// importance
-// list timeline view
-import { useCallback, useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { relativeDate } from '../../../utils/dates';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
 
-import  { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-
-import { useDebouncedValue } from '../../../utils/debounce';
-
-import DrawerScreen from '../../../components/DrawerScreen';
-import Fetch from '../../../interfaces/fetch';
-import Light from '../text/Light';
-
-import Talk from '../../UI/actions/Talk';
-
-import styles from '../styles';
+import { DetailObservable  } from './observable';
 
 import Options from './Options';
 
 import colors from '../colors';
+import Icon from '../icons';
+import styles from '../styles';
+import Light from '../text/Light';
 
-const NoteInput = ({ value, update }) => {  
-  const [body, setBody] = useState('');
-  const debouncedInput = useDebouncedValue(body, 500);  
+import Talk from '../../UI/actions/Talk';
 
-  useEffect(() => {
-    setBody(value);
-  }, [value])
+import Fetch from '../../../interfaces/fetch';
+import { queryClient } from '../../../contexts/query-client';
 
+import DebouncedInput from '../DebouncedInput';
 
-  useEffect(() => {
-    if (value !== body) {
-      update(body);        
+export default function Note({item}) {  
+  const queryKeys = ['notes', item.uuid];
+  const baseUri = `notes/${item.uuid}/`;
+
+  const [body, setBody] = useState(item.body);
+  const [title, setTitle] = useState(item.title);
+  const [updatedAt, setUpdatedAt] = useState(item.updatedAt);
+
+  async function putNote(data) {    
+    try {
+      return await Fetch.put(baseUri, data);
+    } catch (e) {
+      console.log('Put Note Error:', e);
     }
-  }, [debouncedInput]);
-
-  function updateState(text) {    
-    setBody(text)
   }
 
-  return (
-    <TextInput
-        style={{
-          backgroundColor: colors.lightWhite,
-          flex: 1,
-          // margin: 12,
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          flexWrap: 'wrap',
-          fontSize: 20,
-          fontFamily: 'Inter-Regular',
-        }}
-        onChangeText={updateState}
-        value={body}
-        placeholder="type here"
-        editable={true}
-        multiline={true}
-      />
-  )
-
-}
-
-export default function Note() {
-  const local = useLocalSearchParams();
-  const baseUri = `notes/${local.uuid}/`;
-
-  const [body, setBody] = useState('');
-  const [title, setTitle] = useState('Note');
-
-  const [showOptions, setShowOptions] = useState(false);
-  const [action, setAction] = useState('');
-
-  useEffect(() => {
-    if (!showOptions) {
-      setAction('');
+  async function deleteNote() {    
+    try {    
+      return await Fetch.remove(baseUri);      
+    } catch (e) {
+      console.log('Remove Note Error:', e);
+      return false;
     }
-  }, [showOptions, setAction]);
-
-  useFocusEffect(
-    useCallback(() => {      
-      getData();    
-      return () => {};
-    }, [])
-  );
-
-  function getData() {
-    if (!local.uuid) {
-      return;
-    }
-    Fetch.get(baseUri)
-      .then(res => {
-        const [err, note] = res;        
-        setBody(note.body);
-        setTitle(note.title);
-      })
-      .catch(err => {
-        console.warn('note detail error', err);
-      })
   }
 
-  function updateNote(body) {    
-    Fetch.put(baseUri, {body});
-  }
+  const Query = useQuery({
+    queryKey: queryKeys, 
+    queryFn: async () => {        
+      const response = await Fetch.get(baseUri);            
+      setBody(response.body);    
+      setTitle(response.title);
+      setUpdatedAt(response.updated_at);
+      return response;
+    },
+    keepPreviousData: true,
+    placeholderData: keepPreviousData,
+  });
 
-  function updateTitle(newTitle) {    
-    setTitle(newTitle);
-    setShowOptions(false);
-    Fetch.put(baseUri, {title: newTitle});
-  }
+  const updateMutation = useMutation({
+    mutationFn: putNote,
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.log(`rolling back optimistic update with id ${context.id}`)
+    },
+    onSuccess: (data) => {  // variables, context
+      setUpdatedAt(data.updated_at);
+      queryClient.setQueryData(queryKeys, oldData => {            
+        return {...oldData, ...data};
+      });
+      queryClient.setQueryData([queryKeys[0]], oldData => {                    
+        return oldData.map(old => {
+          if (old.uuid !== item.uuid) {
+            return old;
+          }
+          return {
+            ...old,
+            headline: data.title,
+            updated_at: data.updated_at,
+          }
+        });
+      });
+    },
+  })
 
-  function removeNote() {
-    Fetch.remove(baseUri)
-      .then(res => {
-        const [err, success] = res;
-        if (!err) {
-          router.back();
-        }
-      })
-  }
-
-
-
+  const removeMutation = useMutation({
+    mutationFn: deleteNote,
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.log(`rolling back optimistic update with id ${context.id}`)
+    },
+    onSuccess: () => {  // data, variables, context                
+      queryClient.setQueryData([queryKeys[0]], oldData => {                    
+        return oldData.map(old => {
+          if (old.uuid !== item.uuid) {
+            return old;
+          }
+          return null;
+        }).filter(Boolean);        
+      });
+      queryClient.removeQueries({ queryKey: queryKeys, exact: true });
+      DetailObservable.notify(null);
+    },
+  })
+  
   const styled = StyleSheet.create({
-    centeredView: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 22,
-    },
-    modalView: {
-      margin: 20,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      padding: 35,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    },
-    button: {
-      borderRadius: 20,
-      padding: 10,
-      elevation: 2,
-    },
-    buttonOpen: {
-      backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-      backgroundColor: '#2196F3',
-    },
-    textStyle: {
-      color: 'white',
-      fontWeight: 'bold',
-      textAlign: 'center',
-    },
-    modalText: {
-      marginBottom: 15,
-      textAlign: 'center',
-    },
     date: {
       container: {      
         flexDirection: 'row',
-        // backgroundColor: 'green',
         flex: 1,
-        // justifyContent: 'flex-end',
-        paddingLeft: 8,
-        // paddingTop: 16,        
+        paddingLeft: 8,      
       },
       body: {
         fontSize: 12,
@@ -183,44 +122,62 @@ export default function Note() {
 
   const headerOptions = [
     {
-        name: 'rename',
-        cb: updateTitle
-    },
-    {
-        name: 'remove',
-        cb: removeNote
+      cb: removeMutation.mutate,
+      name: 'remove',
+      theme: 'red',
     }
 ];
 
   return (
-    <View style={styles.View}>
-      
-      {DrawerScreen(title, () => <Options options={headerOptions} />)}    
-      
-      <View style={{flex: 1}}>
-        <NoteInput value={body} update={updateNote} />
-        {/* <TextInput
+    <View style={{flex: 1, paddingBottom: 15}}>
+            
+      <View style={{...styles.row, height: 44}}>
+        <Pressable
+          onPress={() => DetailObservable.notify(null)}
+          style={{width: 40, marginRight: 16, left: -4, top: -1}}
+        >
+          <Icon name='close' />
+        </Pressable>
+        
+        <DebouncedInput
+          multiline={false}
+          placeholder='Note Title'
           style={{
-            // flex: 1,
-            margin: 12,
-            padding: 10,
-            flexWrap: 'wrap',
-            fontSize: 20,
-            fontFamily: 'Inter-Regular',
+            fontSize: 26,
+            height: '100%',            
+            marginRight: 16,          
           }}
-          onChangeText={updateNote}
-          value={note}
-          placeholder="type here"
-          editable={true}
-          multiline={true}
-        /> */}
+          update={(value) => { updateMutation.mutate({title: value})}} 
+          value={title}
+        />        
+        <Options options={headerOptions} />
       </View>
-      <View style={styles.footer}>
+      <View style={{flex: 1}}>
+      { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 
+        (
+          <Light>Loading</Light>
+        ) : 
+        (
+          <DebouncedInput
+            multiline={true}
+            placeholder='(untitled)'
+            style={{
+              flexWrap: 'wrap',
+              fontSize: 20,        
+              paddingHorizontal: 16,
+              paddingTop: 16,
+            }}
+            update={(value) => { updateMutation.mutate({body: value})}} 
+            value={body}
+          />
+        ) 
+      
+      }
+      </View>
+      <View style={{...styles.footer, paddingHorizontal: 4}}>
         <View style={styled.date.container}>
-          <Light style={styled.date.body}>Last Updated: Today, 12:34pm</Light>
-        </View>
-        {/* <Input create={() => {}} placeholder='' /> */}
-
+          <Light style={styled.date.body}> {relativeDate(updatedAt)}</Light>          
+        </View>        
         <Talk />
       </View>
     </View>

@@ -8,6 +8,12 @@ import {
   View,
 } from 'react-native';
 
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
+
 import { BaseButton } from 'react-native-gesture-handler';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
@@ -31,189 +37,155 @@ import Input from '../actions/Input';
 
 import Options from './Options';
 
-export default function List() {
-  const local = useLocalSearchParams();  
-  
-  
+import { queryClient } from '../../../contexts/query-client';
+import { DetailObservable } from './observable';
+import DebouncedInput from '../DebouncedInput';
 
-  const base = () => { 
-    console.log('LOCAL', local);
-    return `lists/${local.uuid}/`
-  };
-  // const baseUri = `lists/${local.uuid}/`;
-  const itemsUri = `${base()}items/`;
-  const itemUri = (itemId) => `${base()}item/${itemId}/`;
-  const initialTitle = 'Loading List';
-  // const initialTitle = () => {
-  //   const local = useLocalSearchParams();  
-  //   // return local.title ? local.title : 'List';
-  //   return 'Loading';
-  // }
+export default function List({item}) {
+  console.log(1);
+  const queryKeys = ['lists', item.uuid];
+  const baseUri = `lists/${item.uuid}/`;
+  const itemsUri = `${baseUri}items/`;
+  const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
   
-  let initialList = [];
   const initialSort = { property: 'order', direction: 'desc' };
   const sortOn = ['order', 'updated_at'];
   
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  
   const [filter, setFilter] = useState('');
-  const [listItems, setListItems] = useState(initialList);
+  const [listItems, setListItems] = useState([]);
   const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState(initialSort);
-  const [title, setTitle] = useState(initialTitle);  
-
-  const [showOptions, setShowOptions] = useState(false);
-  const [action, setAction] = useState('');
-  
-  useEffect(() => {
-    if (!showOptions) {
-      setAction('');
-    }
-  }, [showOptions, setAction]);
-
-  useFocusEffect(
-    useCallback(() => {
-      setInitialLoadComplete(true);
-      getData();    
-      return () => {
-        console.log('11111');
-        setInitialLoadComplete(false);
-        setFilter('');
-        setListItems(initialList);        
-        setSort(initialSort);
-        setTitle(initialTitle);
-        setShowOptions(false);
-        setAction('');
-      };
-    }, [])
-  );
-
-  useEffect(() => {    
-    if (initialLoadComplete) {
-      console.log(4);
-      getData();
-    }
-  }, [filter, showCompleted, sort])
+  const [title, setTitle] = useState(item.title);  
 
 
-  function getData() {
-    
-    // if (!local.uuid) {
-    //   console.log(1);
-    //   return;
-    // }
-    console.log(2, base());
-    Fetch.get(base(), {
-      search: filter,
-      sortDirection: sort.direction,
-      sortProperty: sort.property,
-      completed: showCompleted,
-    })
-      .then(res => {            
-        const [err, list] = res;
-        
-        if (!err) {          
-          setTitle(list.title);
-          setListItems(list.children);        
-        }
-      })
-      .catch(err => { console.warn('List Error', err)});
-  }
-
-  function removeList() {    
-    Fetch.remove(base())
-      .then((res) => {
-        const [err] = res;
-        if (!err) {
-          router.back();    
-        }
+  const Query = useQuery({
+    queryKey: queryKeys, 
+    queryFn: async () => {        
+      const response = await Fetch.get(baseUri, {
+        search: filter,
+        sortDirection: sort.direction,
+        sortProperty: sort.property,
+        completed: showCompleted,
       });
-  }
-
-  function updateTitle(newTitle) {
-    setTitle(newTitle);
-    setShowOptions(false);
-    Fetch.put(base(), {title: newTitle});
-  }
-
-
-  // LIST ITEM OPERATIONS
-  function createItem(text) {
-    if (!text.trim().length) {
-      return;
-    }
-    const data = {
-      body: text.trim(), 
-    };
-    setListItems([
-      ...listItems, 
-      { 
-        ...data, 
-        id: `temp${data.order}`,
-        order: listItems.length,
-      }]);
-    
-    Fetch.post(base(), data)
-      .then(res => {            
-        const [err, items] = res;
         
-        if (!err) {
-          setListItems([...listItems, items.results]);
-        }
-      })
-      .catch(err => { console.warn('List Error', err)});    
-  }  
+      const { error, children, title } = response;
+          
+          
+      if (!error) {          
+        setTitle(title);
+        setListItems(children);        
+        return children;
+      }
+      return [];
+    },
+    keepPreviousData: true,
+    placeholderData: keepPreviousData,
+  });
 
-  function removeItem(id) {
-    Fetch.remove(itemUri(id))
-      .then(res => {             
-        const [err] = res;
-        if (!err) {
-          const itemIndex = listItems.indexOf(l => l.id === id);
-          listItems.splice(itemIndex, 1);
-          setListItems([...listItems]);        
-        }
-      })
-      .catch(err => {
-        console.warn('updateItem err', err);
-      });    
-  }
+  const updateListMutation = useMutation({
+    mutationFn: async (data) => {
+      try {
+        return await Fetch.put(baseUri, data);
+      } catch (error) {
+        console.warn('Update List Error:', error);
+      }
+    },
+    onSuccess: (data) => {  // variables, context            
+      queryClient.setQueryData(queryKeys, oldData => {            
+        return {...oldData, ...data};
+      });
+      queryClient.setQueryData([queryKeys[0]], oldData => {                    
+        return oldData.map(old => {
+          if (old.uuid !== item.uuid) {
+            return old;
+          }
+          return {
+            ...old,
+            headline: data.title,
+            updated_at: data.updated_at,
+          }
+        });
+      });
+    },
+  });
 
-  function toggleCompleted({id, completed}) {   
-    updateItem(id, { completed: !completed});
-  }
+  const updateListItemMutation = useMutation({
+    mutationFn: async (data) => {
+      const { id, ...rest } = data;
+      try {
+        const response = await Fetch.put(itemUri(id), rest);
+        return response;
+      } catch (error) {
+        console.warn('Update List Item Error', error);
+      }    
+    },
+    onSuccess: (data) => {  // variables, context               
+      const itemIndex = listItems.findIndex(listItem => data.id === listItem.id);
+      const newListItems = [...listItems];
+      newListItems[itemIndex] = data;
+      setListItems(newListItems);
+    },
+  });
 
-  function updateItem(id, data) {  
-    Fetch.put(itemUri(id), data)
-      .then(res => {            
-        const [err, item] = res;
-        if (!err) {
-          const itemIndex = listItems.findIndex(listItem => item.id === listItem.id);
-          const newListItems = [...listItems];
-          newListItems[itemIndex] = item;
-          setListItems(newListItems);
-        }
-      })
-      .catch(err => {
-        console.warn('updateItem err', err);
-      })
-  }
+  const removeListMutation = useMutation({
+    mutationFn: async () => {
+      try {
+        return await Fetch.remove(baseUri);      
+      } catch (error) {
+        console.warn('Delete List Error:', error);
+      }
+    },
+    onSuccess: () => {
+      queryClient.setQueryData([queryKeys[0]], oldData => {                    
+        return oldData.map(old => {
+          if (old.uuid !== item.uuid) {
+            return old;
+          }
+          return null;
+        }).filter(Boolean);        
+      });
+      queryClient.removeQueries({ queryKey: queryKeys, exact: true });
+      DetailObservable.notify(null);
+    },
+  });
 
-  function updateItemBody(item, text) {
-    const itemIndex = listItems.findIndex(i => i.id = item.id);
-    const newListItems = [...listItems];
-    newListItems[itemIndex].body = text;
-    setListItems(newListItems);
-    Fetch.put(itemUri(item.id), { body: text})
-      .then(res => {
-        const [err, item] = res;
-        if (!err) {
-          // console.log('item', item);
-        }
-      })
-      .catch(err => {})    
-  }
+  const removeListItemMutation = useMutation({
+    mutationFn: async ({ id }) => {
+      try {
+        return await Fetch.remove(itemUri(id));
+      } catch (error) {
+        console.warn('Delete List Item Error:', error);
+      }
+    },
+    onSuccess: (data, variables) => {          
+      if (!data.error) {
+        const itemIndex = listItems.indexOf(l => l.id === variables.id);
+        console.log('itemIndex', itemIndex);
+        listItems.splice(itemIndex, 1);
+        setListItems([...listItems]);        
+      } 
+    }
+  })
 
+  const createListItemMutation = useMutation({
+    mutationFn: async (text) => {
+      if (!text.trim().length) {
+        return;
+      }
+      const data = { body: text.trim() };
 
+      try {
+        return await Fetch.post(baseUri, data)
+      } catch (error) {
+        console.warn('Create List Item Error:', error);
+      }
+    },
+    onSuccess: (data) => {
+      setListItems([...listItems, data.results]);
+    }
+  });
+  
   // UI OPERATIONS
   function onFilterUpdate({search}) {
     setFilter(search);
@@ -292,7 +264,6 @@ export default function List() {
         shadowOpacity: 0.58,
         shadowRadius: 16.00,
         elevation: 24,
-        paddingLeft: 8,
       },
       checkbox: {
         ...Styles.centered,
@@ -302,7 +273,7 @@ export default function List() {
         marginRight: 8,  
       },
       icon: {
-        color: item.completed ? colors.lightWhite : colors.text,    
+        color: item.completed ? 'red' : 'green',
         size:15,    
       },
       body: {
@@ -339,7 +310,7 @@ export default function List() {
       );
 
       return (
-        <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { removeItem(item.id) }}>
+        <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { removeListItemMutation.mutate(item) }}>
           <Animated.View
             style={{            
               justifyContent: 'center',
@@ -369,7 +340,7 @@ export default function List() {
             disabled={isActive}          
           >
             <View style={styled.container}>            
-              <Pressable style={styled.checkbox} onPress={() => toggleCompleted(item)}>
+              <Pressable style={styled.checkbox} onPress={() => updateListItemMutation.mutate({ id: item.id, completed: !item.completed })}>
                 <Icon name={checkboxIcon} styles={styled.icon} />
                 
               </Pressable>
@@ -378,11 +349,13 @@ export default function List() {
                   item.completed ? (
                     <Light style={styled.text}>{item.body}</Light>
                   ) : (
-                    <TextInput              
+                    <DebouncedInput
                       multiline={true}
-                      onChangeText={(text) => updateItemBody(item, text)}
+                      placeholder='(text)'
                       style={styled.input}
-                    >{ item.body }</TextInput>
+                      update={(value) => { updateListItemMutation.mutate({ id: item.id, body: value })}} 
+                      value={item.body}
+                    />  
                   )
                 }
               </View>
@@ -403,18 +376,7 @@ export default function List() {
 
   const headerOptions = [
     {
-        actions: [
-          { display: 'Renmae', cb: updateTitle }
-        ],
-        cb: updateTitle,        
-        name: 'rename',
-        theme: 'dark',
-    },
-    {
-        actions: [
-          { display: 'Remoov', cb: removeList }
-        ],
-        cb: removeList,
+        cb: removeListMutation.mutate,
         name: 'remove',
         theme: 'red',
     }
@@ -422,10 +384,30 @@ export default function List() {
 
   return (
     <>
-      {DrawerScreen(title, () => <Options options={headerOptions} />)}    
+      
       <View style={Styles.View}>        
-          
-          <View style={Styles.header}>
+          <View style={{...Styles.row, height: 44}}>
+            <Pressable
+              onPress={() => DetailObservable.notify(null)}
+              style={{width: 40, marginRight: 16, left: -4, top: -1}}
+            >
+              <Icon name='close' />
+            </Pressable>
+            
+            <DebouncedInput
+              multiline={false}
+              placeholder='Note Title'
+              style={{
+                fontSize: 26,
+                height: '100%',            
+                marginRight: 16,          
+              }}
+              update={(value) => { updateListMutation.mutate({title: value})}} 
+              value={title}
+            />        
+            <Options options={headerOptions} />
+          </View>    
+          <View style={{...Styles.header, paddingHorizontal: 0}}>
          
             <Sort fields={sortOn} query={sort} update={onSortUpdate} />
             <Search placeholder={'Filter'} update={onFilterUpdate} />
@@ -450,7 +432,7 @@ export default function List() {
           </View>
           
           <View style={Styles.footer}>                  
-            <Input hideModal={true} onSubmit={createItem} placeholder='Create New List Item'/>
+            <Input hideModal={true} onSubmit={createListItemMutation.mutate} placeholder='Create New List Item'/>
             <Talk />          
           </View>       
         </View>

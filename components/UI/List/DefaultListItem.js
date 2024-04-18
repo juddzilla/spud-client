@@ -1,27 +1,54 @@
+import React from 'react';
 import {
 Pressable,
 StyleSheet,
 View,
 } from 'react-native';
 
-import { router, useNavigation } from 'expo-router';
-import { BaseButton, RectButton } from 'react-native-gesture-handler';
-import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
+import { queryClient } from '../../../app/_layout';
+
+import { RectButton } from 'react-native-gesture-handler';
+import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import colors from '../colors';
 import Icon from '../icons';
+import styles from '../styles';
 
+import { DetailObservable } from '../Details/observable';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 import Regular from '../text/Regular';
 
-import styles from '../styles';
-
+import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
-export default function DefaultListItem({remove}, {item}) {         
-    const { type } = item;
+const DefaultListItem = ({item}) => {             
+    if (!item) {
+        return null;
+    }
+
+    const typeMap = {
+        List: 'Lists',
+        Convo: 'Convos',
+        Note: 'Notes',
+    };
+
+    const keyMap = {
+        List: 'lists',
+        Convo: 'convos',
+        Note: 'notes',
+    };
+
+    const remove = async () => {
+        const type = typeMap[item.type];
+        const key = keyMap[item.type];        
+        await Fetch.remove(`${type.toLowerCase()}/${item.uuid}/`);        
+        queryClient.setQueryData([key], oldData => {                    
+            const newList = oldData.filter(i => i.uuid !== item.uuid);
+            return newList;
+          });        
+    }
     
     const styled = StyleSheet.create({
         container: {
@@ -66,21 +93,8 @@ export default function DefaultListItem({remove}, {item}) {
         title: { flexWrap: 'wrap', backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 4 },
     });
 
-    function toDetail() {               
-        const typeToRouteMap = {
-            Collection: 'collections',
-            Convo: 'convo',
-            List: 'list',
-            Note: 'note'
-        };  
-
-        if (!typeToRouteMap[type]) {
-            return;
-        }
-
-        const route = `/${typeToRouteMap[type]}?uuid=${item.uuid}`;        
-        console.log('item', route);
-        router.push(route);
+    function toDetail() {      
+        DetailObservable.notify(item);        
     }
 
     const RenderUnderlayLeftActions = () => {
@@ -153,3 +167,4 @@ export default function DefaultListItem({remove}, {item}) {
     )
 };
 
+export default DefaultListItem;

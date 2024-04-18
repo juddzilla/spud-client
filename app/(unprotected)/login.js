@@ -3,9 +3,8 @@ import { router, Link } from 'expo-router';
 import { View, Pressable, Text, TextInput } from 'react-native';
 import Bold from '../../components/UI/text/Bold';
 import Fetch from '../../interfaces/fetch';
-// import { useSession } from './_layout';
 import { useStorageState } from "../../interfaces/storage";
-// import { useSession } from './_layout';
+
 import validators from "../../utils/validators";
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -28,7 +27,6 @@ export default function Login() {
         setSession(token);
         router.replace('/');
     }
-    // const { signIn } = useSession();
     return (
     <View style={{height: '100%', paddingTop: 100, paddingHorizontal: 16}}>
         <TextInput value={email} style={{ borderWidth: 1, padding: 16}} placeholder='email'/>

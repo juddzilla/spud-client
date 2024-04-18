@@ -17,6 +17,7 @@ export default function Lists() {
     },
     subtitle: 'children',
     uri: 'lists/',
+    storeKey: 'lists',
   };
   return (<ListView options={{...options}} />);
 }

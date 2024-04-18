@@ -4,7 +4,6 @@ import { Redirect } from 'expo-router';
 import Bold from '../components/UI/text/Bold';
 
 import { useStorageState } from '../interfaces/storage';
-
 export default function Index() {  
   const [[isLoading, session]] = useStorageState('session');
 
@@ -21,7 +20,7 @@ export default function Index() {
       )
     }
     return (
-      <Redirect href={"/(drawer)/home"} />        
+      <Redirect href={"/(drawer)/home"} />
     )
   }
 }

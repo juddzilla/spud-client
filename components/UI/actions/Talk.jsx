@@ -75,7 +75,7 @@ export default function TalkButton() {
           <View
             style={{
               backgroundColor: 'rgba(255,255,255,0.5)',
-              opacity: 1,
+              opacity: showModal ? 1 : 0,
               position: 'absolute',
               top: (Dimensions.get('window').height - 64 - 16 - 1) * -1,                            
               left: (Dimensions.get('window').width  - 16 - 1) * -1,

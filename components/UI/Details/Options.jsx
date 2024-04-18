@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import Modal from '../modal/Modal';
 import Bold from '../text/Bold';
@@ -9,28 +9,24 @@ import Icon from '../icons';
 import colors from '../colors';
 import Styles from '../styles';
 
-export default function Options({options}) {    
-    const [showOptions, setShowOptions] = useState(false);
-    const [prompt, setPrompt] = useState({});
-    const [newTitle, setNewTitle] = useState('');
-    
-    useEffect(() => {
-        if (!showOptions) {
-            setPrompt({});
-            setNewTitle('');
-        }
-    }, [showOptions, setPrompt]);
+export default function Options({options}) {            
+    const [prompt, setPrompt] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
 
+    useEffect(() => {
+        if (!prompt && submitting) {
+            setSubmitting(false);
+        }
+    }, [prompt]);
+    
     const Prompt = (props) => {
-        const { cta, color, onInputChange, subtitle, title} = props;
+        const { cta, color, subtitle, title} = props;
         
-        const onSubmit = () => {
-            if (onInputChange) {
-                prompt.cb(onInputChange.value);
-            } else {
+        const onSubmit = () => {                
+            if (!submitting) {
                 prompt.cb();
+                setSubmitting(true);
             }
-            setShowOptions(false);
         };
 
         const styled = StyleSheet.create({
@@ -104,28 +100,20 @@ export default function Options({options}) {
                 },
             }
         })
+
         return (
             <>
                 <View style={styled.content}>
                     <View style={styled.option}>
                         <View style={{...styled.icon.container, ...styled.row}}>
-                            <Icon name={prompt.icon} styles={styled.icon.image} />
+                            <Icon name={actions[prompt.name].icon} styles={styled.icon.image} />
                         </View>
                         
                         <Bold style={styled.row}>{ title }</Bold>
                         
                         <View style={{...styled.row, ...styled.body}}>
                             <Light style={{textAlign: 'center'}}>{ subtitle }</Light>                                            
-                        </View>
-                        
-                        { onInputChange &&
-                            <TextInput
-                                value={onInputChange.value}
-                                onChangeText={onInputChange.cb}
-                                style={{...styled.input, ...styled.row}}
-                            />
-                        }
-
+                        </View>                                                
                     </View>                    
                 </View>
 
@@ -136,36 +124,24 @@ export default function Options({options}) {
                     >
                         <Bold style={{color: colors.white}}>{ cta }</Bold>
                     </Pressable>
-                    <Pressable style={styled.button} onPress={() => setPrompt({})}>
+                    <Pressable style={styled.button} onPress={() => setPrompt(null)}>
                         <Bold>Back</Bold>
                     </Pressable>
                 </View>
             </>
         );
-    }
-    
+    };
+   
     const actions = {
         remove: {
             component: () => Prompt({
                 cta: 'Delete',
                 color: colors.remove,
-                subtitle: 'Are you certain you want to delete this List? This action cannot be reversed.',
+                subtitle: 'You sure? This action cannot be reversed.',
                 title: 'Confirmation Required', 
             }),          
             display: 'Delete',
             icon: 'trash',
-        },
-        rename: {
-            component: () => Prompt({
-                cta: 'Rename',
-                color: colors.black,
-                onInputChange: {cb: (text) => setNewTitle(text), value: newTitle},
-                subtitle: 'What would you like to rename this List to?',
-                title: 'Change Title', 
-            }),          
-            display: 'Rename',
-            icon: 'pencil',
-            
         },
         summarize: {
             component: () => Prompt({
@@ -179,91 +155,30 @@ export default function Options({options}) {
         },
     };
 
-    const modal = StyleSheet.create({ 
-        confirmation: {
-            padding: 16,                            
-        },
-        options: {
-            row: {
-                width: '100%',
-                ...Styles.row,
-                ...Styles.centered,
-                ...Styles.row, 
-                backgroundColor: colors.white, 
-                        
-                flexDirection: 'row',
-                // width: '100%',
-                
-                paddingHorizontal: 16,
-                paddingVertical: 16, 
-                borderRadius: 8,
-                marginBottom: 16,
-                
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 2,
-                elevation: 5,
-            },
-            text: {
-                fontSize: 16,
-            },
-            themes: {
-                dark: {
-                    backgroundColor: colors.black,
-                    text: colors.white,
-                },
-                red: {
-                    backgroundColor: colors.remove,
-                    text: colors.white,
-                }
-            }
-        },
-    });
-
     return (
         <View>      
             <Modal
-                show={showOptions}
-                toggleShow={setShowOptions}
-            >
-                { !prompt.name && 
-                    <View>                
-                        { options.map(option => {
-                            const action = actions[option.name];         
-                            const buttonStyle = {
-                                ...modal.options.row, 
-                                backgroundColor: modal.options.themes[option.theme].backgroundColor,
-                            };
-                            const textStyle = {
-                                ...modal.options.text,
-                                color: modal.options.themes[option.theme].text,
-                            }
-                            return (
-                                <Pressable style={buttonStyle} key={action.icon} onPress={() => setPrompt({...action, ...option})}>
-                                    <View>
-                                        <Bold style={textStyle}>{action.display}</Bold>                                
-                                    </View>                
-                                </Pressable>         
-                            )
-                        })}                                                          
-                        
-                    </View>
+                show={!!prompt}
+                toggleShow={() => setPrompt(null)}
+            >                
+                { !!prompt && 
+                    <View style={{padding: 16}}>
+                        { actions[prompt.name].component() }
+                    </View>                 
                 }
-
-                { prompt.name &&
-                    <View style={modal.confirmation}>
-                        { actions[prompt.name]().component() }
-                    </View>
-                }
-                
             </Modal>
-            <Pressable onPress={ () => setShowOptions(!showOptions)}>
-                <Icon name='dots' />
-            </Pressable>
+            
+            <View style={Styles.row}>
+                { options.map(option => (
+                    <Pressable
+                        key={option.name}
+                        onPress={ () => setPrompt(option)}
+                        style={{width: 40, ...Styles.centered}}
+                    >
+                        <Icon name={actions[option.name].icon} styles={{size: 20}} />                    
+                    </Pressable>
+                )) }
+            </View>
         </View>
     );
 }

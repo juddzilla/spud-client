@@ -19,7 +19,7 @@ export default function CustomModal({ show, toggleShow, children }) {
             isVisible={show}
             onBackdropPress={() => toggleShow(false)}            
         >
-            <View>
+            <View style={{}}>
                 {children}                
             </View>            
         </Modal>

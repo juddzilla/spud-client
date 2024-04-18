@@ -1,17 +1,26 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+
+const formatMap = {
+  lessThanWeek: 'dddd, hh:mma',
+  today: '[Today,] LT',
+  greaterThanWeek: 'MMMM DD, hh:mma'
+}
 
 export const relativeDate = (date) => {
-    const now = moment();
-    const diffInDays = now.diff(date, 'days');
+    const now = dayjs.extend(localizedFormat)();
+    const diffInDays = now.diff(date, 'day');
+    const diffInMinute = now.diff(date, 'minute');    
 
-    if (diffInDays === 0) {
-      // Date is from today, display time only
-      return moment(date).format('[Today,] LT');
+    let format = formatMap.greaterThanWeek;
+    if (diffInMinute < 60) {
+      format = `[${diffInMinute} min. ago]`;
+    } else if (diffInDays === 0) {      
+      format = formatMap.today;
     } else if (diffInDays < 7) {
-      // Date is from the past 7 days, display day of the week and time
-      return  moment(date).format('dddd, hh:mma');
+      format = formatMap.lessThanWeek;
     } else {
-      // Date is more than 7 days ago, display full date and time
-      return  moment(date).format('MMMM DD, hh:mma');
+      format = formatMap.greaterThanWeek;
     }
+    return dayjs(date).format(format);
   };

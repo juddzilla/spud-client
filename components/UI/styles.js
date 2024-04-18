@@ -33,14 +33,13 @@ const header = {
     }
 };
 
-const View = { flex: 1, backgroundColor: colors.theme.inputs.light.backgroundColor, };
+const View = { flex: 1,  };
 
 const footer = {
     alignItems: 'center',   
     flexDirection: 'row', 
     height: 56,
     justifyContent: 'flex-end', 
-    // paddingHorizontal: 16,
     width: '100%',    
 };
 

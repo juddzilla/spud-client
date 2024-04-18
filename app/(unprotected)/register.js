@@ -5,7 +5,7 @@ import Bold from '../../components/UI/text/Bold';
 import Fetch from '../../interfaces/fetch';
 
 import { useStorageState } from "../../interfaces/storage";
-// import { useSession } from './_layout';
+
 import validators from "../../utils/validators";
 export default function Register() {
     const [email, setEmail] = useState('');
@@ -46,7 +46,7 @@ export default function Register() {
         router.replace('/')
 
     }
-    // const { signIn } = useSession();
+    
     return (
     <View style={{height: '100%', paddingTop: 100, paddingHorizontal: 16}}>
         <TextInput

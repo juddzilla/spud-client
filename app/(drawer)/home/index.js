@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import {
+  useEffect,
+  useState,
+ } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
@@ -7,6 +10,7 @@ import { BaseButton } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import {Picker} from '@react-native-picker/picker';
 
+
 import CustomModal from '../../../components/UI/modal/Modal';
 import colors from '../../../components/UI/colors';
 import styles from '../../../components/UI/styles';
@@ -14,114 +18,50 @@ import styles from '../../../components/UI/styles';
 import Icon from '../../../components/UI/icons';
 import ListView from '../../../components/UI/List/View';
 
-import Light from '../../../components/UI/text/Light';
 import Regular from '../../../components/UI/text/Regular';
 import Bold from '../../../components/UI/text/Bold';
 
+import Fetch from '../../../interfaces/fetch';
 
-import Fetcher from '../../../interfaces/fetch';
+class ActionableObserver {
+  constructor() {
+    this.observers = [];
+ }
 
-const ItemTemplate = ({onPress, remove}, {item}) => { 
-  const styled = StyleSheet.create({        
-    content: {
-      marginVertical: 2, 
-      flexDirection: 'row',
-      alignItems: 'center', 
-      borderRightWidth: 4,
-      borderRightColor: colors.removeHint,            
-    },
-    icon: {
-      container: {
-        minHeight: 44, 
-        width:44,         
-        marginRight: 0, 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        ...styles.row,      
-      },
-    },        
-    info: {
-      flexDirection: 'row',
-      paddingRight: 8,
-      paddingLeft: 20,
-      // marginLeft: 8,
-      paddingVertical: 12,
-      backgroundColor: colors.lightWhite,      
-      flex: 1,
-    },
-    itemDot: {
-      marginRight: 10,
-      color: colors.theme.text.medium
-    },
-    title: { fontSize: 14, letterSpacing: 0.1, color: colors.darkText },
-  });
+  subscribe(func) {
+    this.observers.push(func);
+  }
 
-  const RenderUnderlayLeftActions = () => {
-    const { percentOpen } = useSwipeableItemParams();
+  unsubscribe(inputFunc) {
+    this.observers.filter(func => func != inputFunc);
+  }
 
-    const animStyle = useAnimatedStyle(
-      () => ({
-        opacity: percentOpen.value,
-      }),
-      [percentOpen]
-    );
+  notify(data) {
+    this.observers.forEach(func => func(data));
+  }
+}
 
-    return (
-      <BaseButton
-        style={{
-          justifyContent: 'center', 
-          alignItems: 'flex-end', 
-        }} 
-        
-      >
-        <Animated.View
-          style={animStyle}>
-            <View
-              style={{                
-                ...styles.row,
-                paddingLeft: 8,
-                backgroundColor: colors.remove,
-              }}
-            >
-              <BaseButton onPress={() => { remove(item.uuid)}}>
-                <View style={styled.icon.container}>
+const Actionable = new ActionableObserver();
 
-                  <Icon name='trash' />
-                </View>
-              </BaseButton>
-            </View>
-        </Animated.View>
-      </BaseButton>
-    );
-  };
-  
-  return (      
-      <SwipeableItem
-        key={item.id}
-        item={item}
-        renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
-        snapPointsLeft={[48]}
-        overSwipe={20}              
-      >         
-      <Pressable onPress={() => onPress(item)}>
-        <View style={styled.content}>                
-            <View style={styled.info}>                  
-                <Regular style={styled.title}>{item.headline}</Regular>              
-            </View>
-        </View>
-      </Pressable>
-    </SwipeableItem>        
-)};
-
-export default function Lists() {  
-  const [actionableItem, setActionableItem] = useState(null);
+const ActionableModal = () => {
+  const [item, setItem] = useState(null);
+  const [show, setShow] = useState(false);
   const [actionPrompt, setActionPrompt] = useState(null);
   const [selectedList, setSelectedList] = useState(null);
   const [existingLists, setExistingLists] = useState(null);
 
+  useEffect(() => {
+    Actionable.subscribe((value) => {      
+      setItem(value);
+    })
+    return () => {
+      Actionable.unsubscribe();
+    }
+  }, []);
+
   useEffect(() => {    
     if (actionPrompt === 'existingList') {
-      Fetcher.get('lists/', {sortDirection: 'asc', sortProperty: 'title'})
+      Fetch.get('lists/', {sortDirection: 'asc', sortProperty: 'title'})
         .then(res => {
           const [err, lists] = res;
           if (!err) {
@@ -134,68 +74,16 @@ export default function Lists() {
   }, [actionPrompt]);
 
   useEffect(() => {
-    if (actionableItem === null) {
+    if (item === null) {
       setExistingLists(null);
       setSelectedList(null);
       setActionPrompt(null);  
-      // , setExistingLists, setSelectedList, setActionPrompt
     }
-  }, [actionableItem])
-
-  // useEffect(() => {
-  //   if (selectedList !== null) {
-  //     addToExistingList(selectedList);    
-  //   }
-  // }, [selectedList]);
-
-  // const actions = {
-  //   list: {
-  //       component: () => Prompt({
-  //           cta: 'Delete',
-  //           color: colors.remove,
-  //           subtitle: 'Are you certain you want to delete this List? This action cannot be reversed.',
-  //           title: 'Confirmation Required', 
-  //       }),          
-  //       display: 'Delete',
-  //       icon: 'trash',
-  //   },
-  //   search: {
-  //       component: () => Prompt({
-  //           cta: 'Rename',
-  //           color: colors.black,
-  //           onInputChange: {cb: (text) => setNewTitle(text), value: newTitle},
-  //           subtitle: 'What would you like to rename this List to?',
-  //           title: 'Change Title', 
-  //       }),          
-  //       display: 'Rename',
-  //       icon: 'pencil',
-  //   },
-  //   summarize: {
-  //       component: () => Prompt({
-  //           cta: 'Summarize',
-  //           color: colors.black,
-  //           subtitle: 'Summarize this convo into a note. doing so will delete convo from history.',
-  //           title: 'Summarize', 
-  //       }),          
-  //       display: 'Summarize',
-  //       icon: 'summarize',
-  //   },
-  // };
-
-  const options = {
-    actions: {
-      onPress: setActionableItem,
-      placeholder: 'Create New Queue Item',
-      talkUri: '',
-    },
-    createKey: 'body',
-    filters: {
-      placeholder: 'Search Queue',
-    },
-    ItemTemplate,
-    uri: 'queue/',
-    viewTitle: 'Quick Queue',    
-  };  
+  }, [item]);
+  
+  if (!item) {
+    return null;
+  }
 
   const styled = StyleSheet.create({
     icon: {
@@ -227,16 +115,16 @@ export default function Lists() {
   });
 
   const webSearch = async () => {        
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(actionableItem.headline)}`;    
+    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(item.headline)}`;    
     await WebBrowser.openBrowserAsync(searchUrl);     
     // show prompt if want to make note         
     // getData();
   };
 
   const addToExistingList = () => {
-    Fetcher.post(`queue/${actionableItem.uuid}/`, {type: 'list', target: selectedList})
+    Fetch.post(`queue/${item.uuid}/`, {type: 'list', target: selectedList})
       .then(res => {
-        console.log('res', res);
+        // console.log('res', res);
         const [err, to] = res;
       
         if (!err) {
@@ -249,15 +137,15 @@ export default function Lists() {
   };
 
   const createListAsTitle = () => {
-    createList({title: actionableItem.headline});
+    createList({title: item.headline});
   };
 
   const createListAsItem = () => {
-    createList({items: [actionableItem.headline]});
+    createList({items: [item.headline]});
   };
 
   const createList = (data) => {
-    Fetcher.post('lists/', data)
+    Fetch.post('lists/', data)
     .then(res => {
       const [err, list] = res;
       if (!err) {
@@ -270,12 +158,10 @@ export default function Lists() {
   };
 
   const createConversion = (type) => {
-    Fetcher.post(`queue/${actionableItem.uuid}/`, {type})
+    Fetch.post(`queue/${item.uuid}/`, {type})
     .then(res => {
-      const [err, to] = res;
-      
-      if (!err) {
-        redirect(to);        
+      if (!res.error) {
+        redirect(res);        
       }
     })
     .catch(err => {
@@ -290,19 +176,26 @@ export default function Lists() {
       'Note': 'note'
     }
 
-    const target = `${typeMap[to.type]}?uuid=${to.uuid}`;   
-    setActionableItem(null);
+    const target = `${typeMap[to.type]}?uuid=${to.uuid}`;       
 
     // https://stackoverflow.com/a/77883629
     // below regex is to compensate for know bug when using a router method and a dynamic route
     router.push(target.replace(/\((.*?)\)/g, "[$1]"));
   }
+  
+  function close() {  
+    if (!show) {
+      setShow(true);
+    } else {      
+      setShow(false);
+      Actionable.notify(null);
+    }
+  }
 
   return (
-    <View style={{flex:1}}>
-      <CustomModal
-        show={actionableItem !== null}
-        toggleShow={() => setActionableItem(null)}
+    <CustomModal
+        show={true}
+        toggleShow={close}
       >
         { !actionPrompt &&
           <View style={{backgroundColor: colors.white, flex: 1, ...styles.centered}}>
@@ -371,7 +264,7 @@ export default function Lists() {
                 <View>
                   <View style={{...styles.row, ...styles.centered, backgroundColor: 'red'}}>
                     <Regular>Add </Regular>
-                    <Bold>{actionableItem.headline}</Bold>
+                    <Bold>{item.headline}</Bold>
                     <Regular> To List</Regular>
                   </View>
                   <Picker
@@ -419,6 +312,123 @@ export default function Lists() {
           </View>
         }
       </CustomModal>
+  )
+};
+
+const ItemTemplate = ({item}) => { 
+  const onPress = () => {
+    Actionable.notify(item);
+  };
+  const remove = () => {};
+
+  const styled = StyleSheet.create({        
+    content: {
+      marginVertical: 2, 
+      flexDirection: 'row',
+      alignItems: 'center', 
+      borderRightWidth: 4,
+      borderRightColor: colors.removeHint,            
+    },
+    icon: {
+      container: {
+        minHeight: 44, 
+        width:44,         
+        marginRight: 0, 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        ...styles.row,      
+      },
+    },        
+    info: {
+      flexDirection: 'row',
+      paddingRight: 8,
+      paddingLeft: 20,
+      // marginLeft: 8,
+      paddingVertical: 12,
+      backgroundColor: colors.lightWhite,      
+      flex: 1,
+    },
+    itemDot: {
+      marginRight: 10,
+      color: colors.theme.text.medium
+    },
+    title: { fontSize: 14, letterSpacing: 0.1, color: colors.darkText },
+  });
+
+  const RenderUnderlayLeftActions = () => {
+    const { percentOpen } = useSwipeableItemParams();
+
+    const animStyle = useAnimatedStyle(
+      () => ({
+        opacity: percentOpen.value,
+      }),
+      [percentOpen]
+    );
+
+    return (
+      <BaseButton
+        style={{
+          justifyContent: 'center', 
+          alignItems: 'flex-end', 
+        }} 
+        
+      >
+        <Animated.View
+          style={animStyle}>
+            <View
+              style={{                
+                ...styles.row,
+                paddingLeft: 8,
+                backgroundColor: colors.remove,
+              }}
+            >
+              <BaseButton onPress={remove}>
+                <View style={styled.icon.container}>
+                  <Icon name='trash' />
+                </View>
+              </BaseButton>
+            </View>
+        </Animated.View>
+      </BaseButton>
+    );
+  };
+  
+  return (      
+      <SwipeableItem
+        key={item.id}
+        item={item}
+        renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
+        snapPointsLeft={[48]}
+        overSwipe={20}              
+      >         
+      <Pressable onPress={onPress}>
+        <View style={styled.content}>                
+            <View style={styled.info}>                  
+                <Regular style={styled.title}>{item.headline}</Regular>              
+            </View>
+        </View>
+      </Pressable>
+    </SwipeableItem>        
+)};
+
+export default function Home() { 
+  const options = {
+    actions: {
+      placeholder: 'Create New Queue Item',
+      talkUri: '',
+    },
+    createKey: 'body',
+    filters: {
+      placeholder: 'Search Queue',
+    },
+    ItemTemplate,
+    uri: 'queue/',
+    viewTitle: 'Quick Queue',    
+  };  
+
+  return (
+    <View style={{flex:1}}>      
+      <ActionableModal />
       <ListView options={{...options}} />
     </View>
   );
