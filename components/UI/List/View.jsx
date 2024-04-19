@@ -17,6 +17,7 @@ import {
 
 import {
   keepPreviousData,
+  useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
@@ -28,13 +29,13 @@ import Icon from '../icons';
 import styles from '../styles';
 
 import Talk from '../actions/Talk';
+import { DetailObservable } from '../Details/observable';
 import Sort from '../filtering/Sort';
 import Search from '../filtering/Search';
 import Bold from '../text/Bold';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
-
 
 export default function ListView({options}) {
   const {
@@ -99,6 +100,19 @@ export default function ListView({options}) {
 
   const Query = useQuery(queryConfig);
 
+  const CreateMutation = useMutation({
+    mutationFn: async (data) => {
+      try {
+        return await Fetch.post(uri, { [createKey]: data });
+      } catch (error) {
+        console.warn('Create Error: ', error);
+      }
+    },
+    onSuccess: async () => {
+      
+    },
+  })
+
   useEffect(() => {    
     if (!Object.entries(initialQuery).every(([key, value]) => query[key] === value)) {
       setNext(null);
@@ -128,11 +142,11 @@ export default function ListView({options}) {
   }, [Query.data])
 
    
-    function getNext() {
-      if (next) {  
-        Query.refetch();
-      };
-    }            
+  function getNext() {
+    if (next) {  
+      Query.refetch();
+    };
+  }            
   
 
     async function create(title) {        
@@ -275,25 +289,9 @@ export default function ListView({options}) {
       }
     });
 
-
-  // function toggleSelected(uuid) {      
-  //   const selectedIndex = selected.indexOf(uuid);
-  //   if (selectedIndex === -1) {
-  //     selected.push(uuid);
-  //   } else {
-  //     selected.splice(selectedIndex, 1);        
-  //   }
-  //   setSelected([...selected]);
-  //   const newList = [...list];
-  //   const itemIndex = newList.findIndex(item => item.uuid === uuid);      
-  //   newList[itemIndex].selected = !newList[itemIndex].selected;
-  //   setList(newList);
-  // }    
-
   const disableSort = !Query.data || (Query.fetchStatus === 'fetching' || Query.data.length === 0);
   const disabledSearch = !Query.data || (Query.fetchStatus === 'fetching' || (query.search.trim().length === 0 && Query.data.length === 0));
   
-  // console.log('DATA', data[0]);
     return (
       <View style={styles.View}>
         {DrawerScreen(viewTitle)}     

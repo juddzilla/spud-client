@@ -5,7 +5,7 @@ StyleSheet,
 View,
 } from 'react-native';
 
-import { queryClient } from '../../../app/_layout';
+import { queryClient } from '../../../contexts/query-client';
 
 import { RectButton } from 'react-native-gesture-handler';
 import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item";
@@ -42,12 +42,9 @@ const DefaultListItem = ({item}) => {
 
     const remove = async () => {
         const type = typeMap[item.type];
-        const key = keyMap[item.type];        
+        const key = keyMap[item.type];          
         await Fetch.remove(`${type.toLowerCase()}/${item.uuid}/`);        
-        queryClient.setQueryData([key], oldData => {                    
-            const newList = oldData.filter(i => i.uuid !== item.uuid);
-            return newList;
-          });        
+        queryClient.setQueryData([key], oldData => oldData.filter(i => i.uuid !== item.uuid));        
     }
     
     const styled = StyleSheet.create({
@@ -114,7 +111,7 @@ const DefaultListItem = ({item}) => {
 
         return (
         <RectButton
-            onPress={() => { remove(item.uuid)}}
+            onPress={remove}
             style={{
                 flex: 1,
                 justifyContent: 'center',

@@ -173,7 +173,7 @@ export default function Options({options}) {
                     <Pressable
                         key={option.name}
                         onPress={ () => setPrompt(option)}
-                        style={{width: 40, ...Styles.centered}}
+                        style={{width: 40, ...Styles.centered, height: '100%'}}
                     >
                         <Icon name={actions[option.name].icon} styles={{size: 20}} />                    
                     </Pressable>

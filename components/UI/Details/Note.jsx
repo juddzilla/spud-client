@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import { relativeDate } from '../../../utils/dates';
 import {
   keepPreviousData,
@@ -23,7 +23,7 @@ import { queryClient } from '../../../contexts/query-client';
 
 import DebouncedInput from '../DebouncedInput';
 
-export default function Note({item}) {  
+export default function Note({item, left}) {  
   const queryKeys = ['notes', item.uuid];
   const baseUri = `notes/${item.uuid}/`;
 
@@ -129,9 +129,16 @@ export default function Note({item}) {
 ];
 
   return (
-    <View style={{flex: 1, paddingBottom: 15}}>
+    <View
+      style={{
+        ...styles.View,
+        left: -(left),
+        paddingBottom: 15,
+        width: Dimensions.get('window').width - left,                
+      }}
+    >
             
-      <View style={{...styles.row, height: 44}}>
+      <View style={{...styles.row, height: 44, paddingLeft: 12, paddingRight: 4}}>
         <Pressable
           onPress={() => DetailObservable.notify(null)}
           style={{width: 40, marginRight: 16, left: -4, top: -1}}

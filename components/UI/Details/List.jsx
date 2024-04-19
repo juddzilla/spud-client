@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
+  Dimensions,
   Animated as RNAnimated,
   Pressable, 
   StyleSheet, 
@@ -19,8 +20,6 @@ import { BaseButton } from 'react-native-gesture-handler';
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import  { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
@@ -41,8 +40,7 @@ import { queryClient } from '../../../contexts/query-client';
 import { DetailObservable } from './observable';
 import DebouncedInput from '../DebouncedInput';
 
-export default function List({item}) {
-  console.log(1);
+export default function List({item, left}) {  
   const queryKeys = ['lists', item.uuid];
   const baseUri = `lists/${item.uuid}/`;
   const itemsUri = `${baseUri}items/`;
@@ -57,8 +55,7 @@ export default function List({item}) {
   const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState(initialSort);
   const [title, setTitle] = useState(item.title);  
-
-
+  
   const Query = useQuery({
     queryKey: queryKeys, 
     queryFn: async () => {        
@@ -69,9 +66,8 @@ export default function List({item}) {
         completed: showCompleted,
       });
         
-      const { error, children, title } = response;
-          
-          
+      const { error, children, title } = response;        
+
       if (!error) {          
         setTitle(title);
         setListItems(children);        
@@ -159,11 +155,31 @@ export default function List({item}) {
       }
     },
     onSuccess: (data, variables) => {          
-      if (!data.error) {
-        const itemIndex = listItems.indexOf(l => l.id === variables.id);
-        console.log('itemIndex', itemIndex);
+      if (!data.error) {        
+        const itemIndex = listItems.findIndex(l => l.id === variables.id);        
         listItems.splice(itemIndex, 1);
-        setListItems([...listItems]);        
+        setListItems([...listItems]);
+        
+        
+        queryClient.setQueryData([queryKeys[0]], oldData => {                    
+          return oldData.map(old => {             
+            if (old.uuid === item.uuid) {              
+              let number = parseInt(old.subheadline);
+              number--;
+              let subheadline = number + ' Item';
+              if (number !== 1) {
+                subheadline = subheadline + 's'
+              }
+
+              return {
+                ...old,
+                subheadline,
+                updated_at: data.updated_at,
+              }
+            }
+            return old;
+          });
+        });
       } 
     }
   })
@@ -183,33 +199,48 @@ export default function List({item}) {
     },
     onSuccess: (data) => {
       setListItems([...listItems, data.results]);
+
+      queryClient.setQueryData([queryKeys[0]], oldData => {                    
+        return oldData.map(old => {             
+          if (old.uuid === item.uuid) {              
+            let number = parseInt(old.subheadline);
+            number++;
+            let subheadline = number + ' Item';            
+            if (number !== 1) {
+              subheadline = subheadline + 's';
+            }
+
+            return {
+              ...old,
+              subheadline,
+              updated_at: data.results.updated_at,
+            }
+          }
+          return old;
+        });
+      });
     }
   });
+
+  const reorderMutation = useMutation({
+    mutationFn: async ({data}) => {
+      const reordered = data.reduce((acc, cur, index) => {
+        cur.order = index;
+        acc.items.push(cur);
+        acc.ids.push(cur.id);
+        return acc;
+      }, { items: [], ids: []});
+  
+      return await Fetch.put(itemsUri, {order: reordered.ids})
+    },
+    onSuccess: (data) => {
+      setListItems(data.results);
+    }
+  })
   
   // UI OPERATIONS
   function onFilterUpdate({search}) {
     setFilter(search);
-  }
-
-  function onReorderUpdate({data}) {
-    const reordered = data.reduce((acc, cur, index) => {
-      cur.order = index;
-      acc.items.push(cur);
-      acc.ids.push(cur.id);
-      return acc;
-    }, { items: [], ids: []});
-
-    setListItems(reordered.items);
-
-    Fetch.put(itemsUri, {order: reordered.ids})
-    .then(res => {                  
-      const [err, items] = res;
-
-      if (!err) {
-        setListItems(items.results);
-      }
-    })
-    .catch(err => { console.warn('List Error', err)});
   }
 
   function onSortUpdate({ sortProperty, sortDirection }) {
@@ -273,7 +304,7 @@ export default function List({item}) {
         marginRight: 8,  
       },
       icon: {
-        color: item.completed ? 'red' : 'green',
+        color: item.completed ? colors.sort.inactive : colors.text,
         size:15,    
       },
       body: {
@@ -383,59 +414,68 @@ export default function List({item}) {
 ];
 
   return (
-    <>
-      
-      <View style={Styles.View}>        
-          <View style={{...Styles.row, height: 44}}>
-            <Pressable
-              onPress={() => DetailObservable.notify(null)}
-              style={{width: 40, marginRight: 16, left: -4, top: -1}}
-            >
-              <Icon name='close' />
-            </Pressable>
-            
-            <DebouncedInput
-              multiline={false}
-              placeholder='Note Title'
-              style={{
-                fontSize: 26,
-                height: '100%',            
-                marginRight: 16,          
-              }}
-              update={(value) => { updateListMutation.mutate({title: value})}} 
-              value={title}
-            />        
-            <Options options={headerOptions} />
-          </View>    
-          <View style={{...Styles.header, paddingHorizontal: 0}}>
-         
-            <Sort fields={sortOn} query={sort} update={onSortUpdate} />
-            <Search placeholder={'Filter'} update={onFilterUpdate} />
-            <Pressable
-              onPress={toggleShowCompleted}
-              style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}
-            >
-              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
-            </Pressable>   
-          </View>          
-
-          <View style={{flex: 1}}>
-            <DraggableFlatList
-              activationDistance={20}           
-              data={listItems}
-              keyExtractor={item => item.id}   
-              ListEmptyComponent={<EmptyState />}
-              onDragEnd={onReorderUpdate}
-              renderItem={ListItem}
-              refreshing={true}
-            />
-          </View>
+    <View
+      style={{
+        ...Styles.View,
+        left: -(left),
+        width: Dimensions.get('window').width - left,                
+      }}
+    >
+        <View style={{...Styles.row, height: 44, paddingLeft: 12, paddingRight: 4}}>
+          <Pressable
+            onPress={() => DetailObservable.notify(null)}
+            style={{width: 40, marginRight: 0, left: -4, top: -1}}
+          >
+            <Icon name='close' />
+          </Pressable>
           
-          <View style={Styles.footer}>                  
-            <Input hideModal={true} onSubmit={createListItemMutation.mutate} placeholder='Create New List Item'/>
-            <Talk />          
-          </View>       
+          <DebouncedInput
+            multiline={false}
+            placeholder='Note Title'
+            style={{
+              fontSize: 26,
+              height: '100%',            
+              marginRight: 16,          
+            }}
+            update={(value) => { updateListMutation.mutate({title: value})}} 
+            value={title}
+          />        
+          <Options options={headerOptions} />
+        </View>    
+        
+        <View
+          style={{
+            ...Styles.header, 
+            paddingHorizontal: 0,
+            
+          }}>
+        
+          <Sort fields={sortOn} query={sort} update={onSortUpdate} />
+          <Search placeholder={'Filter'} update={onFilterUpdate} />
+          <Pressable
+            onPress={toggleShowCompleted}
+            style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}
+          >
+            <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
+          </Pressable>   
+        </View>          
+
+        <View style={{flex: 1}}>
+          <DraggableFlatList
+            activationDistance={20}           
+            data={listItems}
+            keyExtractor={item => item.id}   
+            ListEmptyComponent={<EmptyState />}
+            onDragEnd={reorderMutation.mutate}
+            renderItem={ListItem}
+            refreshing={true}
+          />
         </View>
-    </>
+        
+        <View style={Styles.footer}>                  
+          <Input hideModal={true} onSubmit={createListItemMutation.mutate} placeholder='Create New List Item'/>
+          <Talk />          
+        </View>       
+      </View>
   );
 }
