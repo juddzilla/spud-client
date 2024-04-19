@@ -16,7 +16,7 @@ import Icon from '../icons';
 import styles from '../styles';
 import Light from '../text/Light';
 
-import Talk from '../../UI/actions/Talk';
+import Talk from '../actions/Talk';
 
 import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';

@@ -15,6 +15,7 @@ export default function Convos() {
         fields: ['title', 'updated_at'],
       },
     },
+    storeKey: 'convos',
     uri:'convos/'
   };
 
