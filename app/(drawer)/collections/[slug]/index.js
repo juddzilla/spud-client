@@ -150,8 +150,6 @@ export default function Collection() {
       talkUri: '',
     },
     createKey: 'title',
-    viewTitle: 'Collection',    
-    // details: '/collections',
     filters: {
       placeholder: 'Search Collections',
       sort: {

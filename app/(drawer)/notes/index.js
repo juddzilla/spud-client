@@ -1,4 +1,5 @@
 import ListView from '../../../components/UI/List/View';
+import DrawerScreen from '../../../components/DrawerScreen';
 
 export default function Notes() {  
   const options = {
@@ -6,7 +7,6 @@ export default function Notes() {
       placeholder: 'Create New Note',
       talkUri: '',
     },
-    viewTitle: 'Your Notes',
     detail: '/notes',
     filters: {
       placeholder: 'Search Notes',
@@ -15,9 +15,14 @@ export default function Notes() {
         fields: ['title', 'updated_at'],
       },
     },
-    storeKey: 'notes',
+    storeKey: ['notes'],
     uri: 'notes/'
   };
 
-  return (<ListView options={{...options}} />);
+  return (
+    <>
+      { DrawerScreen('Your Notes') }
+      <ListView options={{...options}} />
+    </>
+);
 }

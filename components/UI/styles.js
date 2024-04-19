@@ -16,19 +16,13 @@ const row = { alignItems: 'center', flexDirection: 'row' };
 
 const header = {
     alignItems: 'center',
-    flexDirection: 'row-reverse',
-    // height: 60,
+    flexDirection: 'row-reverse',    
     justifyContent: 'space-between',
-    // paddingVertical: 8,
-    // backgroundColor: 'white',
     padding: 8,
-    // marginBottom: 8,
     input: {
         container: {
             ...row,
             flex: 1,
-            
-            // marginRight: 16,
         }
     }
 };
@@ -36,11 +30,22 @@ const header = {
 const View = { flex: 1,  };
 
 const footer = {
-    alignItems: 'center',   
+    backgroundColor: colors.lightWhite,    
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    
     flexDirection: 'row', 
-    height: 56,
-    justifyContent: 'flex-end', 
+    // height: 64,
+    justifyContent: 'flex-end',     
     width: '100%',    
+    shadowColor: "#e2e8f0",
+    shadowOffset: {
+        width: 0,
+        height: -20,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.00,
+    elevation: 24,
 };
 
 export default {

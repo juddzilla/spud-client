@@ -25,6 +25,8 @@ import Fetch from '../../../interfaces/fetch';
 
 import { queryClient } from '../../../contexts/query-client';
 
+import DrawerScreen from '../../../components/DrawerScreen';
+
 class ActionableObserver {
   constructor() {
     this.observers = [];
@@ -428,14 +430,14 @@ export default function Home() {
     },
     ItemTemplate,
     uri: 'queue/',
-    storeKey: 'queue',
-    viewTitle: 'Quick Queue',   
+    storeKey: ['queue'],
     noRedirect: true, 
   };  
 
   return (
     <View style={{flex:1}}>      
       <ActionableModal />
+      { DrawerScreen('Quick Queue') }
       <ListView options={{...options}} />
     </View>
   );

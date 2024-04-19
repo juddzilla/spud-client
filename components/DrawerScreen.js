@@ -16,7 +16,7 @@ export default function DrawerScreen(title, headerRight) {
     function toggleMenu() {
       navigation.openDrawer();
     }
-
+    console.log('router.canGoBack()', router.canGoBack());
     return (
         <Drawer.Screen
           options={{

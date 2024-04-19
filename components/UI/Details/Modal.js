@@ -16,7 +16,6 @@ export default function DetailModal() {
     const [item, setItem] = useState(null);
     const [left, setLeft] = useState(0);
 
-
     useEffect(() => {
       DetailObservable.subscribe((value) => {      
         setItem(value);

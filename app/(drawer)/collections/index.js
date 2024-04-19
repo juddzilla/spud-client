@@ -7,7 +7,6 @@ export default function Collections() {
       talkUri: '',
     },
     createKey: 'title',
-    viewTitle: 'Collections',    
     details: '/collections',
     filters: {
       placeholder: 'Search Collections',
@@ -16,6 +15,7 @@ export default function Collections() {
         fields: ['body', 'updated_at'],
       },
     },
+    storeKey: ['collections'],
     uri: 'collections/',
   };
 

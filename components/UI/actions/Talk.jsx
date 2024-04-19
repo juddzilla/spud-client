@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Animated, Dimensions, Pressable, StyleSheet, View } from 'react-native';
 
 import colors from '../colors';
 import Icon from '../icons';
@@ -7,14 +7,16 @@ import Bold from '../text/Bold';
 
 import styles from '../styles';
 
-export default function TalkButton() {
+export default function TalkButton({focused, setFocused}) {
   const [showModal, setShowModal] = useState(false);
+  
 
   const micIcon = {
     backgroundColor: '',
     color: !showModal ? 'white' : 'black', 
     name: !showModal ? 'mic' : 'micOff',
-  }
+  };
+
     return (
       <View
         style={{          

@@ -1,7 +1,5 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { 
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   Text,
   View,

@@ -49,12 +49,25 @@ export default function List({item, left}) {
   const initialSort = { property: 'order', direction: 'desc' };
   const sortOn = ['order', 'updated_at'];
   
-  
   const [filter, setFilter] = useState('');
   const [listItems, setListItems] = useState([]);
   const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState(initialSort);
   const [title, setTitle] = useState(item.title);  
+
+  const [focusedAction, setFocusedAction] = useState(null);
+
+
+  useEffect(() => {
+    const data = queryClient.getQueryData(queryKeys);
+    if (!data) {
+      return;
+    }
+    
+    const items = showCompleted === null ? data : data.filter(i => i.completed === showCompleted);
+
+    setListItems(items);
+  }, [showCompleted]);
   
   const Query = useQuery({
     queryKey: queryKeys, 
@@ -261,16 +274,32 @@ export default function List({item, left}) {
 
   // UI ELEMENTS
   const EmptyState = () => {
+    const message = listItems.length !== 0;
+    const completedMap = {
+      false: "No 'Uncompleted' Items",
+      true: '0 Completed Items',
+    }
+
     return (
-      <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>
-        { listItems.length !== 0 ? (
-          <View style={{...Styles.row}}>
-            <Light style={{marginRight: 2}}>No list items containing</Light>
-            <Bold>"{filter}"</Bold>
+      <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>        
+        { showCompleted === null ? (          
+          <View style={{...Styles.row}}>            
+            <Bold>Add your first list item</Bold>
           </View>
         ) : (
           <View style={{...Styles.row}}>
-            <Bold>Add your first list item</Bold>
+            { filter.trim().length ?
+              (
+                <>
+                  <Light style={{marginRight: 2}}>No list items containing</Light>
+                  <Bold>"{filter}"</Bold>
+                </>
+              ) : (
+                <>
+                  <Light>{completedMap[showCompleted]}</Light>
+                </>
+              )
+            }
           </View>
         ) }
       </View>
@@ -287,14 +316,7 @@ export default function List({item, left}) {
         flexDirection: 'row',
         marginBottom,
         marginHorizontal: 0,    
-        shadowColor: "#e2e8f0",
-        shadowOffset: {
-            width: 0,
-            height: 12,
-        },
-        shadowOpacity: 0.58,
-        shadowRadius: 16.00,
-        elevation: 24,
+
       },
       checkbox: {
         ...Styles.centered,
@@ -319,7 +341,7 @@ export default function List({item, left}) {
         paddingRight: 0,        
         position: 'relative',
         top: -2,
-        paddingBottom: 10,
+        paddingBottom: 10,        
       },
       text: {
         color: colors.lightText,
@@ -411,7 +433,7 @@ export default function List({item, left}) {
         name: 'remove',
         theme: 'red',
     }
-];
+  ];
 
   return (
     <View
@@ -426,16 +448,16 @@ export default function List({item, left}) {
             onPress={() => DetailObservable.notify(null)}
             style={{width: 40, marginRight: 0, left: -4, top: -1}}
           >
-            <Icon name='close' />
+            <Icon name='close' styles={{fontSize: 20}}/>
           </Pressable>
           
           <DebouncedInput
             multiline={false}
             placeholder='Note Title'
             style={{
-              fontSize: 26,
+              fontSize: 16,
               height: '100%',            
-              marginRight: 16,          
+              marginRight: 16,        
             }}
             update={(value) => { updateListMutation.mutate({title: value})}} 
             value={title}
@@ -446,10 +468,8 @@ export default function List({item, left}) {
         <View
           style={{
             ...Styles.header, 
-            paddingHorizontal: 0,
-            
-          }}>
-        
+            paddingHorizontal: 0,            
+          }}>        
           <Sort fields={sortOn} query={sort} update={onSortUpdate} />
           <Search placeholder={'Filter'} update={onFilterUpdate} />
           <Pressable
@@ -472,9 +492,22 @@ export default function List({item, left}) {
           />
         </View>
         
-        <View style={Styles.footer}>                  
-          <Input hideModal={true} onSubmit={createListItemMutation.mutate} placeholder='Create New List Item'/>
-          <Talk />          
+        <View
+          style={{
+            ...Styles.footer,
+            left: -(left)/2,
+            width: Dimensions.get('window').width,
+            paddingHorizontal: 8,
+          }}>
+          <Input
+            focused={focusedAction === 'create'}
+            setFocused={setFocusedAction}
+            onSubmit={createListItemMutation.mutate} 
+            placeholder='Create New List Item'
+          />        
+          { [null, 'talk'].includes(focusedAction) &&          
+            <Talk />          
+          }  
         </View>       
       </View>
   );

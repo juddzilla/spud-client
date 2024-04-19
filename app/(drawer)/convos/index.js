@@ -1,4 +1,5 @@
 import ListView from '../../../components/UI/List/View';
+import DrawerScreen from '../../../components/DrawerScreen';
 
 export default function Convos() {  
   const options = {
@@ -6,7 +7,6 @@ export default function Convos() {
       placeholder: 'Create New Conversation',
       talkUri: '',
     },
-    viewTitle:'Your Conversations',
     detail:'/convos',
     filters: {
       placeholder: 'Search by Title',
@@ -15,9 +15,14 @@ export default function Convos() {
         fields: ['title', 'updated_at'],
       },
     },
-    storeKey: 'convos',
+    storeKey: ['convos'],
     uri:'convos/'
   };
 
-  return (<ListView options={{...options}} />);
+  return (
+    <>
+      { DrawerScreen('Your Conversations') }
+      <ListView options={{...options}} />
+    </>
+  );
 }

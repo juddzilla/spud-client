@@ -40,8 +40,7 @@ export default function Convo({item, left}) {
   const Query = useQuery({
     queryKey: queryKeys,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);
-      console.log('resp', response);
+      const response = await Fetch.get(baseUri);      
       if (!response.error) {
         setTitle(response.title);
         setMessages(response.messages);
