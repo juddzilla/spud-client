@@ -21,7 +21,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-import { router } from 'expo-router';
+
 import DefaultListItem from './DefaultListItem';
 
 import colors from '../colors';
@@ -37,6 +37,7 @@ import Bold from '../text/Bold';
 import DrawerScreen from '../../../components/DrawerScreen';
 import Fetch from '../../../interfaces/fetch';
 
+import { queryClient } from '../../../contexts/query-client';
 export default function ListView({options}) {
   const {
     actions,
@@ -47,6 +48,7 @@ export default function ListView({options}) {
     storeKey,
     uri,
     viewTitle,
+    noRedirect,
   } = options;
 
   const initialQuery = {
@@ -71,7 +73,7 @@ export default function ListView({options}) {
   const focusedWidth = Dimensions.get('window').width-32;
   const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
 
-  const queryConfig = {
+  const Query = useQuery({
     queryKey: [storeKey], 
     queryFn: async () => {
       const endpoint = next ? next : uri;
@@ -96,20 +98,28 @@ export default function ListView({options}) {
     },
     keepPreviousData: true,
     placeholderData: keepPreviousData,
-  };
+  });
 
-  const Query = useQuery(queryConfig);
-
-  const CreateMutation = useMutation({
-    mutationFn: async (data) => {
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      console.log('[createKey]: value', {[createKey]: message});
       try {
-        return await Fetch.post(uri, { [createKey]: data });
+        return await Fetch.post(uri, { [createKey]: message });
       } catch (error) {
         console.warn('Create Error: ', error);
       }
     },
-    onSuccess: async () => {
-      
+    onSuccess: async (value) => {
+      setMessage('');
+      if (noRedirect) {
+        queryClient.setQueryData([storeKey], oldData => {
+          const newData = [...oldData];
+          newData.unshift(value);
+          return newData;
+        });
+      } else {
+        DetailObservable.notify(value);
+      }
     },
   })
 
@@ -147,22 +157,7 @@ export default function ListView({options}) {
       Query.refetch();
     };
   }            
-  
 
-    async function create(title) {        
-      const response = await Fetch.post(uri, { [createKey]: title });
-      
-      if (response.error) {
-        console.warn(`Host Error - POST ${uri} - ${JSON.stringify(response.error)}`)
-      } else {
-        if (detail) {
-          router.push(`${detail}?uuid=${response.uuid}`);
-        } else {
-          // setList([...list, res]);
-        }
-      }
-    }
-  
     function onRefresh() {   
       // idt this is being triggered
       setQuery(initialQuery); 
@@ -171,16 +166,7 @@ export default function ListView({options}) {
     function update(params) {      
       setQuery({...query, ...params});
     }
-  
-    function onSubmitMessage() {
-      // if (!hideModal) {
-      //     toggleModal(true);
-      // }        
-      create(message);
-      setMessage('');       
-      // toggleModal(false); 
-  }
-  
+
     const ListEmptyComponent = () => {      
       const Empty = (props) => (
         <View style={{                
@@ -366,7 +352,7 @@ export default function ListView({options}) {
                       placeholderTextColor={colors.theme.inputs.dark.text.light}
                   />
                   <Pressable
-                      onPress={onSubmitMessage}
+                      onPress={createMutation.mutate}
                       style={textInputStyled.input.send}
                   >
                       <Icon name='send' styles={textInputStyled.input.icons.trailing} />

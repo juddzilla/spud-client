@@ -23,6 +23,8 @@ import Bold from '../../../components/UI/text/Bold';
 
 import Fetch from '../../../interfaces/fetch';
 
+import { queryClient } from '../../../contexts/query-client';
+
 class ActionableObserver {
   constructor() {
     this.observers = [];
@@ -319,7 +321,10 @@ const ItemTemplate = ({item}) => {
   const onPress = () => {
     Actionable.notify(item);
   };
-  const remove = () => {};
+  const remove = async () => {
+    await Fetch.remove(`queue/${item.uuid}/`);        
+    queryClient.setQueryData(['queue'], oldData => oldData.filter(i => i.uuid !== item.uuid));        
+  };
 
   const styled = StyleSheet.create({        
     content: {
@@ -423,7 +428,9 @@ export default function Home() {
     },
     ItemTemplate,
     uri: 'queue/',
-    viewTitle: 'Quick Queue',    
+    storeKey: 'queue',
+    viewTitle: 'Quick Queue',   
+    noRedirect: true, 
   };  
 
   return (
