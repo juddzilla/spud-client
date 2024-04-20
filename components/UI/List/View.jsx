@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -20,7 +19,6 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
-
 
 import DefaultListItem from './DefaultListItem';
 
@@ -57,8 +55,7 @@ export default function ListView({options}) {
     initialQuery.sortProperty = filters.sort.defaults.property;
   }     
   const [total, setTotal] = useState(null);
-
-  const [data, setData] = useState(null);
+  
   const [query, setQuery] = useState(initialQuery);
   const [next, setNext] = useState(null);
   const [focus, setFocus] = useState(false);
@@ -107,7 +104,7 @@ export default function ListView({options}) {
     },
     onSuccess: async (value) => {
       setMessage('');
-      Query.refetch();
+      Query.refetch();      
       if (!noRedirect) {        
         DetailObservable.notify(value);
       }
@@ -133,14 +130,9 @@ export default function ListView({options}) {
     }).start();
     
   }, [widthAnim, focus]);
-
-  useEffect(() => {
-    setData(Query.data);
-  }, [Query.data])
-
    
   function getNext() {
-    if (next) {  
+    if (next && Query.fetchStatus !== 'fetching') {  
       Query.refetch();
     };
   }            
@@ -170,10 +162,8 @@ export default function ListView({options}) {
       </View>
     );
     
-    if (Query.status !== 'pending' && Query.fetchStatus === 'fetching') {
-      return (
-        <Empty><Bold>Lsoading</Bold></Empty>  
-      )
+    if (Query.fetchStatus === 'fetching') {
+      return null;
     }
 
     if (query.search.trim().length > 0) {
@@ -266,8 +256,19 @@ export default function ListView({options}) {
     }
   });
 
-  const disableSort = !Query.data || (Query.fetchStatus === 'fetching' || Query.data.length === 0);
-  const disabledSearch = !Query.data || (Query.fetchStatus === 'fetching' || (query.search.trim().length === 0 && Query.data.length === 0));
+  const loadingStyle = StyleSheet.create({
+    paddingTop: '20%',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.6)',    
+    height: '100%', 
+    left: 0, 
+    position: 'absolute', 
+    top: 0, 
+    width: '100%', 
+  })
+
+  const disableSort = !Query.data || (Query.fetchStatus === 'fetching' || !Query.length === 0);
+  const disabledSearch = !Query.data || (Query.fetchStatus === 'fetching' || (query.search.trim().length === 0 && !Query.length === 0));
   
   return (
     <View style={styles.View}>
@@ -289,65 +290,63 @@ export default function ListView({options}) {
           }
         </View> 
       </View>
-
-      { (Query.status === 'pending' && Query.fetchStatus === 'fetching') && 
-        <View 
-          style={{
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            width: Dimensions.get('window').width,  
-            height: Dimensions.get('window').height -144,              
-            backgroundColor: 'rgba(255,255,255,0.2)',              
-            zIndex: 10
-          }}>
-            <View
-              style={{         
-                ...styles.centered,                  
-                flex: 1,
-              }}>
-              <Bold>Loading</Bold>
-            </View>
-        </View>
-      }
-            
-        <>
-          <FlatList
-            data={data || []}
-            renderItem={ItemTemplate}
-            keyExtractor={item => item.uuid}                      
-            ListEmptyComponent={ListEmptyComponent}
-            ListHeaderComponent={ListHeaderComponent}
-            onRefresh={onRefresh}
-            onEndReached={getNext}
-            //if set to true, the UI will show a loading indicator
-            refreshing={false}
-          /> 
-          <View style={{...styles.footer}}>
-            <Animated.View style={textInputStyled.input.container}>                            
-                <TextInput
-                    value={message}
-                    onBlur={() => setFocus(false)}
-                    onChangeText={(text) => setMessage(text)}
-                    onFocus={() => setFocus(true)}
-                    placeholder={actions.placeholder || 'NEW'}
-                    style={textInputStyled.input.field}
-                    placeholderTextColor={colors.theme.inputs.dark.text.light}
-                />
-                <Pressable
-                    onPress={createMutation.mutate}
-                    style={textInputStyled.input.send}
-                >
-                    <Icon name='send' styles={textInputStyled.input.icons.trailing} />
-                </Pressable>
-            </Animated.View>  
-            { !focus &&
-              <Talk />          
+      <View style={{flex: 1}}>
+        <FlatList
+          data={Query.data}
+          renderItem={ItemTemplate}
+          keyExtractor={(item, index) => `${item.uuid}+${index}`}                      
+          ListEmptyComponent={ListEmptyComponent}
+          ListHeaderComponent={ListHeaderComponent}
+          onRefresh={onRefresh}
+          // onEndReached={getNext}
+          onScroll={({ nativeEvent }) => {
+            // using instead of onEndReached because onEndReach makes 1 extra request
+            const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+            const numberOfPixelsFromBottomThreshold = 100;
+            const isNearBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - numberOfPixelsFromBottomThreshold
+            if (isNearBottom) {
+                getNext(); // I usually fetchMore when end is reached
             }
-            {/* <View style={{ opacity: focus ? 0 : 1}}>
-            </View> */}
+        }}
+          //if set to true, the UI will show a loading indicator
+          refreshing={false}
+        />
+        
+      <View style={{...styles.footer}}>
+        <Animated.View style={textInputStyled.input.container}>                            
+            <TextInput
+                value={message}
+                onBlur={() => setFocus(false)}
+                onChangeText={(text) => setMessage(text)}
+                onFocus={() => setFocus(true)}
+                placeholder={actions.placeholder || 'NEW'}
+                style={textInputStyled.input.field}
+                placeholderTextColor={colors.theme.inputs.dark.text.light}
+            />
+            <Pressable
+                onPress={createMutation.mutate}
+                style={textInputStyled.input.send}
+            >
+                <Icon name='send' styles={textInputStyled.input.icons.trailing} />
+            </Pressable>
+        </Animated.View>  
+        { !focus &&
+          <Talk />          
+        }
+      </View>
+      </View>
+      {
+        Query.fetchStatus === 'fetching' &&
+          <View style={loadingStyle}>
+            <Bold>Loading</Bold>
           </View>
-        </>          
+      }
+      {
+        createMutation.isPending &&
+          <View style={loadingStyle}>
+            <Bold>Creating</Bold>
+          </View>
+      }
     </View>       
   );  
 }

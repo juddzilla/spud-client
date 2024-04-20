@@ -1,7 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Pressable, Modal, StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
-
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet,TextInput, View } from 'react-native';
 
 import colors from '../colors';
 import Icon from '../icons';
@@ -9,19 +7,10 @@ import styles from '../styles';
 
 import { useDebouncedValue } from '../../../utils/debounce';
 
-
 export default function Search({ disabled, placeholder, update }) {        
     const [focused, setFocused] = useState(false);
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
-
-    useFocusEffect(
-        useCallback(() => {          
-          return () => {
-            setSearch('');
-          };
-        }, [])
-      );
 
     useEffect(() => {
         update({search});        
@@ -33,14 +22,14 @@ export default function Search({ disabled, placeholder, update }) {
             backgroundColor: (focused || search.length > 0) ? colors.lightWhite : colors.theme.text.lightest,            
             borderWidth: 1,
             borderRadius: 8,
-            borderColor: colors.theme.text.lightest,               
+            borderColor: colors.input.border,               
             flex: 1,
             justifyContent: 'space-between',
             marginRight: 8,
             
         },
         search: { 
-            color: colors.input.dark.icon, 
+            color: colors.input.icon, 
             size: 14,
          },
          icon: {
@@ -53,11 +42,11 @@ export default function Search({ disabled, placeholder, update }) {
          },
         input: {            
             height: 40,                      
-            marginRight: 0,                              
-            backgroundColor: 'transparent',
-            color: colors.theme.inputs.light.text.dark,                
+            marginRight: 0,           
+            color: colors.input.color,                
             paddingLeft: 18,
-            paddingRight: 44,        
+            paddingRight: 44,     
+            flex: 1,   
         },
         close: { 
             button: {
@@ -67,26 +56,15 @@ export default function Search({ disabled, placeholder, update }) {
                 ...styles.centered,
             },
             icon: {
-                color: disabled ? colors.white : colors.theme.inputs.light.text.dark, 
+                color: disabled ? colors.button.disabled : colors.button.enabled, 
                 size: 12,
                 
             },
          },
-        //  trigger: {
-        //     left: 12, 
-        //     position: 'absolute',             
-        //     width: 48,
-        //     height: 64, 
-        //     alignItems: 'center', 
-        //     justifyContent: 'center',
-        //  },
     });
-    
-    let inputStyle = {};
-    
+     
     return (
-        <View style={style.container}>
-            
+        <View style={style.container}>        
             <TextInput
                 editable={!!disabled === false}
                 value={search}
@@ -94,12 +72,11 @@ export default function Search({ disabled, placeholder, update }) {
                 onBlur={() => setFocused(false)}
                 onFocus={() => setFocused(true)}
                 placeholder={placeholder}
-                style={{...style.input, ...inputStyle}}
+                style={style.input}
             />
             <View style={
                 style.icon.container
-            }>            
-                
+            }>                         
                 { search.length > 0 ?            
                     (<Pressable
                         onPress={() => setSearch('')}

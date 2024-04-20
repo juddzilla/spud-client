@@ -84,6 +84,11 @@ const colors = {
     black,
     white,
 
+    button: {
+        disabled: slate.medium,
+        enabled: slate.dark,
+    },
+
     colorway: {
         dark: {
             primary: slate.light,
@@ -96,11 +101,16 @@ const colors = {
         active: zinc.dark, //zinc 900
     },
     input: {
+        border: 'rgb(228,229,230)',
+        color: 'rgb(34,34,34)',
         dark: {
             backgroundColor: slate.light,
             color: slate.dark,
             icon: slate.medium,
-        },        
+        },
+        icon: {            
+            unfocused: slate.medium,
+        }
     },
     header: {
         icon: '',
