@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import { relativeDate } from '../../../utils/dates';
 import {
@@ -8,10 +8,10 @@ import {
 } from '@tanstack/react-query';
 
 import { DetailObservable  } from './observable';
-
-import Options from './Options';
+import Heading from './Heading';
 
 import colors from '../colors';
+import DebouncedInput from '../DebouncedInput';
 import Icon from '../icons';
 import styles from '../styles';
 import Light from '../text/Light';
@@ -20,8 +20,6 @@ import Talk from '../actions/Talk';
 
 import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';
-
-import DebouncedInput from '../DebouncedInput';
 
 export default function Note({item, left}) {  
   const queryKeys = ['notes', item.uuid];
@@ -138,27 +136,10 @@ export default function Note({item, left}) {
       }}
     >
             
-      <View style={{...styles.row, height: 44, paddingLeft: 12, paddingRight: 4}}>
-        <Pressable
-          onPress={() => DetailObservable.notify(null)}
-          style={{width: 40, marginRight: 16, left: -4, top: -1}}
-        >
-          <Icon name='close' />
-        </Pressable>
-        
-        <DebouncedInput
-          multiline={false}
-          placeholder='Note Title'
-          style={{
-            fontSize: 26,
-            height: '100%',            
-            marginRight: 16,          
-          }}
-          update={(value) => { updateMutation.mutate({title: value})}} 
-          value={title}
-        />        
-        <Options options={headerOptions} />
-      </View>
+      <Heading
+        headerOptions={headerOptions}
+        mutations={{ update: updateMutation.mutate }}
+      />
       <View style={{flex: 1}}>
       { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 
         (
@@ -173,6 +154,8 @@ export default function Note({item, left}) {
               fontSize: 20,        
               paddingHorizontal: 16,
               paddingTop: 16,
+              backgroundColor: 'transparent', 
+              color: colors.white,
             }}
             update={(value) => { updateMutation.mutate({body: value})}} 
             value={body}
@@ -181,7 +164,7 @@ export default function Note({item, left}) {
       
       }
       </View>
-      <View style={{...styles.footer, paddingHorizontal: 4}}>
+      <View style={{...styles.footer, paddingHorizontal: 4, backgroundColor: 'transparent', shadowColor: 'transparent', }}>
         <View style={styled.date.container}>
           <Light style={styled.date.body}> {relativeDate(updatedAt)}</Light>          
         </View>        

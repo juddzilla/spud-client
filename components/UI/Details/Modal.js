@@ -38,12 +38,12 @@ export default function DetailModal() {
     
     return (
       // set value of context to {bool, toggle}
-      <DetailContext.Provider value={{ item, setItem }}>        
+      // <DetailContext.Provider value={{ item, setItem }}>        
         <View
           style={{position: 'absolute', top: 0, left: 0, flex: 1}}
         >
           <Modal
-            backdropColor={colors.theme.backgroundColor}            
+            // backdropColor={colors.theme.backgroundColor}            
             animationIn='fadeIn'
             animationInTiming={100}
             transparent={false}
@@ -51,8 +51,10 @@ export default function DetailModal() {
             onBackdropPress={() => DetailObservable.notify(null)}  
             style={{ }}
           >
+            
             <View 
               style={{
+                // backgroundColor: colors.theme.backgroundColor,
                 paddingTop: 40, 
                 flex: 1,
                 paddingHorizontal: 10,
@@ -62,11 +64,10 @@ export default function DetailModal() {
                 setLeft(diff/2);
               }}
             >
-
               <Component item={item} left={left}/>
             </View>
           </Modal>
         </View>
-      </DetailContext.Provider>
+      // </DetailContext.Provider>
     );
   };

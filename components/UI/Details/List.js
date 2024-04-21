@@ -20,6 +20,8 @@ import { BaseButton } from 'react-native-gesture-handler';
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Heading from './Heading';
+
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
@@ -443,27 +445,7 @@ export default function List({item, left}) {
         width: Dimensions.get('window').width - left,                
       }}
     >
-        <View style={{...Styles.row, height: 44, paddingLeft: 12, paddingRight: 4}}>
-          <Pressable
-            onPress={() => DetailObservable.notify(null)}
-            style={{width: 40, marginRight: 0, left: -4, top: -1}}
-          >
-            <Icon name='close' styles={{fontSize: 20}}/>
-          </Pressable>
-          
-          <DebouncedInput
-            multiline={false}
-            placeholder='Note Title'
-            style={{
-              fontSize: 16,
-              height: '100%',            
-              marginRight: 16,        
-            }}
-            update={(value) => { updateListMutation.mutate({title: value})}} 
-            value={title}
-          />        
-          <Options options={headerOptions} />
-        </View>    
+        <Heading mutations={{ update: updateListMutation.mutate }} headerOptions={headerOptions} />
         
         <View
           style={{

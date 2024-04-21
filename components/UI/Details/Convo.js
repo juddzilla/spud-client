@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import Heading from './Heading';
 import Options from './Options';
 
 import Input from '../actions/Input';
@@ -209,27 +210,7 @@ const flatlist = StyleSheet.create({
         width: Dimensions.get('window').width - left,                
       }}
     >   
-      <View style={{...styles.row, height: 44, paddingLeft: 12, paddingRight: 4}}>
-          <Pressable
-            onPress={() => DetailObservable.notify(null)}
-            style={{width: 40, marginRight: 0, left: -4, top: -1}}
-          >
-            <Icon name='close' />
-          </Pressable>
-          
-          <DebouncedInput
-            multiline={false}
-            placeholder='Convo Title'
-            style={{
-              fontSize: 26,
-              height: '100%',            
-              marginRight: 16,          
-            }}
-            update={(value) => { updateMutation.mutate({title: value})}} 
-            value={title}
-          />        
-          <Options options={headerOptions} />
-        </View>  
+      <Heading mutations={{ update: updateMutation }} headerOptions={headerOptions} />
       <View style={flatlist.container}>
         <FlatList          
           data={messages}

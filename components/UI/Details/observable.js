@@ -1,7 +1,12 @@
 class DetailObserver {
     constructor() {
       this.observers = [];
-   }
+      this.data = null;
+    }
+
+    getData() {
+      return this.data;
+    }
   
     subscribe(func) {
       this.observers.push(func);
@@ -12,6 +17,7 @@ class DetailObserver {
     }
   
     notify(data) {
+      this.data = data;
       this.observers.forEach(func => func(data));
     }
   }

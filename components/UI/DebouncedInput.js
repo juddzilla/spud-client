@@ -26,17 +26,18 @@ export default function DebouncedInput({placeholder, multiline, style, update, v
 
   return (
     <TextInput
+        editable={true}
+        onChangeText={updateState}
+        placeholder={placeholder || 'Type Here'}
+        placeholderTextColor={{}}
+        multiline={multiline}
         style={{
           backgroundColor: colors.lightWhite,
           flex: 1,
           fontFamily: 'Inter-Regular',
           ...style,
         }}
-        onChangeText={updateState}
         value={text}
-        placeholder={placeholder || 'Type Here'}
-        editable={true}
-        multiline={multiline}
       />
   );
 };

@@ -3,15 +3,20 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import Modal from '../modal/Modal';
 import Bold from '../text/Bold';
-import Light from '../text/Light';
-import Icon from '../icons';
+
+import { DetailObservable  } from './observable';
 
 import colors from '../colors';
-import Styles from '../styles';
+import DebouncedInput from '../DebouncedInput';
+import Icon from '../icons';
+import styles from '../styles';
+import Light from '../text/Light';
 
-export default function Options({options}) {            
+export default function Heading({ headerOptions, mutations }) {    
+    const { update } = mutations;
     const [prompt, setPrompt] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const item = DetailObservable.getData();
 
     useEffect(() => {
         if (!prompt && submitting) {
@@ -55,8 +60,8 @@ export default function Options({options}) {
             },
             icon: {
                 container: {
-                    ...Styles.centered, 
-                    ...Styles.buttons.icon, 
+                    ...styles.centered, 
+                    ...styles.buttons.icon, 
                     backgroundColor: color, 
                     borderRadius: 999,
                 },
@@ -81,12 +86,12 @@ export default function Options({options}) {
                 marginBottom: 12,
             },
             button: {
-                ...Styles.centered,
+                ...styles.centered,
                 borderWidth: 1,          
                 borderRadius: 8,
                 marginBottom: 12,
                 height: 44,
-                ...Styles.centered,
+                ...styles.centered,
                 backgroundColor: colors.white,
             },
             actions : {
@@ -156,29 +161,52 @@ export default function Options({options}) {
     };
 
     return (
-        <View>      
-            <Modal
-                show={!!prompt}
-                toggleShow={() => setPrompt(null)}
-            >                
-                { !!prompt && 
-                    <View style={{padding: 16}}>
-                        { actions[prompt.name].component() }
-                    </View>                 
-                }
-            </Modal>
+        <View style={{...styles.row, backgroundColor: '', height: 44, paddingLeft: 12, paddingRight: 4, marginBottom: 4,}}>
+            <Pressable
+                onPress={() => DetailObservable.notify(null)}
+                style={{width: 40, height: '100%', backgroundColor: '', left: -4, ...styles.centered, left: -8}}
+            >
+                <Icon name='closeModal' styles={{color: colors.white, fontSize: 24}} />
+            </Pressable>
             
-            <View style={Styles.row}>
-                { options.map(option => (
-                    <Pressable
-                        key={option.name}
-                        onPress={ () => setPrompt(option)}
-                        style={{width: 40, ...Styles.centered, height: '100%'}}
-                    >
-                        <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white,}} />                    
-                    </Pressable>
-                )) }
+            <DebouncedInput
+                multiline={false}
+                placeholder='Note Title'
+                style={{
+                    fontSize: 26,
+                    height: '100%',            
+                    marginRight: 16,        
+                    paddingHorizontal: 4,  
+                    color: colors.white,
+                    backgroundColor: 'transparent',
+                }}
+                update={(value) => { update({title: value})}} 
+                value={item.title}
+            />        
+            <View>      
+                <Modal
+                    show={!!prompt}
+                    toggleShow={() => setPrompt(null)}
+                >                
+                    { !!prompt && 
+                        <View style={{padding: 16}}>
+                            { actions[prompt.name].component() }
+                        </View>                 
+                    }
+                </Modal>
+                
+                <View style={styles.row}>
+                    { headerOptions.map(option => (
+                        <Pressable
+                            key={option.name}
+                            onPress={ () => setPrompt(option)}
+                            style={{width: 40, ...styles.centered, height: '100%'}}
+                        >
+                            <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white,}} />                    
+                        </Pressable>
+                    )) }
+                </View>
             </View>
-        </View>
-    );
+      </View>
+    )
 }
