@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import Bold from '../assets/fonts/Inter-Bold.otf';
 import Black from '../assets/fonts/Inter-Black.otf';
@@ -57,15 +58,17 @@ export default function RootLayout() {
           { fontsLoaded ? (
             <QueryClientProvider client={queryClient}>
               <SessionProvider>
-                <SafeAreaView style={{ flex: 1}}>
-                  {/* <KeyboardAvoidingView
-                    behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
-                    style={{ flex: 1}}
-                  >
-                  </KeyboardAvoidingView> */}
-                  <Slot />
-                  <DetailModal />
-                </SafeAreaView>
+                <ActionSheetProvider>              
+                  <SafeAreaView style={{ flex: 1}}>
+                    {/* <KeyboardAvoidingView
+                      behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                      style={{ flex: 1}}
+                    >
+                    </KeyboardAvoidingView> */}
+                    <Slot />
+                    <DetailModal />
+                  </SafeAreaView>
+                </ActionSheetProvider>
               </SessionProvider>
             </QueryClientProvider>
           ) : (

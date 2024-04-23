@@ -11,11 +11,12 @@ const icons = {
     checkOutline: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},
     checkedFilled: { library: MaterialCommunityIcons, name: 'checkbox-blank-circle'},
     close: { library: Ionicons, name: 'close'},
-    closeModal: { library: MaterialCommunityIcons, name: 'close-box-outline'},
+    closeModal: { library: MaterialCommunityIcons, name: 'close-circle-outline'},
     completedAll: { library: MaterialCommunityIcons, name: 'dots-square'},
     completedNot: { library: MaterialCommunityIcons, name: 'checkbox-blank-outline'},
     completedOnly: { library: MaterialCommunityIcons, name: 'checkbox-marked-outline'},
     collection: { library: MaterialIcons, name: 'collections-bookmark' },
+    collectionAdd: { library: MaterialIcons, name: 'library-add' },
     convoAdd: { library: MaterialCommunityIcons, name: 'chat-plus-outline'},
     convo: { library: MaterialCommunityIcons, name: 'chat-processing-outline'},
     // the below 2 icons are named incorrectly at the source. below is visually correct.

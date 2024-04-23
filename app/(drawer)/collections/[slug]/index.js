@@ -97,7 +97,6 @@ const ItemTemplate = ({remove}, {item}) => {
       <BaseButton style={{ justifyContent: 'center', alignItems: 'flex-end', height: 64}} onPress={() => { remove(id)}}>
         <Animated.View
           style={{                
-            backgroundColor: 'green',
             justifyContent: 'flex-end',
             // alignItems: 'flex-end',
             width: 60,

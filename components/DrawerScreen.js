@@ -7,16 +7,19 @@ import Icon from './UI/icons';
 export default function DrawerScreen(title, headerRight) {    
     const navigation = useNavigation();
     
+    function canGoBack() {
+      console.log("router.back", router.back);
+      console.log("router.canGoBack()", router.canGoBack());
+      return router.back && router.canGoBack();
+    }
     function goBack() {
-      // navigation.pop();
       router.back();   
-      // navigation.goBack();
     }
 
     function toggleMenu() {
       navigation.openDrawer();
     }
-    console.log('router.canGoBack()', router.canGoBack());
+
     return (
         <Drawer.Screen
           options={{
@@ -26,7 +29,7 @@ export default function DrawerScreen(title, headerRight) {
               backgroundColor: 'transparent',
             },
             headerLeft: () => {
-              if (!router.canGoBack()) {
+              if (!canGoBack()) {
                 return (
                   <TouchableOpacity onPress={toggleMenu}>
                     <Icon name="navicon" />

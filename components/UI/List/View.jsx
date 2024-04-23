@@ -272,12 +272,12 @@ export default function ListView({options}) {
   
   return (
     <View style={styles.View}>
-      <View style={styles.header}>   
+      <View style={{...styles.header, paddingVertical: 8}}>   
         <View style={{paddingLeft:12, ...styles.row}}>              
           <Search
             disabled={disabledSearch}
             placeholder={filters.placeholder} 
-            value={query.search}
+            value={query.search}            
             update={update} 
           />
           { Object.hasOwn(filters, 'sort') &&

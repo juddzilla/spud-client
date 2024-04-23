@@ -9,10 +9,9 @@ import styles from '../styles';
 
 export default function TalkButton({focused, setFocused}) {
   const [showModal, setShowModal] = useState(false);
-  
+
 
   const micIcon = {
-    backgroundColor: '',
     color: !showModal ? 'white' : 'black', 
     name: !showModal ? 'mic' : 'micOff',
   };

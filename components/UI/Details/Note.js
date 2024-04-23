@@ -26,7 +26,6 @@ export default function Note({item, left}) {
   const baseUri = `notes/${item.uuid}/`;
 
   const [body, setBody] = useState(item.body);
-  const [title, setTitle] = useState(item.title);
   const [updatedAt, setUpdatedAt] = useState(item.updatedAt);
 
   async function putNote(data) {    
@@ -51,7 +50,6 @@ export default function Note({item, left}) {
     queryFn: async () => {        
       const response = await Fetch.get(baseUri);            
       setBody(response.body);    
-      setTitle(response.title);
       setUpdatedAt(response.updated_at);
       return response;
     },
@@ -138,9 +136,9 @@ export default function Note({item, left}) {
             
       <Heading
         headerOptions={headerOptions}
-        mutations={{ update: updateMutation.mutate }}
+        mutations={{ update: updateMutation.mutate }}        
       />
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, }}>
       { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 
         (
           <Light>Loading</Light>
@@ -164,7 +162,7 @@ export default function Note({item, left}) {
       
       }
       </View>
-      <View style={{...styles.footer, paddingHorizontal: 4, backgroundColor: 'transparent', shadowColor: 'transparent', }}>
+      <View style={{...styles.footer, paddingHorizontal: 4, }}>
         <View style={styled.date.container}>
           <Light style={styled.date.body}> {relativeDate(updatedAt)}</Light>          
         </View>        

@@ -18,7 +18,7 @@ const header = {
     alignItems: 'center',
     flexDirection: 'row-reverse',    
     justifyContent: 'space-between',
-    padding: 8,
+    paddingHorizontal: 8,
     input: {
         container: {
             ...row,
@@ -30,22 +30,15 @@ const header = {
 const View = { flex: 1,  };
 
 const footer = {
-    backgroundColor: colors.lightWhite,    
+    backgroundColor: 'transparent',    
     paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingRight: 4,
+    paddingLeft: 16,
     
     flexDirection: 'row', 
     // height: 64,
     justifyContent: 'flex-end',     
-    width: '100%',    
-    shadowColor: "#e2e8f0",
-    shadowOffset: {
-        width: 0,
-        height: -20,
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.00,
-    elevation: 24,
+    width: '100%',
 };
 
 export default {

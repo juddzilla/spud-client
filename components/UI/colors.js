@@ -96,6 +96,10 @@ const colors = {
         }
     },
 
+    detail: {
+        background: slate.darkest,
+    },
+
     sort: {
         inactive: zinc.light, // zinc 300
         active: zinc.dark, //zinc 900

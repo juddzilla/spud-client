@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-
-import Modal from '../modal/Modal';
-import Bold from '../text/Bold';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 import { DetailObservable  } from './observable';
 
@@ -10,161 +8,76 @@ import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
 import Icon from '../icons';
 import styles from '../styles';
-import Light from '../text/Light';
 
-export default function Heading({ headerOptions, mutations }) {    
+export default function Heading({ headerOptions, mutations, theme = 'light' }) {    
     const { update } = mutations;
     const [prompt, setPrompt] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [collections, setCollections] = useState(null);
     const item = DetailObservable.getData();
+    const { showActionSheetWithOptions } = useActionSheet();
+    const standardHeight = 44;
 
     useEffect(() => {
+        console.log('prompt', prompt);
         if (!prompt && submitting) {
+            console.log(100);
             setSubmitting(false);
         }
     }, [prompt]);
+
+    useEffect(() => {
+        console.log('coll', collections);
+    }, [collections]);
     
-    const Prompt = (props) => {
-        const { cta, color, subtitle, title} = props;
+    function chooseAction(option) {        
+        let cancelButtonIndex = null;
+        let destructiveButtonIndex = null;
+        let options = [];
+        let title = '';
+        let message = '';
+
+        if (option.name === 'remove') {            
+            options = ['Delete', 'Cancel'];
+            destructiveButtonIndex = 0;
+            cancelButtonIndex = 2;
+            title = 'You sure?';
+            message = ' This action cannot be reversed.';
+        }
         
-        const onSubmit = () => {                
-            if (!submitting) {
-                prompt.cb();
-                setSubmitting(true);
-            }
-        };
+        showActionSheetWithOptions({
+            cancelButtonIndex,
+            destructiveButtonIndex,
+            options,
+            title,
+            message,
+          }, (selectedIndex) => {
+              console.log('selected', options[selectedIndex]);
+              if (selectedIndex === 0) {
 
-        const styled = StyleSheet.create({
-            content: {
-                backgroundColor: colors.white,
-                paddingHorizontal: 16,  
-                paddingTop: 20,
-                paddingBottom: 4,                    
-                borderRadius: 8,
-                shadowColor: colors.darkestBg,
-                shadowOffset: {
-                    width: 0,
-                    height: 5,
-                },
-                shadowOpacity: 0.2,
-                shadowRadius: 6.27,
-                elevation: 10,
-                width: '100%',
-                marginBottom: 16,                
-            },
-            body: {
-                flexDirection: 'row', 
-                flexWrap: 'wrap',
-                textAlign: 'center',
-                marginBottom: 16,
-            },
-            icon: {
-                container: {
-                    ...styles.centered, 
-                    ...styles.buttons.icon, 
-                    backgroundColor: color, 
-                    borderRadius: 999,
-                },
-                image: {
-                    color: colors.white,
-                }
-            },
-            input: {
-                textAlign: 'center',                
-                borderWidth: 1, 
-                borderColor: colors.darkBg,
-                width: '100%',
-                height: 44,
-                borderRadius: 8,
-                marginBottom: 16,
-                fontFamily: 'Inter-Bold',   
-            },
-            option: {
-                alignItems: 'center',     
-            },
-            row: {
-                marginBottom: 12,
-            },
-            button: {
-                ...styles.centered,
-                borderWidth: 1,          
-                borderRadius: 8,
-                marginBottom: 12,
-                height: 44,
-                ...styles.centered,
-                backgroundColor: colors.white,
-            },
-            actions : {
-                cancel: {
-                    backgroundColor: colors.black,     
-                    borderColor: colors.black,        
-                },
-                remove: {            
-                    backgroundColor: colors.remove,     
-                    borderColor: colors.remove,        
-                },
-            }
-        })
-
-        return (
-            <>
-                <View style={styled.content}>
-                    <View style={styled.option}>
-                        <View style={{...styled.icon.container, ...styled.row}}>
-                            <Icon name={actions[prompt.name].icon} styles={styled.icon.image} />
-                        </View>
-                        
-                        <Bold style={styled.row}>{ title }</Bold>
-                        
-                        <View style={{...styled.row, ...styled.body}}>
-                            <Light style={{textAlign: 'center'}}>{ subtitle }</Light>                                            
-                        </View>                                                
-                    </View>                    
-                </View>
-
-                <View style={{width: '100%'}}>
-                    <Pressable
-                        onPress={onSubmit}
-                        style={{ ...styled.button, backgroundColor: color, borderColor: color }}
-                    >
-                        <Bold style={{color: colors.white}}>{ cta }</Bold>
-                    </Pressable>
-                    <Pressable style={styled.button} onPress={() => setPrompt(null)}>
-                        <Bold>Back</Bold>
-                    </Pressable>
-                </View>
-            </>
-        );
-    };
+                  option.cb();
+              }
+              setPrompt(null);
+          });
+    }
    
     const actions = {
-        remove: {
-            component: () => Prompt({
-                cta: 'Delete',
-                color: colors.remove,
-                subtitle: 'You sure? This action cannot be reversed.',
-                title: 'Confirmation Required', 
-            }),          
-            display: 'Delete',
+        addToCollection: {
+            icon: 'collectionAdd',
+        },
+        remove: {            
             icon: 'trash',
         },
-        summarize: {
-            component: () => Prompt({
-                cta: 'Summarize',
-                color: colors.black,
-                subtitle: 'Summarize this convo into a note. doing so will delete convo from history.',
-                title: 'Summarize', 
-            }),          
-            display: 'Summarize',
+        summarize: {            
             icon: 'summarize',
         },
     };
 
     return (
-        <View style={{...styles.row, backgroundColor: '', height: 44, paddingLeft: 12, paddingRight: 4, marginBottom: 4,}}>
+        <View style={{...styles.row, height: standardHeight, paddingLeft: 16, paddingRight: 4, marginBottom: 8,}}>
             <Pressable
                 onPress={() => DetailObservable.notify(null)}
-                style={{width: 40, height: '100%', backgroundColor: '', left: -4, ...styles.centered, left: -8}}
+                style={{width: 40, height: '100%', left: -4, ...styles.centered, left: -8}}
             >
                 <Icon name='closeModal' styles={{color: colors.white, fontSize: 24}} />
             </Pressable>
@@ -182,31 +95,20 @@ export default function Heading({ headerOptions, mutations }) {
                 }}
                 update={(value) => { update({title: value})}} 
                 value={item.title}
-            />        
-            <View>      
-                <Modal
-                    show={!!prompt}
-                    toggleShow={() => setPrompt(null)}
-                >                
-                    { !!prompt && 
-                        <View style={{padding: 16}}>
-                            { actions[prompt.name].component() }
-                        </View>                 
-                    }
-                </Modal>
-                
-                <View style={styles.row}>
-                    { headerOptions.map(option => (
-                        <Pressable
-                            key={option.name}
-                            onPress={ () => setPrompt(option)}
-                            style={{width: 40, ...styles.centered, height: '100%'}}
-                        >
-                            <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white,}} />                    
-                        </Pressable>
-                    )) }
-                </View>
-            </View>
+            />
+
+            <View style={styles.row}>
+                { headerOptions.map(option => (
+                    <Pressable
+                        key={option.name}
+                        onPress={ () => { chooseAction(option)}}
+                        style={{width: 40, ...styles.centered, height: standardHeight}}
+                    >
+                        
+                        <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white,}} />                    
+                    </Pressable>
+                )) }
+            </View>           
       </View>
     )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Animated,
     Pressable,
@@ -8,13 +8,47 @@ import {
 } from 'react-native';
 import Icon from '../icons';
 import colors from '../colors';
-
-export default function Input({ onSubmit, placeholder, focused, setFocused }) {
+import styles from '../styles';
+export default function Input({ onSubmit, placeholder, focused, setFocused, theme='light' }) {
     const [message, setMessage] = useState('');
+    const inputRef = useRef(); 
+
+    const height = 48;
+
+    let inputTheme = {
+        inactive: {
+            backgroundColor: colors.white,
+            borderColor: colors.white,
+            color: colors.sort.inactive,
+        },
+        active: {
+            backgroundColor: 'red',
+            borderColor: 'green',
+            color: colors.sort.active,
+        },
+    };
+
+    if (theme === 'dark') {
+        inputTheme = {
+            inactive: {
+                backgroundColor: 'transparent',
+                borderColor: colors.lightWhite,
+                color: colors.lightWhite,
+            },
+            active: {
+                backgroundColor: colors.lightWhite,
+                borderColor: colors.lightWhite,
+                color: colors.detail.background,
+            },
+        }
+    }
+
+    const style = inputTheme[focused ? 'active' : 'inactive'];
     
     function onSubmitMessage() {               
         onSubmit(message);
-        setMessage('');     
+        setMessage('');  
+        // inputRef.current.blur();
     }
 
     function onBlur() {
@@ -26,82 +60,65 @@ export default function Input({ onSubmit, placeholder, focused, setFocused }) {
     }
 
     const styled = StyleSheet.create({
-        input: {
-            container: {
-                backgroundColor: 'white',                
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                flex: 1,  
-                borderWidth: 1,
-                borderColor: focused ? colors.theme.text.light : colors.theme.text.lightest, //
-                borderBottomColor: focused ? colors.theme.text.light : colors.theme.text.lightest,
-                borderRadius: 12,
-                marginBottom: 4,            
-                zIndex: 10,
-            },
-            field: {               
-                color: colors.theme.inputs.dark.text.darkest,                            
-                flex: 1,
-                height: 48,
-                paddingHorizontal: 16,            
-            },
-            icons: {
-                leading: {
-                    color: focused ? 'transparent' : colors.theme.inputs.dark.text.light, 
-                    left: 12,
-                    position: 'absolute',
-                    zIndex: 1, 
-                    size: 12, 
-                },
-                trailing: {
-                    color: focused ? colors.darkestBg : '#d4d4d4',
-                    size: 16, 
-                    zIndex: 1,
-                }
-            },
-            send: {
-                height: 40,
-                width: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-                // backgroundColor: colors.darkBg, 
-                // borderRadius: 40,
-                opacity: (focused && message.trim().length) ? 1 : 0,
-                position: 'absolute', 
-                right: 4
-            },
+        container: {
+            backgroundColor: style.backgroundColor,
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            flex: 1,  
+            borderWidth: 1,
+            borderColor: style.borderColor,
+            borderRadius: height/2,
+            marginBottom: 4,            
+            // zIndex: 10,
         },
-        modal: {
-            container: {
-                flex: 1,
-                paddingTop: 100,
-                paddingHorizontal: 16,
-            },
-            content: {
-                fontSize: 36, 
-                textAlign: 'center',
-            }
-        }
+        send: {
+            color: style.color,
+            size: 16, 
+            // zIndex: 1,
+        },
+        input: {
+            color: style.color,
+            flex: 1,
+            height,
+            paddingLeft: 16,      
+            paddingRight: 4,
+        },
+        button: {
+            height: 40,
+            width: 40,
+            ...styles.centered,            
+            opacity: (focused && message.trim().length) ? 1 : 0,            
+        },
+        send: {
+            color: style.color,
+            size: 16, 
+            zIndex: 1,
+        },
       });
 
+      useEffect(() => {
+        if (message === '') {
+            setTimeout(() => { inputRef.current.blur(); }, 0)            
+        }
+      }, [message])
+
     return (
-        <View style={styled.input.container}>
-            {/* <Icon name='plus' styles={styled.input.icons.leading} /> */}
+        <View style={styled.container}>            
             <TextInput
-                value={message}
                 onBlur={onBlur}
                 onChangeText={(text) => setMessage(text)}
-
                 onFocus={onFocus}
                 placeholder={placeholder || 'NEW'}
-                style={styled.input.field}
-                placeholderTextColor={colors.theme.inputs.dark.text.light}
+                placeholderTextColor={style.color}
+                ref={inputRef}
+                style={styled.input}
+                value={message}
             />
             <Pressable
                 onPress={onSubmitMessage}
-                style={styled.input.send}
+                style={styled.button}
             >
-                <Icon name='send' styles={styled.input.icons.trailing} />
+                <Icon name='send' styles={styled.send} />
             </Pressable>
         </View>        
     )

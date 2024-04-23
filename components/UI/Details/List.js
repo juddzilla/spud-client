@@ -16,10 +16,11 @@ import {
 } from '@tanstack/react-query';
 
 import { BaseButton } from 'react-native-gesture-handler';
-
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+
+
 import Heading from './Heading';
 
 import Fetch from '../../../interfaces/fetch';
@@ -35,8 +36,6 @@ import Search from '../filtering/Search';
 
 import Talk from '../actions/Talk';
 import Input from '../actions/Input';
-
-import Options from './Options';
 
 import { queryClient } from '../../../contexts/query-client';
 import { DetailObservable } from './observable';
@@ -55,10 +54,8 @@ export default function List({item, left}) {
   const [listItems, setListItems] = useState([]);
   const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState(initialSort);
-  const [title, setTitle] = useState(item.title);  
 
   const [focusedAction, setFocusedAction] = useState(null);
-
 
   useEffect(() => {
     const data = queryClient.getQueryData(queryKeys);
@@ -70,8 +67,59 @@ export default function List({item, left}) {
 
     setListItems(items);
   }, [showCompleted]);
+
+  useEffect(() => {
+    const data = queryClient.getQueryData(queryKeys);
+    
+    if (!data) {
+      return;
+    }
+    
+    const items = data
+      .filter(i => {
+        if (showCompleted === null) { return true; }
+        return i.completed === showCompleted;
+      })
+      .filter(i => {
+        if (!filter.trim().length) {
+          return true;
+        }
+        return i.body.includes(filter);
+      })
+      .sort((a,b) => {
+        let first = a[sort.property];
+        let second = b[sort.property];
+
+        if (sort.property === 'updated_at') {          
+          const timestamp = (dateString) => {
+            const date = new Date(dateString);
+            return date.getTime();
+          }
+   
+          first = timestamp(first);
+          second = timestamp(second);
+        }
+
+        if (first === second) {
+          return 0;
+        }
+        
+        const values = [first, second];
+
+        if (sort.direction === 'desc') {
+          values.reverse();
+        }
+
+        return values[0] - values[1];
+      })
+
+    setListItems(items);
+  }, [filter, showCompleted, sort]);
   
   const Query = useQuery({
+    initialData: [],
+    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     queryKey: queryKeys, 
     queryFn: async () => {        
       const response = await Fetch.get(baseUri, {
@@ -81,18 +129,18 @@ export default function List({item, left}) {
         completed: showCompleted,
       });
         
-      const { error, children, title } = response;        
+      const { error, children } = response;        
 
-      if (!error) {          
-        setTitle(title);
-        setListItems(children);        
+      if (!error) {                
         return children;
       }
       return [];
-    },
-    keepPreviousData: true,
-    placeholderData: keepPreviousData,
+    },    
   });
+
+  useEffect(() => {
+    setListItems(Query.data);    
+  }, [Query.data]);
 
   const updateListMutation = useMutation({
     mutationFn: async (data) => {
@@ -212,7 +260,7 @@ export default function List({item, left}) {
         console.warn('Create List Item Error:', error);
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (data) => {      
       setListItems([...listItems, data.results]);
 
       queryClient.setQueryData([queryKeys[0]], oldData => {                    
@@ -234,6 +282,10 @@ export default function List({item, left}) {
           return old;
         });
       });
+
+      // queryClient.setQueryData(queryKeys, oldData => {            
+      //   return {...oldData, ...data};
+      // });
     }
   });
 
@@ -285,8 +337,12 @@ export default function List({item, left}) {
     return (
       <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>        
         { showCompleted === null ? (          
-          <View style={{...Styles.row}}>            
-            <Bold>Add your first list item</Bold>
+          <View style={{...Styles.row, color: colors.white
+          
+          
+          
+          }}>            
+            <Bold style={{color: colors.lightWhite}}>Add your first list item</Bold>
           </View>
         ) : (
           <View style={{...Styles.row}}>
@@ -316,7 +372,7 @@ export default function List({item, left}) {
     const styled = StyleSheet.create({
       container: {
         flexDirection: 'row',
-        marginBottom,
+        marginBottom: 1,
         marginHorizontal: 0,    
 
       },
@@ -328,26 +384,25 @@ export default function List({item, left}) {
         marginRight: 8,  
       },
       icon: {
-        color: item.completed ? colors.sort.inactive : colors.text,
-        size:15,    
+        color: item.completed ? 'rgba(255,255,255,0.8)' : colors.white,
+        size: item.completed ? 12 : 15,    
       },
       body: {
-        paddingTop: 10,        
-        // backgroundColor: item.completed ? 'transparent' : 'white',  
-        paddingHorizontal: 8,   
         flex: 1,
+        paddingHorizontal: 8,   
       },
       input: {
-        color: colors.text,
-        fontFamily: 'Inter-Bold',                     
+        backgroundColor: 'transparent',
+        color: colors.white,
+        fontFamily: item.completed ? 'Inter-Light' :'Inter-Bold',                     
+        height: '100%',
         paddingRight: 0,        
+        paddingTop: 13,
         position: 'relative',
         top: -2,
-        paddingBottom: 10,        
       },
       text: {
-        color: colors.lightText,
-        paddingBottom: 10, 
+        color: colors.lightWhite,
         position: 'relative', 
         top: 3
       }
@@ -369,12 +424,12 @@ export default function List({item, left}) {
           <Animated.View
             style={{            
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'center',              
               width: 60,
               flex: 1,
               ...animStyle,
             }}>            
-            <Icon name='trash' styles={{transform: [{ translateX: -16 }]}} />
+            <Icon name='trash' styles={{backgroundColor: colors.remove, transform: [{ translateX: -16 }]}} />
           </Animated.View>
         </BaseButton>
       );
@@ -396,23 +451,17 @@ export default function List({item, left}) {
           >
             <View style={styled.container}>            
               <Pressable style={styled.checkbox} onPress={() => updateListItemMutation.mutate({ id: item.id, completed: !item.completed })}>
-                <Icon name={checkboxIcon} styles={styled.icon} />
-                
+                <Icon name={checkboxIcon} styles={styled.icon} />                
               </Pressable>
               <View style={styled.body}>
-                {
-                  item.completed ? (
-                    <Light style={styled.text}>{item.body}</Light>
-                  ) : (
-                    <DebouncedInput
-                      multiline={true}
-                      placeholder='(text)'
-                      style={styled.input}
-                      update={(value) => { updateListItemMutation.mutate({ id: item.id, body: value })}} 
-                      value={item.body}
-                    />  
-                  )
-                }
+                <DebouncedInput
+                  editable={!item.completed}
+                  multiline={true}
+                  placeholder='(text)'
+                  style={styled.input}
+                  update={(value) => { updateListItemMutation.mutate({ id: item.id, body: value })}} 
+                  value={item.body}
+                />  
               </View>
             </View>
           </TouchableOpacity>        
@@ -430,11 +479,17 @@ export default function List({item, left}) {
   };
 
   const headerOptions = [
+    // {
+    //   cb: () => {
+    //   console.log('do somethi');
+    //   },
+    //   name: 'addToCollection',      
+    // },
     {
         cb: removeListMutation.mutate,
         name: 'remove',
         theme: 'red',
-    }
+    },
   ];
 
   return (
@@ -442,50 +497,56 @@ export default function List({item, left}) {
       style={{
         ...Styles.View,
         left: -(left),
-        width: Dimensions.get('window').width - left,                
+        width: Dimensions.get('window').width - left,                        
       }}
     >
         <Heading mutations={{ update: updateListMutation.mutate }} headerOptions={headerOptions} />
         
-        <View
-          style={{
-            ...Styles.header, 
-            paddingHorizontal: 0,            
-          }}>        
-          <Sort fields={sortOn} query={sort} update={onSortUpdate} />
-          <Search placeholder={'Filter'} update={onFilterUpdate} />
-          <Pressable
-            onPress={toggleShowCompleted}
-            style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}
-          >
-            <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.sort.active }} />
-          </Pressable>   
-        </View>          
+        <View style={{flex: 1, paddingLeft: 8,}}>
 
-        <View style={{flex: 1}}>
-          <DraggableFlatList
-            activationDistance={20}           
-            data={listItems}
-            keyExtractor={item => item.id}   
-            ListEmptyComponent={<EmptyState />}
-            onDragEnd={reorderMutation.mutate}
-            renderItem={ListItem}
-            refreshing={true}
-          />
+          <View
+            style={{
+              ...Styles.header, 
+              paddingHorizontal: 0,
+              marginBottom: 8,
+            }}
+          >        
+            <Sort fields={sortOn} query={sort} size='small' theme='dark' update={onSortUpdate} />
+            <Search placeholder={'Filter'} size='small' update={onFilterUpdate} />
+            <Pressable
+              onPress={toggleShowCompleted}
+              style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}
+            >
+              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.white }} />
+            </Pressable>   
+          </View>          
+
+          <View style={{flex: 1}}>
+            <DraggableFlatList
+              activationDistance={20}           
+              data={listItems}
+              keyExtractor={item => item.id}   
+              ListEmptyComponent={<EmptyState />}
+              onDragEnd={reorderMutation.mutate}
+              renderItem={ListItem}
+              refreshing={true}
+            />
+          </View>
         </View>
         
         <View
           style={{
             ...Styles.footer,
-            left: -(left)/2,
-            width: Dimensions.get('window').width,
-            paddingHorizontal: 8,
+            // left: -(left)/2,
+            // width: Dimensions.get('window').width,
+            // paddingHorizontal: 8,
           }}>
           <Input
             focused={focusedAction === 'create'}
             setFocused={setFocusedAction}
             onSubmit={createListItemMutation.mutate} 
             placeholder='Create New List Item'
+            theme='dark'
           />        
           { [null, 'talk'].includes(focusedAction) &&          
             <Talk />          

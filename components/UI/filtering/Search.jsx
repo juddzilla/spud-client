@@ -7,10 +7,19 @@ import styles from '../styles';
 
 import { useDebouncedValue } from '../../../utils/debounce';
 
-export default function Search({ disabled, placeholder, update }) {        
+export default function Search({ disabled, placeholder, size='small', update }) {        
     const [focused, setFocused] = useState(false);
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
+
+    let height = 40;    
+    let searchIconSize = 14;
+    let closeIconSize = 12;
+
+    if (size === 'small') {
+        height = 32;
+        searchIconSize = 12;
+    }
 
     useEffect(() => {
         update({search});        
@@ -19,9 +28,9 @@ export default function Search({ disabled, placeholder, update }) {
     const style = StyleSheet.create({    
         container: {
             ...styles.row,   
-            backgroundColor: (focused || search.length > 0) ? colors.lightWhite : colors.theme.text.lightest,            
+            backgroundColor: (focused || search.length > 0) ? colors.lightWhite : 'transparent', 
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: height / 2,
             borderColor: colors.input.border,               
             flex: 1,
             justifyContent: 'space-between',
@@ -29,19 +38,18 @@ export default function Search({ disabled, placeholder, update }) {
             
         },
         search: { 
-            color: colors.input.icon, 
-            size: 14,
+            color: focused ? colors.button.enabled : colors.lightWhite,
+            size: searchIconSize,
          },
          icon: {
             container: {
-                height: 40,
-                width: 40,
+                height,
+                width: height,
                 ...styles.centered,
             },
-            image: {}
          },
         input: {            
-            height: 40,                      
+            height,                      
             marginRight: 0,           
             color: colors.input.color,                
             paddingLeft: 18,
@@ -50,14 +58,16 @@ export default function Search({ disabled, placeholder, update }) {
         },
         close: { 
             button: {
+                height,
+                width: height,
                 position: 'absolute', 
                 right: 0, 
-                ...styles.buttons.iconSmall, 
-                ...styles.centered,
+                ...styles.centered,                
             },
             icon: {
                 color: disabled ? colors.button.disabled : colors.button.enabled, 
-                size: 12,
+                // color: colors.lightWhite, 
+                size: 18,
                 
             },
          },
@@ -72,6 +82,7 @@ export default function Search({ disabled, placeholder, update }) {
                 onBlur={() => setFocused(false)}
                 onFocus={() => setFocused(true)}
                 placeholder={placeholder}
+                placeholderTextColor={colors.lightWhite}
                 style={style.input}
             />
             <View style={

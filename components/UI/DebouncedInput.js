@@ -5,7 +5,7 @@ import colors from './colors';
 
 import { useDebouncedValue } from '../../utils/debounce';
 
-export default function DebouncedInput({placeholder, multiline, style, update, value}) {  
+export default function DebouncedInput({editable = true, placeholder, multiline, style, update, value}) {  
   const [text, setText] = useState(value);
   const debouncedInput = useDebouncedValue(text, 500);  
 
@@ -26,7 +26,7 @@ export default function DebouncedInput({placeholder, multiline, style, update, v
 
   return (
     <TextInput
-        editable={true}
+        editable={editable}
         onChangeText={updateState}
         placeholder={placeholder || 'Type Here'}
         placeholderTextColor={{}}

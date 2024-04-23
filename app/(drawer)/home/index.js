@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
  } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -9,7 +10,9 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { BaseButton } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import {Picker} from '@react-native-picker/picker';
-
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import RNPickerSelect from 'react-native-picker-select';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import CustomModal from '../../../components/UI/modal/Modal';
 import colors from '../../../components/UI/colors';
@@ -53,9 +56,62 @@ const ActionableModal = () => {
   const [actionPrompt, setActionPrompt] = useState(null);
   const [selectedList, setSelectedList] = useState(null);
   const [existingLists, setExistingLists] = useState(null);
+  const { showActionSheetWithOptions } = useActionSheet();
+
+  function chooseAction() {        
+    const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
+    const cancelButtonIndex = options.length - 1;
+    const destructiveButtonIndex = null;
+    const title = `What would you like to do with: ${item.headline}`;
+    const message = 'Pick an existing, or create a new List';
+
+    console.log(1, options);
+
+    showActionSheetWithOptions({
+        cancelButtonIndex,
+        destructiveButtonIndex,
+        message,
+        options,
+        title,
+      }, (selectedIndex) => {
+          console.log('selected', options[selectedIndex]);
+          // if (selectedIndex === 0) {
+
+          //     option.cb();
+          // }
+          // setPrompt(null);
+      });
+      console.log(2);
+}
+
+function chooseList() {
+  const options = ['Existing', 'New', 'Back', 'Cancel'];
+  const cancelButtonIndex = options.length - 1;
+  const destructiveButtonIndex = 2;
+  const title = 'Pick a List';
+  const message = 'Pick an existing, or create a new List';
+
+  
+  
+  showActionSheetWithOptions({
+      cancelButtonIndex,
+      destructiveButtonIndex,
+      options,
+      title,
+      message,
+    }, (selectedIndex) => {
+        console.log('selected', options[selectedIndex]);
+        if (selectedIndex === 0) {
+
+            option.cb();
+        }
+        setPrompt(null);
+    });
+}
 
   useEffect(() => {
-    Actionable.subscribe((value) => {      
+    Actionable.subscribe((value) => {     
+      console.log('v', value);
       setItem(value);
     })
     return () => {
@@ -82,6 +138,8 @@ const ActionableModal = () => {
       setExistingLists(null);
       setSelectedList(null);
       setActionPrompt(null);  
+    } else {
+      chooseAction();
     }
   }, [item]);
   
@@ -195,6 +253,8 @@ const ActionableModal = () => {
       Actionable.notify(null);
     }
   }
+
+  return (<View style={{flex: 1}}></View>);
 
   return (
     <CustomModal
@@ -419,6 +479,55 @@ const ItemTemplate = ({item}) => {
 )};
 
 export default function Home() { 
+  // const [item, setItem] = useState(null);
+  const [lists, setLists] = useState([]);
+  const [showLists, setShowLists] = useState(false);
+  const [toList, setToList] = useState(null);
+  const { showActionSheetWithOptions } = useActionSheet();
+  const existingListsRef = useRef(null);
+
+  const listsQuery = useQuery({
+    enabled: false,
+    // initialData: [],
+    queryKey: ['lists'],
+    queryFn: async () => {
+      const params = {
+        page: 1,
+        per: 200,
+        search: '', 
+        sortDirection: 'desc',
+        sortProperty: 'updated_at',
+      };
+       
+      const response = await Fetch.get('lists/', params);
+      console.log('response', response);
+
+      if (!response.error) {
+        console.log(0);
+        return response.results;
+      }
+    },
+  });
+
+  useEffect(() => {
+    console.log('listsQuery.data', listsQuery);
+    if (listsQuery.data && !listsQuery.isPending && listsQuery.isSuccess) {
+      setLists(listsQuery.data.map(i => ({
+        label: i.headline,
+        value: i.uuid,        
+      })));
+      setShowLists(true);
+    }
+  }, [listsQuery.data, listsQuery.isPending, listsQuery.isSuccess]);
+
+  useEffect(() => {
+    console.log("lists", lists);
+    if (showLists) {
+      console.log('sss');
+      existingListsRef.current.togglePicker();   
+    }
+  }, [lists, showLists]);
+
   const options = {
     actions: {
       placeholder: 'Create New Queue Item',
@@ -429,16 +538,77 @@ export default function Home() {
       placeholder: 'Search Queue',
     },
     ItemTemplate,
-    uri: 'queue/',
     storeKey: ['queue'],
     noRedirect: true, 
   };  
 
+  useEffect(() => {
+    Actionable.subscribe((value) => {           
+      chooseAction(value);
+    })
+    return () => {
+      Actionable.unsubscribe();
+    }
+  }, []);
+
+  function chooseListType(item) {
+    const options = ['Existing', 'New', 'Back', 'Cancel'];
+    const cancelButtonIndex = options.length - 1;
+    const destructiveButtonIndex = 2;
+    const title = `Which type of list would you like to add "${item.headline}" to?`;    
+
+    showActionSheetWithOptions({
+        cancelButtonIndex,
+        destructiveButtonIndex,        
+        options,
+        title,
+      }, (selectedIndex) => {
+          console.log('selected', item.uuid, options[selectedIndex]);
+          if (selectedIndex === destructiveButtonIndex) {
+            chooseAction(item);
+          } else {
+            console.log('existingListsRef.current', Object.keys(existingListsRef.current));
+            listsQuery.refetch();
+            // existingListsRef.current.togglePicker();        
+          }
+      });
+  }
+
+  function chooseAction(item) {        
+    const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
+    const cancelButtonIndex = options.length - 1;
+    const destructiveButtonIndex = null;
+    const title = `What would you like to do with: "${item.headline}"`;    
+    console.log('RNPickerSelect', RNPickerSelect);
+
+    showActionSheetWithOptions({
+        cancelButtonIndex,
+        destructiveButtonIndex,        
+        options,
+        title,
+      }, (selectedIndex) => {
+          console.log('selected', item.uuid, options[selectedIndex]);
+          if (selectedIndex === 3) {
+            chooseListType(item);
+          }
+      });
+  }
+
   return (
     <View style={{flex:1}}>      
-      <ActionableModal />
+      {/* <ActionableModal /> */}
       { DrawerScreen('Quick Queue') }
       <ListView options={{...options}} />
+  
+      <View style={{position:'abolsute', height: 0, opacity: 0, bottom: 0}}>        
+          <RNPickerSelect
+            ref={existingListsRef}
+            doneText='Choose'
+            onValueChange={(value) => setToList(value)}
+            onDonePress={() => { console.log('done')}}
+            items={lists}
+          />        
+      </View>
     </View>
   );
 }
