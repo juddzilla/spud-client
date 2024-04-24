@@ -30,358 +30,366 @@ import { queryClient } from '../../../contexts/query-client';
 
 import DrawerScreen from '../../../components/DrawerScreen';
 
-class ActionableObserver {
-  constructor() {
-    this.observers = [];
- }
+import Home, { Observer } from '../../../components/UI/Details/Home';
 
-  subscribe(func) {
-    this.observers.push(func);
-  }
+// class ActionableObserver {
+//   constructor() {
+//     this.data = null;
+//     this.observers = [];
+//   }
 
-  unsubscribe(inputFunc) {
-    this.observers.filter(func => func != inputFunc);
-  }
+//   get() {
+//     return this.data;
+//   }
 
-  notify(data) {
-    this.observers.forEach(func => func(data));
-  }
-}
+//   subscribe(func) {
+//     this.observers.push(func);
+//   }
 
-const Actionable = new ActionableObserver();
+//   unsubscribe(inputFunc) {
+//     this.observers.filter(func => func != inputFunc);
+//   }
 
-const ActionableModal = () => {
-  const [item, setItem] = useState(null);
-  const [show, setShow] = useState(false);
-  const [actionPrompt, setActionPrompt] = useState(null);
-  const [selectedList, setSelectedList] = useState(null);
-  const [existingLists, setExistingLists] = useState(null);
-  const { showActionSheetWithOptions } = useActionSheet();
+//   notify(data) {
+//     this.data = data;
+//     this.observers.forEach(func => func(data));
+//   }
+// }
 
-  function chooseAction() {        
-    const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
-    const cancelButtonIndex = options.length - 1;
-    const destructiveButtonIndex = null;
-    const title = `What would you like to do with: ${item.headline}`;
-    const message = 'Pick an existing, or create a new List';
+// const Actionable = new ActionableObserver();
 
-    console.log(1, options);
+// const ActionableModal = () => {
+//   const [item, setItem] = useState(null);
+//   const [show, setShow] = useState(false);
+//   const [actionPrompt, setActionPrompt] = useState(null);
+//   const [selectedList, setSelectedList] = useState(null);
+//   const [existingLists, setExistingLists] = useState(null);
+//   const { showActionSheetWithOptions } = useActionSheet();
 
-    showActionSheetWithOptions({
-        cancelButtonIndex,
-        destructiveButtonIndex,
-        message,
-        options,
-        title,
-      }, (selectedIndex) => {
-          console.log('selected', options[selectedIndex]);
-          // if (selectedIndex === 0) {
+//   function chooseAction() {        
+//     const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
+//     const cancelButtonIndex = options.length - 1;
+//     const destructiveButtonIndex = null;
+//     const title = `What would you like to do with: ${item.headline}`;
+//     const message = 'Pick an existing, or create a new List';
 
-          //     option.cb();
-          // }
-          // setPrompt(null);
-      });
-      console.log(2);
-}
+//     console.log(1, options);
 
-function chooseList() {
-  const options = ['Existing', 'New', 'Back', 'Cancel'];
-  const cancelButtonIndex = options.length - 1;
-  const destructiveButtonIndex = 2;
-  const title = 'Pick a List';
-  const message = 'Pick an existing, or create a new List';
+//     showActionSheetWithOptions({
+//         cancelButtonIndex,
+//         destructiveButtonIndex,
+//         message,
+//         options,
+//         title,
+//       }, (selectedIndex) => {
+//           console.log('selected', options[selectedIndex]);
+//           // if (selectedIndex === 0) {
+
+//           //     option.cb();
+//           // }
+//           // setPrompt(null);
+//       });
+//       console.log(2);
+// }
+
+// function chooseList() {
+//   const options = ['Existing', 'New', 'Back', 'Cancel'];
+//   const cancelButtonIndex = options.length - 1;
+//   const destructiveButtonIndex = 2;
+//   const title = 'Pick a List';
+//   const message = 'Pick an existing, or create a new List';
 
   
   
-  showActionSheetWithOptions({
-      cancelButtonIndex,
-      destructiveButtonIndex,
-      options,
-      title,
-      message,
-    }, (selectedIndex) => {
-        console.log('selected', options[selectedIndex]);
-        if (selectedIndex === 0) {
+//   showActionSheetWithOptions({
+//       cancelButtonIndex,
+//       destructiveButtonIndex,
+//       options,
+//       title,
+//       message,
+//     }, (selectedIndex) => {
+//         console.log('selected', options[selectedIndex]);
+//         if (selectedIndex === 0) {
 
-            option.cb();
-        }
-        setPrompt(null);
-    });
-}
+//             option.cb();
+//         }
+//         setPrompt(null);
+//     });
+// }
 
-  useEffect(() => {
-    Actionable.subscribe((value) => {     
-      console.log('v', value);
-      setItem(value);
-    })
-    return () => {
-      Actionable.unsubscribe();
-    }
-  }, []);
+//   useEffect(() => {
+//     Actionable.subscribe((value) => {     
+//       console.log('v', value);
+//       setItem(value);
+//     })
+//     return () => {
+//       Actionable.unsubscribe();
+//     }
+//   }, []);
 
-  useEffect(() => {    
-    if (actionPrompt === 'existingList') {
-      Fetch.get('lists/', {sortDirection: 'asc', sortProperty: 'title'})
-        .then(res => {
-          const [err, lists] = res;
-          if (!err) {
-            setExistingLists(lists.results)
-          }
-        })
-    } else {
-      setExistingLists(null);
-    }
-  }, [actionPrompt]);
+//   useEffect(() => {    
+//     if (actionPrompt === 'existingList') {
+//       Fetch.get('lists/', {sortDirection: 'asc', sortProperty: 'title'})
+//         .then(res => {
+//           const [err, lists] = res;
+//           if (!err) {
+//             setExistingLists(lists.results)
+//           }
+//         })
+//     } else {
+//       setExistingLists(null);
+//     }
+//   }, [actionPrompt]);
 
-  useEffect(() => {
-    if (item === null) {
-      setExistingLists(null);
-      setSelectedList(null);
-      setActionPrompt(null);  
-    } else {
-      chooseAction();
-    }
-  }, [item]);
+//   useEffect(() => {
+//     if (item === null) {
+//       setExistingLists(null);
+//       setSelectedList(null);
+//       setActionPrompt(null);  
+//     } else {
+//       chooseAction();
+//     }
+//   }, [item]);
   
-  if (!item) {
-    return null;
-  }
+//   if (!item) {
+//     return null;
+//   }
 
-  const styled = StyleSheet.create({
-    icon: {
-      container: {
-        height: 100, 
-        width:100,       
-        marginBottom: 20, 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        // ...styles.row,      
-        backgroundColor: colors.white,
-      },
-      image: {
-        color: colors.text,
-      }
-    }
-  });
+//   const styled = StyleSheet.create({
+//     icon: {
+//       container: {
+//         height: 100, 
+//         width:100,       
+//         marginBottom: 20, 
+//         alignItems: 'center', 
+//         justifyContent: 'center',
+//         // ...styles.row,      
+//         backgroundColor: colors.white,
+//       },
+//       image: {
+//         color: colors.text,
+//       }
+//     }
+//   });
 
-  const promptOptions = StyleSheet.create({
-    button: {
-      ...styles.centered,
-      borderWidth: 1,          
-      borderRadius: 8,
-      marginBottom: 12,
-      height: 44,
-      ...styles.centered,
-      backgroundColor: colors.white,
-  },
-  });
+//   const promptOptions = StyleSheet.create({
+//     button: {
+//       ...styles.centered,
+//       borderWidth: 1,          
+//       borderRadius: 8,
+//       marginBottom: 12,
+//       height: 44,
+//       ...styles.centered,
+//       backgroundColor: colors.white,
+//   },
+//   });
 
-  const webSearch = async () => {        
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(item.headline)}`;    
-    await WebBrowser.openBrowserAsync(searchUrl);     
-    // show prompt if want to make note         
-    // getData();
-  };
+//   const webSearch = async () => {        
+//     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(item.headline)}`;    
+//     await WebBrowser.openBrowserAsync(searchUrl);     
+//     // show prompt if want to make note         
+//     // getData();
+//   };
 
-  const addToExistingList = () => {
-    Fetch.post(`queue/${item.uuid}/`, {type: 'list', target: selectedList})
-      .then(res => {
-        // console.log('res', res);
-        const [err, to] = res;
+//   const addToExistingList = () => {
+//     Fetch.post(`queue/${item.uuid}/`, {type: 'list', target: selectedList})
+//       .then(res => {
+//         // console.log('res', res);
+//         const [err, to] = res;
       
-        if (!err) {
-          redirect(to);        
-        }
-      })
-      .catch(err => {
-        console.warn('Add To Existing List Error: ', err);
-      });
-  };
+//         if (!err) {
+//           redirect(to);        
+//         }
+//       })
+//       .catch(err => {
+//         console.warn('Add To Existing List Error: ', err);
+//       });
+//   };
 
-  const createListAsTitle = () => {
-    createList({title: item.headline});
-  };
+//   const createListAsTitle = () => {
+//     createList({title: item.headline});
+//   };
 
-  const createListAsItem = () => {
-    createList({items: [item.headline]});
-  };
+//   const createListAsItem = () => {
+//     createList({items: [item.headline]});
+//   };
 
-  const createList = (data) => {
-    Fetch.post('lists/', data)
-    .then(res => {
-      const [err, list] = res;
-      if (!err) {
-        redirect(list);
-      }
-    })
-    .catch(err => {
-      console.warn('Create List Error: ', err);
-    });
-  };
+//   const createList = (data) => {
+//     Fetch.post('lists/', data)
+//     .then(res => {
+//       const [err, list] = res;
+//       if (!err) {
+//         redirect(list);
+//       }
+//     })
+//     .catch(err => {
+//       console.warn('Create List Error: ', err);
+//     });
+//   };
 
-  const createConversion = (type) => {
-    Fetch.post(`queue/${item.uuid}/`, {type})
-    .then(res => {
-      if (!res.error) {
-        redirect(res);        
-      }
-    })
-    .catch(err => {
-      console.warn('Create Conversion Error: ', err);
-    });
-  };
+//   const createConversion = (type) => {
+//     Fetch.post(`queue/${item.uuid}/`, {type})
+//     .then(res => {
+//       if (!res.error) {
+//         redirect(res);        
+//       }
+//     })
+//     .catch(err => {
+//       console.warn('Create Conversion Error: ', err);
+//     });
+//   };
 
-  const redirect = (to) => {
-    const typeMap = {
-      'Convo': 'convo',
-      'List': 'list',
-      'Note': 'note'
-    }
+//   const redirect = (to) => {
+//     const typeMap = {
+//       'Convo': 'convo',
+//       'List': 'list',
+//       'Note': 'note'
+//     }
 
-    const target = `${typeMap[to.type]}?uuid=${to.uuid}`;       
+//     const target = `${typeMap[to.type]}?uuid=${to.uuid}`;       
 
-    // https://stackoverflow.com/a/77883629
-    // below regex is to compensate for know bug when using a router method and a dynamic route
-    router.push(target.replace(/\((.*?)\)/g, "[$1]"));
-  }
+//     // https://stackoverflow.com/a/77883629
+//     // below regex is to compensate for know bug when using a router method and a dynamic route
+//     router.push(target.replace(/\((.*?)\)/g, "[$1]"));
+//   }
   
-  function close() {  
-    if (!show) {
-      setShow(true);
-    } else {      
-      setShow(false);
-      Actionable.notify(null);
-    }
-  }
+//   function close() {  
+//     if (!show) {
+//       setShow(true);
+//     } else {      
+//       setShow(false);
+//       Actionable.notify(null);
+//     }
+//   }
 
-  return (<View style={{flex: 1}}></View>);
+//   return (<View style={{flex: 1}}></View>);
 
-  return (
-    <CustomModal
-        show={true}
-        toggleShow={close}
-      >
-        { !actionPrompt &&
-          <View style={{backgroundColor: colors.white, flex: 1, ...styles.centered}}>
-            <View style={{width: 240, height: 240, justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'}}>            
-              <Pressable onPress={webSearch}>
-                <View style={styled.icon.container}>
-                  <Regular>Search Web</Regular>
-                  <Icon name='webSearch' styles={styled.icon.image}/>
-                </View>
-              </Pressable>
+//   return (
+//     <CustomModal
+//         show={true}
+//         toggleShow={close}
+//       >
+//         { !actionPrompt &&
+//           <View style={{backgroundColor: colors.white, flex: 1, ...styles.centered}}>
+//             <View style={{width: 240, height: 240, justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'}}>            
+//               <Pressable onPress={webSearch}>
+//                 <View style={styled.icon.container}>
+//                   <Regular>Search Web</Regular>
+//                   <Icon name='webSearch' styles={styled.icon.image}/>
+//                 </View>
+//               </Pressable>
         
-              <Pressable onPress={createConversion.bind(null, 'convo')}>
-                <View style={styled.icon.container}>
-                  <Regular>Start Convo</Regular>
-                  <Icon name='convoAdd' styles={styled.icon.image}/>
-                </View>
-              </Pressable>
+//               <Pressable onPress={createConversion.bind(null, 'convo')}>
+//                 <View style={styled.icon.container}>
+//                   <Regular>Start Convo</Regular>
+//                   <Icon name='convoAdd' styles={styled.icon.image}/>
+//                 </View>
+//               </Pressable>
             
-              <Pressable onPress={createConversion.bind(null, 'note')}>
-                <View style={styled.icon.container}>
-                  <Regular>Add Note</Regular>
-                  <Icon name='noteAdd' styles={styled.icon.image}/>
-                </View>
-              </Pressable>
+//               <Pressable onPress={createConversion.bind(null, 'note')}>
+//                 <View style={styled.icon.container}>
+//                   <Regular>Add Note</Regular>
+//                   <Icon name='noteAdd' styles={styled.icon.image}/>
+//                 </View>
+//               </Pressable>
               
-              <Pressable onPress={setActionPrompt.bind(null, 'list')}>
-                <View style={styled.icon.container}>
-                  <Regular>Add To List</Regular>
-                  <Icon name='listAdd' styles={styled.icon.image}/>
-                </View>
-              </Pressable>
+//               <Pressable onPress={setActionPrompt.bind(null, 'list')}>
+//                 <View style={styled.icon.container}>
+//                   <Regular>Add To List</Regular>
+//                   <Icon name='listAdd' styles={styled.icon.image}/>
+//                 </View>
+//               </Pressable>
 
-            </View>  
-          </View>
-        }
+//             </View>  
+//           </View>
+//         }
 
-        {
-          actionPrompt === 'list' &&
-            <View style={{width: '100%'}}>
-                <Pressable
-                    onPress={() => setActionPrompt('existingList')}
-                    style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
-                >
-                    <Bold style={{color: colors.white}}>Existing List</Bold>
-                </Pressable>
-                <Pressable
-                    onPress={() => setActionPrompt('createList')}
-                    style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
-                >
-                    <Bold style={{color: colors.white}}>New List</Bold>
-                </Pressable>
-                <Pressable style={promptOptions.button} onPress={() => setActionPrompt(null)}>
-                    <Bold>Back</Bold>
-                </Pressable>
-            </View>
-        }
+//         {
+//           actionPrompt === 'list' &&
+//             <View style={{width: '100%'}}>
+//                 <Pressable
+//                     onPress={() => setActionPrompt('existingList')}
+//                     style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
+//                 >
+//                     <Bold style={{color: colors.white}}>Existing List</Bold>
+//                 </Pressable>
+//                 <Pressable
+//                     onPress={() => setActionPrompt('createList')}
+//                     style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
+//                 >
+//                     <Bold style={{color: colors.white}}>New List</Bold>
+//                 </Pressable>
+//                 <Pressable style={promptOptions.button} onPress={() => setActionPrompt(null)}>
+//                     <Bold>Back</Bold>
+//                 </Pressable>
+//             </View>
+//         }
 
 
-        { actionPrompt === 'existingList' &&
-            <View style={{backgroundColor: 'white', width: '100%'}}>
-                { !existingLists && 
-                  <View><Bold>Loading</Bold></View>
-                }
+//         { actionPrompt === 'existingList' &&
+//             <View style={{backgroundColor: 'white', width: '100%'}}>
+//                 { !existingLists && 
+//                   <View><Bold>Loading</Bold></View>
+//                 }
 
-                { existingLists && 
-                <View>
-                  <View style={{...styles.row, ...styles.centered, backgroundColor: 'red'}}>
-                    <Regular>Add </Regular>
-                    <Bold>{item.headline}</Bold>
-                    <Regular> To List</Regular>
-                  </View>
-                  <Picker
-                    selectedValue={selectedList}
-                    style={{backgroundColor: 'green'}}
-                    onValueChange={(itemValue, itemIndex) =>
-                      setSelectedList(itemValue)
-                    }>
-                      { existingLists.map(list => {
+//                 { existingLists && 
+//                 <View>
+//                   <View style={{...styles.row, ...styles.centered, backgroundColor: 'red'}}>
+//                     <Regular>Add </Regular>
+//                     <Bold>{item.headline}</Bold>
+//                     <Regular> To List</Regular>
+//                   </View>
+//                   <Picker
+//                     selectedValue={selectedList}
+//                     style={{backgroundColor: 'green'}}
+//                     onValueChange={(itemValue, itemIndex) =>
+//                       setSelectedList(itemValue)
+//                     }>
+//                       { existingLists.map(list => {
 
-                        return (<Picker.Item key={list.uuid} label={list.title} value={list.uuid} />)
-                      })}
-                  </Picker>
-                  <Pressable
-                    onPress={addToExistingList}
-                    style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
-                  >
-                    <Bold style={{color: colors.white}}>Add To List</Bold>
-                  </Pressable>
-                  <Pressable style={promptOptions.button} onPress={() => setActionPrompt('list')}>
-                      <Bold>Back</Bold>
-                  </Pressable>
-                </View>
-                }
-            </View>
-        }
+//                         return (<Picker.Item key={list.uuid} label={list.title} value={list.uuid} />)
+//                       })}
+//                   </Picker>
+//                   <Pressable
+//                     onPress={addToExistingList}
+//                     style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
+//                   >
+//                     <Bold style={{color: colors.white}}>Add To List</Bold>
+//                   </Pressable>
+//                   <Pressable style={promptOptions.button} onPress={() => setActionPrompt('list')}>
+//                       <Bold>Back</Bold>
+//                   </Pressable>
+//                 </View>
+//                 }
+//             </View>
+//         }
 
-        { actionPrompt === 'createList' &&
-          <View style={{backgroundColor: 'white', width: '100%'}}>
-            <Pressable
-                    onPress={createListAsTitle}
-                    style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
-                >
-                    <Bold style={{color: colors.white}}>As List Title</Bold>
-                </Pressable>
-                <Pressable
-                    onPress={createListAsItem}
-                    style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
-                >
-                    <Bold style={{color: colors.white}}>As List Item</Bold>
-                </Pressable>
-                <Pressable style={promptOptions.button} onPress={() => setActionPrompt('list')}>
-                    <Bold>Back</Bold>
-                </Pressable>
-          </View>
-        }
-      </CustomModal>
-  )
-};
+//         { actionPrompt === 'createList' &&
+//           <View style={{backgroundColor: 'white', width: '100%'}}>
+//             <Pressable
+//                     onPress={createListAsTitle}
+//                     style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
+//                 >
+//                     <Bold style={{color: colors.white}}>As List Title</Bold>
+//                 </Pressable>
+//                 <Pressable
+//                     onPress={createListAsItem}
+//                     style={{ ...promptOptions.button, backgroundColor: colors.black, borderColor: colors.black }}
+//                 >
+//                     <Bold style={{color: colors.white}}>As List Item</Bold>
+//                 </Pressable>
+//                 <Pressable style={promptOptions.button} onPress={() => setActionPrompt('list')}>
+//                     <Bold>Back</Bold>
+//                 </Pressable>
+//           </View>
+//         }
+//       </CustomModal>
+//   )
+// };
 
 const ItemTemplate = ({item}) => { 
-  const onPress = () => {
-    Actionable.notify(item);
+  const onPress = () => {  
+    Observer.notify(item);
   };
   const remove = async () => {
     await Fetch.remove(`queue/${item.uuid}/`);        
@@ -478,56 +486,7 @@ const ItemTemplate = ({item}) => {
     </SwipeableItem>        
 )};
 
-export default function Home() { 
-  // const [item, setItem] = useState(null);
-  const [lists, setLists] = useState([]);
-  const [showLists, setShowLists] = useState(false);
-  const [toList, setToList] = useState(null);
-  const { showActionSheetWithOptions } = useActionSheet();
-  const existingListsRef = useRef(null);
-
-  const listsQuery = useQuery({
-    enabled: false,
-    // initialData: [],
-    queryKey: ['lists'],
-    queryFn: async () => {
-      const params = {
-        page: 1,
-        per: 200,
-        search: '', 
-        sortDirection: 'desc',
-        sortProperty: 'updated_at',
-      };
-       
-      const response = await Fetch.get('lists/', params);
-      console.log('response', response);
-
-      if (!response.error) {
-        console.log(0);
-        return response.results;
-      }
-    },
-  });
-
-  useEffect(() => {
-    console.log('listsQuery.data', listsQuery);
-    if (listsQuery.data && !listsQuery.isPending && listsQuery.isSuccess) {
-      setLists(listsQuery.data.map(i => ({
-        label: i.headline,
-        value: i.uuid,        
-      })));
-      setShowLists(true);
-    }
-  }, [listsQuery.data, listsQuery.isPending, listsQuery.isSuccess]);
-
-  useEffect(() => {
-    console.log("lists", lists);
-    if (showLists) {
-      console.log('sss');
-      existingListsRef.current.togglePicker();   
-    }
-  }, [lists, showLists]);
-
+export default function HomeView() { 
   const options = {
     actions: {
       placeholder: 'Create New Queue Item',
@@ -542,73 +501,11 @@ export default function Home() {
     noRedirect: true, 
   };  
 
-  useEffect(() => {
-    Actionable.subscribe((value) => {           
-      chooseAction(value);
-    })
-    return () => {
-      Actionable.unsubscribe();
-    }
-  }, []);
-
-  function chooseListType(item) {
-    const options = ['Existing', 'New', 'Back', 'Cancel'];
-    const cancelButtonIndex = options.length - 1;
-    const destructiveButtonIndex = 2;
-    const title = `Which type of list would you like to add "${item.headline}" to?`;    
-
-    showActionSheetWithOptions({
-        cancelButtonIndex,
-        destructiveButtonIndex,        
-        options,
-        title,
-      }, (selectedIndex) => {
-          console.log('selected', item.uuid, options[selectedIndex]);
-          if (selectedIndex === destructiveButtonIndex) {
-            chooseAction(item);
-          } else {
-            console.log('existingListsRef.current', Object.keys(existingListsRef.current));
-            listsQuery.refetch();
-            // existingListsRef.current.togglePicker();        
-          }
-      });
-  }
-
-  function chooseAction(item) {        
-    const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
-    const cancelButtonIndex = options.length - 1;
-    const destructiveButtonIndex = null;
-    const title = `What would you like to do with: "${item.headline}"`;    
-    console.log('RNPickerSelect', RNPickerSelect);
-
-    showActionSheetWithOptions({
-        cancelButtonIndex,
-        destructiveButtonIndex,        
-        options,
-        title,
-      }, (selectedIndex) => {
-          console.log('selected', item.uuid, options[selectedIndex]);
-          if (selectedIndex === 3) {
-            chooseListType(item);
-          }
-      });
-  }
-
   return (
     <View style={{flex:1}}>      
-      {/* <ActionableModal /> */}
       { DrawerScreen('Quick Queue') }
       <ListView options={{...options}} />
-  
-      <View style={{position:'abolsute', height: 0, opacity: 0, bottom: 0}}>        
-          <RNPickerSelect
-            ref={existingListsRef}
-            doneText='Choose'
-            onValueChange={(value) => setToList(value)}
-            onDonePress={() => { console.log('done')}}
-            items={lists}
-          />        
-      </View>
+      <Home />
     </View>
   );
 }
