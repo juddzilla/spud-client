@@ -63,25 +63,22 @@ export default function Home() {
             sortProperty: 'updated_at',
             };
             
-            const response = await Fetch.get('lists/', params);
-            console.log('response', response);
+            const response = await Fetch.get('lists/', params);            
 
-            if (!response.error) {
-            console.log(0);
-            return response.results;
+            if (!response.error) {            
+                return response.results;
             }
         },
     });
 
     useEffect(() => {
-        console.log('UE 0 ITEM', item);
     if (item) {
         chooseAction();
     }
     }, [item])
 
     useEffect(() => {
-        console.log('UE 1 listsQuery.data', listsQuery);
+        
         if (listsQuery.data && !listsQuery.isPending && listsQuery.isSuccess) {
             setLists([
             { headline: 'Create as title', uuid: 'new-as-title'},
@@ -95,17 +92,14 @@ export default function Home() {
         }
     }, [listsQuery.data, listsQuery.isPending, listsQuery.isSuccess]);
 
-    useEffect(() => {
-        console.log("UE 2", item, lists, showLists);
-        if (showLists) {
-            console.log('sss');
+    useEffect(() => {        
+        if (showLists) {        
             showPicker(item);
         }
     }, [item, lists, showLists]);
 
     useEffect(() => {
-        Observer.subscribe((value) => {     
-            console.log('action', value);
+        Observer.subscribe((value) => {  
             setItem(value);
         //   chooseAction();
         })
@@ -114,7 +108,6 @@ export default function Home() {
 
 
     function chooseAction() {        
-        console.log('CHOOSE ITEM', item);
         const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
         const cancelButtonIndex = options.length - 1;
         const destructiveButtonIndex = null;
@@ -126,7 +119,6 @@ export default function Home() {
             options,
             title,
         }, (selectedIndex) => {
-            console.log('selected', item.uuid, options[selectedIndex]);
             if (selectedIndex === cancelButtonIndex) {
                 Observer.notify(null);
             }
@@ -143,15 +135,12 @@ export default function Home() {
     }
 
     function chooseList() {
-        console.log('chooselist', item);
+        // console.log('chooselist', item);
     }
 
-    function listDone() {
-        console.log('done', Object.keys(existingListsRef.current));
-        // const item = Observer.get();
+    function listDone() {        
         Observer.notify(null);
         chooseAction();
-        // existingListsRef.current.props.onClose();
     }
 
     return (

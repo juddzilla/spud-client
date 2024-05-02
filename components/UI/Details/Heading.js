@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 
 import { DetailObservable  } from './observable';
@@ -12,23 +12,16 @@ import styles from '../styles';
 export default function Heading({ headerOptions, mutations, theme = 'light' }) {    
     const { update } = mutations;
     const [prompt, setPrompt] = useState(null);
-    const [submitting, setSubmitting] = useState(false);
-    const [collections, setCollections] = useState(null);
+    const [submitting, setSubmitting] = useState(false);    
     const item = DetailObservable.getData();
     const { showActionSheetWithOptions } = useActionSheet();
     const standardHeight = 44;
 
     useEffect(() => {
-        console.log('prompt', prompt);
-        if (!prompt && submitting) {
-            console.log(100);
+        if (!prompt && submitting) {            
             setSubmitting(false);
         }
     }, [prompt]);
-
-    useEffect(() => {
-        console.log('coll', collections);
-    }, [collections]);
     
     function chooseAction(option) {        
         let cancelButtonIndex = null;
@@ -51,10 +44,8 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
             options,
             title,
             message,
-          }, (selectedIndex) => {
-              console.log('selected', options[selectedIndex]);
+          }, (selectedIndex) => {              
               if (selectedIndex === 0) {
-
                   option.cb();
               }
               setPrompt(null);

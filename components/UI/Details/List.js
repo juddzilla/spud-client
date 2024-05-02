@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Dimensions,
-  Animated as RNAnimated,
   Pressable, 
   StyleSheet, 
   TouchableOpacity, 

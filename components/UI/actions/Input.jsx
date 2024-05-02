@@ -11,6 +11,7 @@ import colors from '../colors';
 import styles from '../styles';
 export default function Input({ onSubmit, placeholder, focused, setFocused, theme='light' }) {
     const [message, setMessage] = useState('');
+    const [focus, setFocus] = useState(false);
     const inputRef = useRef(); 
 
     const height = 48;
@@ -52,11 +53,11 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
     }
 
     function onBlur() {
-        setFocused(null);
+        setFocus(null);
     }
 
     function onFocus() {
-        setFocused('create');
+        setFocus('create');
     }
 
     const styled = StyleSheet.create({
@@ -69,12 +70,8 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
             borderColor: style.borderColor,
             borderRadius: height/2,
             marginBottom: 4,            
+            
             // zIndex: 10,
-        },
-        send: {
-            color: style.color,
-            size: 16, 
-            // zIndex: 1,
         },
         input: {
             color: style.color,
@@ -86,21 +83,21 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
         button: {
             height: 40,
             width: 40,
-            ...styles.centered,            
-            opacity: (focused && message.trim().length) ? 1 : 0,            
+            ...styles.centered,      
+            opacity: (focus && message.trim().length) ? 1 : 0,               
         },
         send: {
-            color: style.color,
+            color: colors.lightWhite,
             size: 16, 
-            zIndex: 1,
+            // zIndex: 1,
         },
       });
 
-      useEffect(() => {
-        if (message === '') {
-            setTimeout(() => { inputRef.current.blur(); }, 0)            
-        }
-      }, [message])
+    //   useEffect(() => {
+    //     if (message === '') {
+    //         setTimeout(() => { inputRef.current.blur(); }, 0)            
+    //     }
+    //   }, [message])
 
     return (
         <View style={styled.container}>            

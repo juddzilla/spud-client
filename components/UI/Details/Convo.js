@@ -3,24 +3,22 @@
 // ability to summarize entire convo
 // archive
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   FlatList,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import AnimatedEllipsis from 'rn-animated-ellipsis';
 
 import Heading from './Heading';
-import Options from './Options';
 
 import Input from '../actions/Input';
 import Talk from '../actions/Talk';
-import DebouncedInput from '../DebouncedInput';
 import { DetailObservable } from '../Details/observable';
-import Icon from '../icons';
+
 import colors from '../colors';
 import styles from '../styles';
 import Bold from '../text/Bold';
@@ -31,19 +29,65 @@ import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 import { convoDate } from '../../../utils/dates';
 
-export default function Convo({item, left}) {  
+import { generateUrl, useWebSocket } from '../../../interfaces/websocket';
+
+function objectToUrlParams(obj) {
+  const params = [];
+
+  for (const key in obj) {
+    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`);
+  }
+
+  return params.join('&');
+}
+
+
+export default function Convo({item, left}) {    
   const queryKeys = ['convos', item.uuid];
   const baseUri = `convos/${item.uuid}/`;    
-  
+  const wsUrl = generateUrl('convo/chat/', { uuid: item.uuid});
+  console.log('wsUrl', wsUrl);
+    
   const [messages, setMessages] = useState([]);
-  const [title, setTitle] = useState(item.title);
+  const [awaiting, setAwaiting] = useState(false);
+  
+  // for below, if object passed to useWebSocket, then to url params within, infinit cycle. must stringify first. idk why TODO
+  // const { connected, message, sendMessage } = useWebSocket(objectToUrlParams({type:'convo_chat', uuid: item.uuid}));
+  const { connected, message, sendMessage } = useWebSocket(wsUrl);
+  // const { connected, message, sendMessage } = useWebSocket('convo_chat');
+
+  const awaitingIndex = 1000000;
+
+  useEffect(() => {
+    if (message) {    
+      if (message.type === 'system') {
+
+        setAwaiting(false);  
+      }
+      setMessages([message, ...messages]);
+    }
+  }, [message])
+
+  // useEffect(() => {
+  //   console.log('MESSAGES3333', messages);
+  // }, [messages])
+
+  useEffect(() => {
+    DetailObservable.subscribe((value) => {      
+      console.log('deets', value);
+      // setItem(value);
+    })
+    return () => {
+      DetailObservable.unsubscribe();
+    }
+  }, []);
   
   const Query = useQuery({
     queryKey: queryKeys,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);      
+      const response = await Fetch.get(baseUri);     
+      // console.log("response", response.messages);
       if (!response.error) {
-        setTitle(response.title);
         setMessages(response.messages);
       }
       return response.messages || [];
@@ -57,36 +101,43 @@ export default function Convo({item, left}) {
       }
 
       try {
-        return await Fetch.post(baseUri, {body: text});
+        setAwaiting(true);
+        sendMessage({body: text});
+        // return await Fetch.post(`${baseUri}chat`, {body: text});
+        return true;
       } catch (error) {
         console.warn('Create Convo Message Error: ', error);
       }
 
     },
     onSuccess: (data) => {
-      if (!data.error) {
-        setMessages([...messages, data]);
-        queryClient.setQueryData([queryKeys[0]], oldData => {                    
-          return oldData.map(old => {     
+      // if (!data.error) {
+      //   setMessages([data, ...messages]);
+      //   queryClient.setQueryData([queryKeys[0]], oldData => {                    
+      //     return oldData.map(old => {     
             
-            if (old.uuid === item.uuid) {              
-              let number = parseInt(old.subheadline);
-              number++;
-              let subheadline = number + ' Item';            
-              if (number !== 1) {
-                subheadline = subheadline + 's';
-              }
+      //       if (old.uuid === item.uuid) {              
+      //         let number = parseInt(old.subheadline);
+      //         number++;
+      //         let subheadline = number + ' Item';            
+      //         if (number !== 1) {
+      //           subheadline = subheadline + 's';
+      //         }
   
-              return {
-                ...old,
-                subheadline,
-                updated_at: data.created_at,
-              }
-            }
-            return old;
-          });
-        });
-      }
+      //         return {
+      //           ...old,
+      //           subheadline,
+      //           updated_at: data.created_at,
+      //         }
+      //       }
+      //       return old;
+      //     });
+      //   });
+      //   setTimeout(() => {
+      //     setAwaiting(false);
+      //   }, 5000)
+      // }
+      console.log('onsuccess', data);
     },
   })
 
@@ -140,23 +191,14 @@ export default function Convo({item, left}) {
     },
   });
 
-  const Message = ({ index, item}) => {
+  const Message = ({ index, item }) => {
     const styled = StyleSheet.create({
       message: {
         paddingHorizontal: 16, 
-        paddingTop: 8,     
-        marginBottom: item.type === 'system' ? 32 : 0, 
+        paddingTop: 8,
         marginTop: index === 0 ? 16 : 0,     
         borderRadius: 8,
-        flex: 1,        
-        shadowColor: colors.darkestBg,
-        shadowOffset: {
-            width: 0,
-            height: 12,
-        },
-        shadowOpacity: 0.58,
-        shadowRadius: 16.00,
-        elevation: 24,
+        flex: 1,
       },
       header: {        
         flexDirection: 'row',
@@ -164,9 +206,9 @@ export default function Convo({item, left}) {
         alignItems: 'flex-start',
         height: 20,
       },
-      body: { lineHeight: 24 },
-      date: { color: colors.darkestBg, fontSize: 11 },
-      user: {  },
+      body: { color: colors.white, lineHeight: 24 },
+      date: { color: colors.lightWhite, fontSize: 11 },
+      user: { color: colors.white },
     });
 
     const displayNameMap = {
@@ -178,20 +220,34 @@ export default function Convo({item, left}) {
       <View style={styled.message}>
         <View style={styled.header}>
           <Bold style={styled.user}>{ displayNameMap[item.type] }</Bold>
-          <Light style={styled.date}>{convoDate(item.created_at)}</Light>
+          { item.created_at && 
+            <Light style={styled.date}>{convoDate(item.created_at)}</Light>
+          }
         </View>
-        <Regular style={styled.body}>{ item.body }</Regular>
+        { (index === awaitingIndex && item.body === 'awaiting') ? (
+          <AnimatedEllipsis numberOfDots={5} style={{fontSize: 20, color: colors.white}}/>
+        ) : (
+          <Regular style={styled.body}>{ item.body }</Regular>
+        )}
       </View>
     )
   };
-const flatlist = StyleSheet.create({
+  const flatlist = StyleSheet.create({
     container: {
       flex: 1,
+      paddingBottom: 8,
     }  
-  })
+  });
 
-  const headerOptions = [
+  const ListFooterComponent = () => {
     
+    if (!awaiting) {
+      return null;      
+    }
+    return Message({ index: awaitingIndex, item : {type: 'system', created_at: null, body: 'awaiting'}});
+  };
+
+  const headerOptions = [    
     {
         name: 'remove',
         cb: removeMutation.mutate
@@ -217,11 +273,19 @@ const flatlist = StyleSheet.create({
           renderItem={Message}
           keyExtractor={item => item.id}        
           inverted={true}    
-        />   
+          ListHeaderComponent={ListFooterComponent}
+        />
+        {/* { setAwaiting &&
+          Message({ index: 100000, item : {type: 'system', created_at: null, body: 'awaiting'}})
+        } */}
       </View>
 
-      <View style={styles.footer}>
-        <Input onSubmit={messageMutation.mutate} placeholder='Create New Message'/> 
+      <View style={{...styles.footer}}>
+        <Input
+          onSubmit={messageMutation.mutate} 
+          placeholder='Create New Message'
+          theme='dark' 
+        /> 
         <Talk />
       </View>
     </View>

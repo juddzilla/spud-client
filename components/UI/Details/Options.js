@@ -9,8 +9,7 @@ import Icon from '../icons';
 import colors from '../colors';
 import Styles from '../styles';
 
-export default function Options({options}) {            
-    console.log('options', options);
+export default function Options({options}) {                
     const [prompt, setPrompt] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 

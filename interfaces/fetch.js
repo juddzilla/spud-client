@@ -20,7 +20,7 @@ class CustomFetch {
     if (query && Object.keys(query).length) {
       target += `?${new URLSearchParams(query).toString()}`;
     }
-
+    
       return fetch(target, 
           { 
               credentials: 'include',
@@ -58,15 +58,19 @@ class CustomFetch {
           }
       )
       .then(async (res) => {      
-        // console.log('POST', res);      
+        console.log('POST', res);      
         if ([400, 401, 403, 404, 420].includes(res.statusCode)) {
             return { error: 'Not Authorized', statusCode: res.statusCode };
         }
+        if ([500].includes(res.statusCode)) {
+          console.warn('FETCH POST 500', res);
+          return { error: 'Our bad!', statusCode: res.statusCode };
+      }
         // console.log("res.json()", res.json());
         return await res.json();
     })  
       .catch(error => {
-          console.log('FETCH POST ERR', err);
+          console.log('FETCH POST ERR', error);
           return { error };
       });
   }

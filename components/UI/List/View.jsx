@@ -5,7 +5,6 @@ import {
  } from 'react';
 
 import {
-  Animated,
   Dimensions,
   FlatList,
   Pressable,
@@ -19,6 +18,7 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import DefaultListItem from './DefaultListItem';
 
@@ -65,7 +65,7 @@ export default function ListView({options}) {
 
   const unfocusedWidth = Dimensions.get('window').width-48-40;
   const focusedWidth = Dimensions.get('window').width-32;
-  const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
+  // const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
 
   const Query = useQuery({
     queryKey: storeKey, 
@@ -121,15 +121,15 @@ export default function ListView({options}) {
     }
   }, [next]);
   
-  useEffect(() => {
-    let toValue = focus ? focusedWidth : unfocusedWidth
-    Animated.timing(widthAnim, {
-      toValue,
-      duration: 90,
-      useNativeDriver: false,
-    }).start();
+  // useEffect(() => {
+  //   let toValue = focus ? focusedWidth : unfocusedWidth
+  //   Animated.timing(widthAnim, {
+  //     toValue,
+  //     duration: 90,
+  //     useNativeDriver: false,
+  //   }).start();
     
-  }, [widthAnim, focus]);
+  // }, [widthAnim, focus]);
    
   function getNext() {
     if (next && Query.fetchStatus !== 'fetching') {  
@@ -202,12 +202,10 @@ export default function ListView({options}) {
             flex: 1,              
             borderWidth: 1,
             borderColor: colors.theme.text.lightest,
-            borderRadius: 12,            
-            // height:  44,    
+            borderRadius: 12,                      
             zIndex: 10,
-            // position: 'absolute',
-            // left: 16,
-            width: widthAnim,
+            
+            // width: widthAnim,
         },
         field: {                    
             height: 48,    
