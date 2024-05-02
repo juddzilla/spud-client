@@ -19,6 +19,7 @@ export default function TalkButton({focused, setFocused}) {
     return (
       <View
         style={{          
+          backgroundColor: 'red',
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',          
@@ -78,8 +79,10 @@ export default function TalkButton({focused, setFocused}) {
               backgroundColor: 'rgba(255,255,255,0.5)',
               opacity: showModal ? 1 : 0,
               position: 'absolute',
-              top: (Dimensions.get('window').height - 64 - 16 - 1) * -1,                            
-              left: (Dimensions.get('window').width  - 16 - 1) * -1,
+              top: 0,
+              left: 0,
+              // top: (Dimensions.get('window').height - 64 - 16 - 1) * -1,                            
+              // left: (Dimensions.get('window').width  - 16 - 1) * -1,
               width: Dimensions.get('window').width,
               height: showModal ? Dimensions.get('window').height : 0,
               zIndex: 1,
