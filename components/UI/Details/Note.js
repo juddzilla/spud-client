@@ -153,7 +153,7 @@ export default function Note({item, left}) {
               paddingHorizontal: 16,
               paddingTop: 16,
               backgroundColor: 'transparent', 
-              color: colors.white,
+              color: colors.darkText,
             }}
             update={(value) => { updateMutation.mutate({body: value})}} 
             value={body}

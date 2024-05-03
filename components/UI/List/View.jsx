@@ -32,6 +32,7 @@ import Sort from '../filtering/Sort';
 import Search from '../filtering/Search';
 import Bold from '../text/Bold';
 
+import TalkButton from '../Talk/Button';
 import Fetch from '../../../interfaces/fetch';
 
 export default function ListView({options}) {
@@ -40,8 +41,9 @@ export default function ListView({options}) {
     createKey='title',    
     filters,
     ItemTemplate = DefaultListItem,    
-    storeKey,    
     noRedirect,
+    storeKey,  
+    talk,  
   } = options;
 
   const initialQuery = {
@@ -187,7 +189,7 @@ export default function ListView({options}) {
     }
 
     return (
-      <View style={{...styles.row, paddingLeft: 24, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>
+      <View style={{...styles.row, paddingLeft: 20, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>
         <Bold style={{fontSize: 12, color: colors.lightText}}>{ headerMessage }</Bold>        
       </View>
     )
@@ -328,8 +330,8 @@ export default function ListView({options}) {
                 <Icon name='send' styles={textInputStyled.input.icons.trailing} />
             </Pressable>
         </Animated.View>  
-        { !focus &&
-          <Talk />          
+        { (!focus && talk) &&
+          <TalkButton type={talk} />          
         }
       </View>
       </View>

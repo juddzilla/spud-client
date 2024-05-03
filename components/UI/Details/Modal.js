@@ -1,9 +1,7 @@
-
 import { useEffect, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import Modal from "react-native-modal";
 
-import Bold from '../text/Bold';
 import Convo from './Convo';
 import List from './List';
 import Note from './Note';
@@ -37,13 +35,12 @@ export default function DetailModal() {
     const Component = typeMap[item.type];
     
     return (
-      // set value of context to {bool, toggle}
-      // <DetailContext.Provider value={{ item, setItem }}>        
         <View
           style={{position: 'absolute', top: 0, left: 0, flex: 1}}
         >
           <Modal
-            backdropColor={colors.detail.background}      
+            // backdropColor={colors.detail.background}    
+            backdropColor={colors.darkBg}  
             backdropOpacity={1}
             // backdropColor='rgba(0,0,0,1)'      
             animationIn='fadeIn'

@@ -31,14 +31,15 @@ export default function Search({ disabled, placeholder, size='small', update }) 
             backgroundColor: (focused || search.length > 0) ? colors.lightWhite : 'transparent', 
             borderWidth: 1,
             borderRadius: height / 2,
-            borderColor: colors.input.border,               
+            borderColor: colors.white,               
+            // borderColor: 'red',
             flex: 1,
             justifyContent: 'space-between',
             marginRight: 8,
             
         },
         search: { 
-            color: focused ? colors.button.enabled : colors.lightWhite,
+            color: colors.darkText,
             size: searchIconSize,
          },
          icon: {
@@ -51,7 +52,7 @@ export default function Search({ disabled, placeholder, size='small', update }) 
         input: {            
             height,                      
             marginRight: 0,           
-            color: colors.input.color,                
+            color: colors.darkBgd,                
             paddingLeft: 18,
             paddingRight: 44,     
             flex: 1,   
@@ -82,7 +83,7 @@ export default function Search({ disabled, placeholder, size='small', update }) 
                 onBlur={() => setFocused(false)}
                 onFocus={() => setFocused(true)}
                 placeholder={placeholder}
-                placeholderTextColor={colors.lightWhite}
+                placeholderTextColor={colors.darkText}
                 style={style.input}
             />
             <View style={

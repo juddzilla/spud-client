@@ -128,8 +128,13 @@ export default function HomeView() {
       placeholder: 'Search Queue',
     },
     ItemTemplate,
+    noRedirect: true,
     storeKey: ['queue'],
-    noRedirect: true, 
+    talk: {
+      message: 'Tell us how youd like us to add, modify, or delete Quick Queue items',
+      view: 'home',
+
+    }
   };  
 
   return (

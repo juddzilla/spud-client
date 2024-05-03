@@ -25,6 +25,7 @@ import Heading from './Heading';
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
+import Regular from '../text/Regular';
 import Icon from '../icons';
 
 import colors from '../colors';
@@ -366,7 +367,9 @@ export default function List({item, left}) {
   const ListItem = useCallback((props) => {    
     const {drag, getIndex, isActive, item} = props;     
 
-    const marginBottom = getIndex() === listItems.length - 1 ? 64 : 0;
+    // const marginBottom = getIndex() === listItems.length - 1 ? 64 : 0;
+
+    const textColor = colors.darkText;
     
     const styled = StyleSheet.create({
       container: {
@@ -379,20 +382,35 @@ export default function List({item, left}) {
         ...Styles.centered,
         // top: 1,
         width: 40,
+        // paddingLeft: 9,
+        // paddingRight: 9,
         height: 40,
-        marginRight: 8,  
+        // marginRight: 8,  
+        // backgroundColor: 'red',
       },
       icon: {
-        color: item.completed ? 'rgba(255,255,255,0.8)' : colors.white,
-        size: item.completed ? 12 : 15,    
+        color: textColor,
+        size: 20,    
       },
       body: {
         flex: 1,
         paddingHorizontal: 8,   
       },
+      indexContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        maxWidth: 24,
+        minWidth: 16,
+        height: 40,
+        
+      },
+      index: {
+        fontSize: 10, 
+        // color: colors.theme.text.light,            
+      },
       input: {
         backgroundColor: 'transparent',
-        color: colors.white,
+        color: textColor,
         fontFamily: item.completed ? 'Inter-Light' :'Inter-Bold',                     
         height: '100%',
         paddingRight: 0,        
@@ -407,7 +425,7 @@ export default function List({item, left}) {
       }
     });
 
-    const checkboxIcon = item.completed ? 'checkedFilled' : 'checkOutline';
+    const checkboxIcon = item.completed ? 'checkedOutline' : 'checkOutline';
 
     const RenderRightActions = () => {    
       const { percentOpen } = useSwipeableItemParams();
@@ -448,10 +466,13 @@ export default function List({item, left}) {
             onLongPress={drag}
             disabled={isActive}          
           >
-            <View style={styled.container}>            
+            <View style={styled.container}>
               <Pressable style={styled.checkbox} onPress={() => updateListItemMutation.mutate({ id: item.id, completed: !item.completed })}>
                 <Icon name={checkboxIcon} styles={styled.icon} />                
               </Pressable>
+              <View style={styled.indexContainer}>
+                <Regular style={styled.index}>{ getIndex()+1 }</Regular>
+              </View>
               <View style={styled.body}>
                 <DebouncedInput
                   editable={!item.completed}
@@ -472,7 +493,7 @@ export default function List({item, left}) {
 
   // UI CONFIG
   const checkboxToggleIconMap = {
-    null: 'completedAll',
+    null: 'checkedFilled',
     true: 'completedOnly',
     false: 'completedNot'
   };
@@ -501,7 +522,7 @@ export default function List({item, left}) {
     >
         <Heading mutations={{ update: updateListMutation.mutate }} headerOptions={headerOptions} />
         
-        <View style={{flex: 1, paddingLeft: 8,}}>
+        <View style={{flex: 1,}}>
 
           <View
             style={{
@@ -516,7 +537,7 @@ export default function List({item, left}) {
               onPress={toggleShowCompleted}
               style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}
             >
-              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.white }} />
+              <Icon name={checkboxToggleIconMap[showCompleted]} styles={{size: 22, color: colors.darkText }} />
             </Pressable>   
           </View>          
 

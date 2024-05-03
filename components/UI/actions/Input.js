@@ -62,13 +62,13 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
 
     const styled = StyleSheet.create({
         container: {
-            backgroundColor: style.backgroundColor,
+            backgroundColor: focus ? colors.white : style.backgroundColor,
             flexDirection: 'row', 
             alignItems: 'center', 
             flex: 1,  
             borderWidth: 1,
-            borderColor: style.borderColor,
-            borderRadius: height/2,
+            borderColor: focus ? colors.darkText : colors.white,
+            borderRadius: 8,
             marginBottom: 4,            
             
             // zIndex: 10,
@@ -106,7 +106,7 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
                 onChangeText={(text) => setMessage(text)}
                 onFocus={onFocus}
                 placeholder={placeholder || 'NEW'}
-                placeholderTextColor={style.color}
+                placeholderTextColor={colors.darkText}
                 ref={inputRef}
                 style={styled.input}
                 value={message}

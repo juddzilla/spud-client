@@ -1,5 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Dimensions, Pressable, StyleSheet, View } from 'react-native';
+
+import { TalkObservable } from './observable';
 
 import colors from '../colors';
 import Icon from '../icons';
@@ -7,25 +9,39 @@ import Bold from '../text/Bold';
 
 import styles from '../styles';
 
-export default function TalkButton({focused, setFocused}) {
-  const [showModal, setShowModal] = useState(false);
+export default function TalkButton(type) {
+    const [isOpen, setIsOpen] = useState(false);
 
+    const micIcon = {
+        color: !isOpen ? 'white' : 'black', 
+        name: !isOpen ? 'mic' : 'micOff',
+    };
 
-  const micIcon = {
-    color: !showModal ? 'white' : 'black', 
-    name: !showModal ? 'mic' : 'micOff',
-  };
+    useEffect(() => {
+        TalkObservable.subscribe((value) => {      
+            setIsOpen(value !== null);
+        })
+        return () => {
+            TalkObservable.unsubscribe();
+            setIsOpen(false);
+        }
+    }, []);
+
+    function toggle() {
+        const value = isOpen ? false : type;
+        TalkObservable.notify(value);    
+    }
 
     return (
       <View
         style={{          
-          // backgroundColor: 'red',
+          backgroundColor: 'red',
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',          
         }}>
           <Pressable            
-            onPress={() => {setShowModal(!showModal)}}
+            onPress={toggle}
             style={({ pressed }) => ({
               justifyContent: 'center',               
               // shadowColor: colors.darkestBg,
@@ -48,7 +64,7 @@ export default function TalkButton({focused, setFocused}) {
           >
             <View
                 style={{
-                  backgroundColor: showModal ? 'black' : colors.brand,
+                  backgroundColor: isOpen ? 'black' : colors.brand,
                   borderBottomLeftRadius: '50%',
                   borderBottomRightRadius: 8,
                   borderTopLeftRadius: '50%',
@@ -77,14 +93,14 @@ export default function TalkButton({focused, setFocused}) {
           <View
             style={{
               backgroundColor: 'rgba(255,255,255,0.5)',
-              opacity: showModal ? 1 : 0,
+              opacity: isOpen ? 1 : 0,
               position: 'absolute',
               top: 0,
               left: 0,
               // top: (Dimensions.get('window').height - 64 - 16 - 1) * -1,                            
               // left: (Dimensions.get('window').width  - 16 - 1) * -1,
               width: Dimensions.get('window').width,
-              height: showModal ? Dimensions.get('window').height : 0,
+              height: isOpen ? Dimensions.get('window').height : 0,
               zIndex: 1,
             }}
           >

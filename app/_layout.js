@@ -25,6 +25,8 @@ import { useStorageState } from '../interfaces/storage';
 import colors from '../components/UI/colors';
 
 import DetailModal from '../components/UI/Details/Modal';
+import TalkModal from '../components/UI/Talk/Modal';
+
 export function SessionProvider(props) {
   const [[isLoading, session], setSession] = useStorageState('session');
   return (
@@ -67,6 +69,7 @@ export default function RootLayout() {
                     </KeyboardAvoidingView> */}
                     <Slot />
                     <DetailModal />
+                    <TalkModal />
                   </SafeAreaView>
                 </ActionSheetProvider>
               </SessionProvider>
@@ -74,7 +77,7 @@ export default function RootLayout() {
           ) : (
             <View>
               <Text>Loading</Text>
-              </View>
+            </View>
           )}
           
       </GestureHandlerRootView>

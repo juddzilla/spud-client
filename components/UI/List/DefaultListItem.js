@@ -18,7 +18,7 @@ import Regular from '../text/Regular';
 import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
-const DefaultListItem = ({ item }) => {             
+const DefaultListItem = ({ index, item }) => {             
     if (!item) {
         return null;
     }
@@ -46,6 +46,7 @@ const DefaultListItem = ({ item }) => {
         container: {
             ...styles.row,
             padding: 12,      
+            paddingLeft: 0,
             flex: 1,
         },
         checkbox: {
@@ -57,7 +58,10 @@ const DefaultListItem = ({ item }) => {
         },
         content: {
             flex: 1,       
-            paddingLeft: 8,     
+            paddingLeft: 8,
+            ...styles.row,   
+            // backgroundColor: 'green', 
+            alignItems: 'flex-start', 
         },
         date: {
             color: colors.theme.text.medium,
@@ -66,7 +70,17 @@ const DefaultListItem = ({ item }) => {
         icon: {
             color: item.selected ? colors.text : colors.theme.text.light,    
             size: 15,    
-          },
+        },
+        index: {
+            fontSize: 12, 
+            color: colors.theme.text.light,            
+        },
+        indexContainer: {
+            width: 34,
+            alignItems: 'flex-end',
+            paddingRight: 8,
+            paddingTop: 2,
+        },
         info: {
             ...styles.row,
             flexWrap: 'wrap',
@@ -134,12 +148,19 @@ const DefaultListItem = ({ item }) => {
                     onPress={() => DetailObservable.notify(item)} 
                 >      
                     <View style={styled.content}>
-                        <Bold style={styled.title}>{item.headline}</Bold>
-                        <View style={styled.info}>
-                            { item.subheadline &&
-                                <Regular style={styled.subtitle}>{ item.subheadline }</Regular>
-                            }
-                            <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
+                        
+                        <View style={styled.indexContainer}>
+
+                            <Regular style={styled.index}>{ index+1 } </Regular>
+                        </View>
+                        <View>
+                            <Bold style={styled.title}>{item.headline}</Bold>
+                            <View style={styled.info}>
+                                { item.subheadline &&
+                                    <Regular style={styled.subtitle}>{ item.subheadline }</Regular>
+                                }
+                                <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
+                            </View>
                         </View>
                     </View>
                 </Pressable>            

@@ -19,15 +19,15 @@ export default function Sort({ disabled, fields, query, size='small', theme = 'l
 
   const buttonThemes = {
     dark: {
-      inactive: {
-        backgroundColor: colors.detail.background,
-        borderColor: colors.detail.background,
+      active: {
+        backgroundColor: colors.darkText,
+        borderColor: colors.darkText,
         color: colors.lightWhite,
       },
-      active: {
+      inactive: {
         backgroundColor: 'transparent',
-        borderColor: colors.lightWhite,
-        color: colors.white,
+        borderColor: colors.white,
+        color: colors.darkText,
       },
     },
     light: {

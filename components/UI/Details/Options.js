@@ -132,6 +132,8 @@ export default function Options({options}) {
         );
     };
    
+    const textColor = colors.darkText;
+   
     const actions = {
         remove: {
             component: () => Prompt({
@@ -175,7 +177,7 @@ export default function Options({options}) {
                         onPress={ () => setPrompt(option)}
                         style={{width: 40, ...Styles.centered, height: '100%'}}
                     >
-                        <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white,}} />                    
+                        <Icon name={actions[option.name].icon} styles={{size: 20, color: textColor}} />                    
                     </Pressable>
                 )) }
             </View>

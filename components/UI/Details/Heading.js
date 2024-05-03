@@ -64,13 +64,15 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
         },
     };
 
+    const textColor = colors.darkText;
+
     return (
-        <View style={{...styles.row, height: standardHeight, paddingLeft: 16, paddingRight: 4, marginBottom: 8,}}>
+        <View style={{...styles.row, height: standardHeight, paddingLeft: 8, backgroundColor: '',paddingRight: 4, marginBottom: 8,}}>
             <Pressable
                 onPress={() => DetailObservable.notify(null)}
                 style={{width: 40, height: '100%', left: -4, ...styles.centered, left: -8}}
             >
-                <Icon name='closeModal' styles={{color: colors.white, fontSize: 24}} />
+                <Icon name='closeModal' styles={{color: textColor, fontSize: 20}} />
             </Pressable>
             
             <DebouncedInput
@@ -81,8 +83,10 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
                     height: '100%',            
                     marginRight: 16,        
                     paddingHorizontal: 4,  
-                    color: colors.white,
+                    color: textColor,
                     backgroundColor: 'transparent',
+                    // textDecorationLine: 'underline',
+                    
                 }}
                 update={(value) => { update({title: value})}} 
                 value={item.title}
@@ -96,7 +100,7 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
                         style={{width: 40, ...styles.centered, height: standardHeight}}
                     >
                         
-                        <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white,}} />                    
+                        <Icon name={actions[option.name].icon} styles={{size: 20, color: textColor}} />                    
                     </Pressable>
                 )) }
             </View>           

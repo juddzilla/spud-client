@@ -31,28 +31,15 @@ import { convoDate } from '../../../utils/dates';
 
 import { generateUrl, useWebSocket } from '../../../interfaces/websocket';
 
-function objectToUrlParams(obj) {
-  const params = [];
-
-  for (const key in obj) {
-    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`);
-  }
-
-  return params.join('&');
-}
-
-
 export default function Convo({item, left}) {    
   const queryKeys = ['convos', item.uuid];
   const baseUri = `convos/${item.uuid}/`;    
+  // for below, if object passed to useWebSocket, then to url params within, infinit cycle. must stringify first. idk why TODO
   const wsUrl = generateUrl('convo/chat/', { uuid: item.uuid});
-  console.log('wsUrl', wsUrl);
-    
+
   const [messages, setMessages] = useState([]);
   const [awaiting, setAwaiting] = useState(false);
   
-  // for below, if object passed to useWebSocket, then to url params within, infinit cycle. must stringify first. idk why TODO
-  // const { connected, message, sendMessage } = useWebSocket(objectToUrlParams({type:'convo_chat', uuid: item.uuid}));
   const { connected, message, sendMessage } = useWebSocket(wsUrl);
   // const { connected, message, sendMessage } = useWebSocket('convo_chat');
 
@@ -194,21 +181,24 @@ export default function Convo({item, left}) {
   const Message = ({ index, item }) => {
     const styled = StyleSheet.create({
       message: {
-        paddingHorizontal: 16, 
+        paddingHorizontal: 8, 
         paddingTop: 8,
-        marginTop: index === 0 ? 16 : 0,     
+        marginTop: 10,     
         borderRadius: 8,
         flex: 1,
+        // backgroundColor: index % 2 == 0 ? 'green' : 'blue'
       },
       header: {        
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        // ...styles.row,
+        alignItems: 'flex-end',
         height: 20,
+        marginBottom: 6,
       },
-      body: { color: colors.white, lineHeight: 24 },
-      date: { color: colors.lightWhite, fontSize: 11 },
-      user: { color: colors.white },
+      body: { color: colors.darkText, lineHeight: 24, paddingHorizontal: 6 },
+      date: { color: colors.lightText, fontSize: 10, marginLeft: 6, paddingBottom: 1 },
+      user: { color: colors.black },
     });
 
     const displayNameMap = {
