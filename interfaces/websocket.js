@@ -12,9 +12,18 @@ function objectToUrlParams(obj) {
     return params.join('&');
   }
 
-export const generateUrl = (path, params) => `${environment.wsHost}${path}?${objectToUrlParams(params)}`;
+export const generateUrl = (path, params) => {
+  // const parts = [`${environment.wsHost}${path}?`];
 
-export function useWebSocket(url) {
+  // if (params && Object.keys(params).length) {
+  //   parts.push(objectToUrlParams(params));
+  // }
+
+  // return parts.join('');
+  return `${environment.wsHost}${path}?${objectToUrlParams(params)}`;;
+}
+
+export function useWebSocket(path, params={}) {
     const [connected, setConnected] = useState(false);
     const [message, setMessage] = useState(null);
     const [webSocket, setWebSocket] = useState(null);    
@@ -25,7 +34,8 @@ export function useWebSocket(url) {
         if (!session) {
             return;
         }
-        
+        const url = generateUrl(path, {...params, token: session});
+        console.log('URL', url);
         const uri = `${url}&token=${session}`;
         const socket = new WebSocket(uri);
         

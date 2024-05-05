@@ -3,7 +3,7 @@
 // ability to summarize entire convo
 // archive
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -26,42 +26,32 @@ import Light from '../text/Light';
 import Regular from '../text/Regular';
 
 import { queryClient } from '../../../contexts/query-client';
+import { WebsocketContext } from '../../../contexts/websocket';
 import Fetch from '../../../interfaces/fetch';
 import { convoDate } from '../../../utils/dates';
-
-import { generateUrl, useWebSocket } from '../../../interfaces/websocket';
 
 export default function Convo({item, left}) {    
   const queryKeys = ['convos', item.uuid];
   const baseUri = `convos/${item.uuid}/`;    
-  // for below, if object passed to useWebSocket, then to url params within, infinit cycle. must stringify first. idk why TODO
-  const wsUrl = generateUrl('convo/chat/', { uuid: item.uuid});
+  const { message, sendMessage } = useContext(WebsocketContext);
 
   const [messages, setMessages] = useState([]);
   const [awaiting, setAwaiting] = useState(false);
-  
-  const { connected, message, sendMessage } = useWebSocket(wsUrl);
-  // const { connected, message, sendMessage } = useWebSocket('convo_chat');
 
   const awaitingIndex = 1000000;
 
   useEffect(() => {
-    if (message) {    
+    if (message && message.convo_uuid && message.convo_uuid === item.uuid) {    
       if (message.type === 'system') {
-
         setAwaiting(false);  
       }
       setMessages([message, ...messages]);
     }
-  }, [message])
-
-  // useEffect(() => {
-  //   console.log('MESSAGES3333', messages);
-  // }, [messages])
+  }, [message]) // move this to websocke thandler, it should be pushing to cache
 
   useEffect(() => {
     DetailObservable.subscribe((value) => {      
-      console.log('deets', value);
+      // console.log('deets', value);
       // setItem(value);
     })
     return () => {
@@ -87,14 +77,17 @@ export default function Convo({item, left}) {
         return;
       }
 
-      try {
-        setAwaiting(true);
-        sendMessage({body: text});
-        // return await Fetch.post(`${baseUri}chat`, {body: text});
-        return true;
-      } catch (error) {
-        console.warn('Create Convo Message Error: ', error);
-      }
+      sendMessage({
+        action: 'create',
+        context: queryKeys,
+        data: { body: text, },
+      });
+      // try {        
+      //   // return await Fetch.post(`${baseUri}chat`, {body: text});
+      //   return true;
+      // } catch (error) {
+      //   console.warn('Create Convo Message Error: ', error);
+      // }
 
     },
     onSuccess: (data) => {
@@ -124,6 +117,7 @@ export default function Convo({item, left}) {
       //     setAwaiting(false);
       //   }, 5000)
       // }
+      setAwaiting(true);
       console.log('onsuccess', data);
     },
   })

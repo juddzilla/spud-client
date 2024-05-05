@@ -1,4 +1,9 @@
-import React, { useCallback } from 'react';
+import React,
+  {
+    createContext,
+    useCallback,
+    useEffect,
+  } from 'react';
 import { 
   SafeAreaView,
   Text,
@@ -21,11 +26,14 @@ import Regular from '../assets/fonts/Inter-Regular.otf';
 import { AuthContext } from '../contexts/auth';
 import { queryClient } from '../contexts/query-client';
 
-import { useStorageState } from '../interfaces/storage';
 import colors from '../components/UI/colors';
+import { useStorageState } from '../interfaces/storage';
+import { generateUrl, useWebSocket } from '../interfaces/websocket';
 
 import DetailModal from '../components/UI/Details/Modal';
 import TalkModal from '../components/UI/Talk/Modal';
+
+import { WebsocketContext } from '../contexts/websocket';
 
 export function SessionProvider(props) {
   const [[isLoading, session], setSession] = useStorageState('session');
@@ -39,6 +47,29 @@ export function SessionProvider(props) {
     </AuthContext.Provider>
   );
 }
+
+function WebsocketProvider(props) {
+  const { message, sendMessage } = useWebSocket('u/');
+  return (
+    <WebsocketContext.Provider value={{ message, sendMessage}}>
+      { props.children }
+    </WebsocketContext.Provider>
+  )
+
+}
+
+// function WebSocketeer() {
+//   const [[isLoading, session]] = useStorageState('session');
+//   // const wsUrl = generateUrl('u/');
+//   // console.log("wsUrl",wsUrl);
+//   const { connected, message, sendMessage } = useWebSocket('u/');
+
+//   useEffect(() => {
+//     console.log('index ws message', message);
+//   }, [message]);
+
+//   return <View></View>
+// }
 
 export default function RootLayout() {
     const [fontsLoaded, fontError] = useFonts({
@@ -60,18 +91,20 @@ export default function RootLayout() {
           { fontsLoaded ? (
             <QueryClientProvider client={queryClient}>
               <SessionProvider>
-                <ActionSheetProvider>              
-                  <SafeAreaView style={{ flex: 1}}>
-                    {/* <KeyboardAvoidingView
-                      behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
-                      style={{ flex: 1}}
-                    >
-                    </KeyboardAvoidingView> */}
-                    <Slot />
-                    <DetailModal />
-                    <TalkModal />
-                  </SafeAreaView>
-                </ActionSheetProvider>
+                <WebsocketProvider>
+                  <ActionSheetProvider>              
+                    <SafeAreaView style={{ flex: 1}}>
+                      {/* <KeyboardAvoidingView
+                        behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                        style={{ flex: 1}}
+                      >
+                      </KeyboardAvoidingView> */}
+                      <Slot />
+                      <DetailModal />
+                      <TalkModal />
+                    </SafeAreaView>
+                  </ActionSheetProvider>
+                </WebsocketProvider>                
               </SessionProvider>
             </QueryClientProvider>
           ) : (

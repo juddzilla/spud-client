@@ -9,7 +9,7 @@ import {
 import Icon from '../icons';
 import colors from '../colors';
 import styles from '../styles';
-export default function Input({ onSubmit, placeholder, focused, setFocused, theme='light' }) {
+export default function Input({ onSubmit, placeholder, theme='light' }) {
     const [message, setMessage] = useState('');
     const [focus, setFocus] = useState(false);
     const inputRef = useRef(); 
@@ -31,20 +31,20 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
 
     if (theme === 'dark') {
         inputTheme = {
-            inactive: {
+            active: {
                 backgroundColor: 'transparent',
                 borderColor: colors.lightWhite,
-                color: colors.lightWhite,
+                color: colors.darkText,
             },
-            active: {
+            inactive: {
                 backgroundColor: colors.lightWhite,
                 borderColor: colors.lightWhite,
-                color: colors.detail.background,
+                color: 'red'// colors.darkText,
             },
         }
     }
 
-    const style = inputTheme[focused ? 'active' : 'inactive'];
+    const style = inputTheme[focus ? 'active' : 'inactive'];
     
     function onSubmitMessage() {               
         onSubmit(message);
@@ -87,7 +87,7 @@ export default function Input({ onSubmit, placeholder, focused, setFocused, them
             opacity: (focus && message.trim().length) ? 1 : 0,               
         },
         send: {
-            color: colors.lightWhite,
+            color: colors.darkText,
             size: 16, 
             // zIndex: 1,
         },
