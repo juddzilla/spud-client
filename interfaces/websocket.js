@@ -34,8 +34,7 @@ export function useWebSocket(path, params={}) {
         if (!session) {
             return;
         }
-        const url = generateUrl(path, {...params, token: session});
-        console.log('URL', url);
+        const url = generateUrl(path, {...params, token: session});        
         const uri = `${url}&token=${session}`;
         const socket = new WebSocket(uri);
         

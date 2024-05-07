@@ -19,9 +19,6 @@ import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatl
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-
-import Heading from './Heading';
-
 import Fetch from '../../../interfaces/fetch';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
@@ -70,12 +67,13 @@ export default function List({item, left}) {
 
   useEffect(() => {
     const data = queryClient.getQueryData(queryKeys);
+    console.log('LIST DATA', data);
     
-    if (!data) {
+    if (!data || !data.children) {
       return;
     }
     
-    const items = data
+    const items = data.children
       .filter(i => {
         if (showCompleted === null) { return true; }
         return i.completed === showCompleted;
@@ -84,7 +82,7 @@ export default function List({item, left}) {
         if (!filter.trim().length) {
           return true;
         }
-        return i.body.includes(filter);
+        return i.body.toLowerCase().includes(filter.toLowerCase());
       })
       .sort((a,b) => {
         let first = a[sort.property];
@@ -139,6 +137,7 @@ export default function List({item, left}) {
   });
 
   useEffect(() => {
+    console.log('QUERY.data', Query.data)
     setListItems(Query.data);    
   }, [Query.data]);
 
@@ -517,11 +516,9 @@ export default function List({item, left}) {
       style={{
         ...Styles.View,
         left: -(left),
-        width: Dimensions.get('window').width - left,                        
+        width: Dimensions.get('window').width - (left*2),                            
       }}
-    >
-        <Heading mutations={{ update: updateListMutation.mutate }} headerOptions={headerOptions} />
-        
+    >        
         <View style={{flex: 1,}}>
 
           <View
@@ -531,7 +528,13 @@ export default function List({item, left}) {
               marginBottom: 8,
             }}
           >        
-            <Sort fields={sortOn} query={sort} size='small' theme='dark' update={onSortUpdate} />
+            <Sort
+              fields={sortOn} 
+              query={sort} 
+              size='small' 
+              theme='dark' 
+              update={onSortUpdate}
+            />
             <Search placeholder={'Filter'} size='small' update={onFilterUpdate} />
             <Pressable
               onPress={toggleShowCompleted}

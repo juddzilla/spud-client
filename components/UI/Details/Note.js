@@ -122,23 +122,17 @@ export default function Note({item, left}) {
       name: 'remove',
       theme: 'red',
     }
-];
+  ];
 
   return (
     <View
       style={{
         ...styles.View,
-        left: -(left),
+        left: - (left),
         paddingBottom: 15,
-        width: Dimensions.get('window').width - left,                
+        width: Dimensions.get('window').width - (left*2),               
       }}
-    >
-            
-      <Heading
-        headerOptions={headerOptions}
-        mutations={{ update: updateMutation.mutate }}        
-      />
-      <View style={{flex: 1, }}>
+    >                
       { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 
         (
           <Light>Loading</Light>
@@ -161,7 +155,7 @@ export default function Note({item, left}) {
         ) 
       
       }
-      </View>
+      
       <View style={{...styles.footer, paddingHorizontal: 4, }}>
         <View style={styled.date.container}>
           <Light style={styled.date.body}> {relativeDate(updatedAt)}</Light>          

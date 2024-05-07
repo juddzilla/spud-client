@@ -25,13 +25,15 @@ export default function Search({ disabled, placeholder, size='small', update }) 
         update({search});        
       }, [debouncedSearch]);      
 
+    const focusedOrHasSearch = focused || search.trim().length > 0;
+
     const style = StyleSheet.create({    
         container: {
             ...styles.row,   
-            backgroundColor: (focused || search.length > 0) ? colors.lightWhite : 'transparent', 
+            backgroundColor: focusedOrHasSearch ? colors.lightWhite : 'transparent', 
             borderWidth: 1,
             borderRadius: height / 2,
-            borderColor: colors.white,               
+            borderColor: focusedOrHasSearch? colors.darkText : colors.white,               
             // borderColor: 'red',
             flex: 1,
             justifyContent: 'space-between',
@@ -39,7 +41,7 @@ export default function Search({ disabled, placeholder, size='small', update }) 
             
         },
         search: { 
-            color: colors.darkText,
+            color: focusedOrHasSearch ? colors.darkText : colors.sort.inactive,
             size: searchIconSize,
          },
          icon: {
@@ -52,7 +54,7 @@ export default function Search({ disabled, placeholder, size='small', update }) 
         input: {            
             height,                      
             marginRight: 0,           
-            color: colors.darkBgd,                
+            color: colors.darkText,                
             paddingLeft: 18,
             paddingRight: 44,     
             flex: 1,   

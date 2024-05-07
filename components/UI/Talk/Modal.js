@@ -12,7 +12,7 @@ export default function TalkModal() {
 
     useEffect(() => {
         TalkObservable.subscribe((data) => {   
-            console.log('dATA', data);
+            console.log('TalkObservable dATA', data);
             const value = data ? data.type : null;            
             console.log('talk modal obs', value);
             setItem(value);

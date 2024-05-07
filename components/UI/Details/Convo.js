@@ -17,7 +17,6 @@ import Heading from './Heading';
 
 import Input from '../actions/Input';
 import Talk from '../actions/Talk';
-import { DetailObservable } from '../Details/observable';
 
 import colors from '../colors';
 import styles from '../styles';
@@ -30,40 +29,16 @@ import { WebsocketContext } from '../../../contexts/websocket';
 import Fetch from '../../../interfaces/fetch';
 import { convoDate } from '../../../utils/dates';
 
-export default function Convo({item, left}) {    
-  const queryKeys = ['convos', item.uuid];
-  const baseUri = `convos/${item.uuid}/`;    
-  const { message, sendMessage } = useContext(WebsocketContext);
-
-  const [messages, setMessages] = useState([]);
-  const [awaiting, setAwaiting] = useState(false);
-
+const Messages = ({uuid}) => {
+  const queryKeys = ['convos', uuid];
+  const baseUri = `${queryKeys.join('/')}/`;
   const awaitingIndex = 1000000;
+  const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    if (message && message.convo_uuid && message.convo_uuid === item.uuid) {    
-      if (message.type === 'system') {
-        setAwaiting(false);  
-      }
-      setMessages([message, ...messages]);
-    }
-  }, [message]) // move this to websocke thandler, it should be pushing to cache
-
-  useEffect(() => {
-    DetailObservable.subscribe((value) => {      
-      // console.log('deets', value);
-      // setItem(value);
-    })
-    return () => {
-      DetailObservable.unsubscribe();
-    }
-  }, []);
-  
   const Query = useQuery({
     queryKey: queryKeys,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);     
-      // console.log("response", response.messages);
+      const response = await Fetch.get(baseUri);    
       if (!response.error) {
         setMessages(response.messages);
       }
@@ -71,106 +46,13 @@ export default function Convo({item, left}) {
     },
   });
 
-  const messageMutation = useMutation({
-    mutationFn: async (text) => {
-      if (!text.trim().length) {
-        return;
-      }
-
-      sendMessage({
-        action: 'create',
-        context: queryKeys,
-        data: { body: text, },
-      });
-      // try {        
-      //   // return await Fetch.post(`${baseUri}chat`, {body: text});
-      //   return true;
-      // } catch (error) {
-      //   console.warn('Create Convo Message Error: ', error);
-      // }
-
-    },
-    onSuccess: (data) => {
-      // if (!data.error) {
-      //   setMessages([data, ...messages]);
-      //   queryClient.setQueryData([queryKeys[0]], oldData => {                    
-      //     return oldData.map(old => {     
-            
-      //       if (old.uuid === item.uuid) {              
-      //         let number = parseInt(old.subheadline);
-      //         number++;
-      //         let subheadline = number + ' Item';            
-      //         if (number !== 1) {
-      //           subheadline = subheadline + 's';
-      //         }
-  
-      //         return {
-      //           ...old,
-      //           subheadline,
-      //           updated_at: data.created_at,
-      //         }
-      //       }
-      //       return old;
-      //     });
-      //   });
-      //   setTimeout(() => {
-      //     setAwaiting(false);
-      //   }, 5000)
-      // }
-      setAwaiting(true);
-      console.log('onsuccess', data);
-    },
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: async (data) => {
-      try {
-        return await Fetch.put(baseUri, data);
-      } catch (error) {
-        console.warn('Update List Error:', error);
-      }
-    },
-    onSuccess: () => {
-      queryClient.setQueryData(queryKeys, oldData => {            
-        return {...oldData, ...data};
-      });
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {
-          if (old.uuid !== item.uuid) {
-            return old;
-          }
-          return {
-            ...old,
-            headline: data.title,
-            updated_at: data.updated_at,
-          }
-        });
-      });
-    },
-  });
-  
-  const removeMutation = useMutation({
-    mutationFn: async () => {
-      try {
-        return await Fetch.remove(baseUri);
-      } catch (error) {
-        console.warn('Remove Convo Error: ', error);
-      }
-      
-    },
-    onSuccess: () => {
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {
-          if (old.uuid !== item.uuid) {
-            return old;
-          }
-          return null;
-        }).filter(Boolean);        
-      });
-      queryClient.removeQueries({ queryKey: queryKeys, exact: true });
-      DetailObservable.notify(null);      
-    },
-  });
+  useEffect(() => {
+    if (!Query.data) {
+      return;
+    }
+    const sorted = Query.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    setMessages(sorted);
+  }, [Query.data])
 
   const Message = ({ index, item }) => {
     const styled = StyleSheet.create({
@@ -180,12 +62,10 @@ export default function Convo({item, left}) {
         marginTop: 10,     
         borderRadius: 8,
         flex: 1,
-        // backgroundColor: index % 2 == 0 ? 'green' : 'blue'
       },
       header: {        
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        // ...styles.row,
+        justifyContent: 'space-between',        
         alignItems: 'flex-end',
         height: 20,
         marginBottom: 6,
@@ -224,49 +104,51 @@ export default function Convo({item, left}) {
   });
 
   const ListFooterComponent = () => {
-    
-    if (!awaiting) {
+    if (!messages.length || messages[0].type === 'system') {    
       return null;      
     }
     return Message({ index: awaitingIndex, item : {type: 'system', created_at: null, body: 'awaiting'}});
   };
 
-  const headerOptions = [    
-    {
-        name: 'remove',
-        cb: removeMutation.mutate
-    },
-    // {
-    //     name: 'summarize',
-    //     cb: () => { console.log('summ')}
-    // }
-  ];
+  return (
+    <View style={flatlist.container}>
+      <FlatList          
+        data={messages}
+        renderItem={Message}
+        keyExtractor={item => item.id}        
+        inverted={true}    
+        ListHeaderComponent={ListFooterComponent}
+      />
+    </View>
+  )
+}
+
+export default function Convo({item, left}) {    
+  const queryKeys = ['convos', item.uuid];
+
+  const { sendMessage } = useContext(WebsocketContext);
+
+  function createMessage(text) {
+    sendMessage({
+      action: 'create',
+      context: queryKeys,
+      data: { body: text, },
+    });
+  }
 
   return (
     <View
       style={{
-        ...styles.View,
+        ...styles.View,        
         left: -(left),
-        width: Dimensions.get('window').width - left,                
+        width: Dimensions.get('window').width - (left*2),        
       }}
     >   
-      <Heading mutations={{ update: updateMutation }} headerOptions={headerOptions} />
-      <View style={flatlist.container}>
-        <FlatList          
-          data={messages}
-          renderItem={Message}
-          keyExtractor={item => item.id}        
-          inverted={true}    
-          ListHeaderComponent={ListFooterComponent}
-        />
-        {/* { setAwaiting &&
-          Message({ index: 100000, item : {type: 'system', created_at: null, body: 'awaiting'}})
-        } */}
-      </View>
+      <Messages uuid={item.uuid}/>
 
       <View style={{...styles.footer}}>
         <Input
-          onSubmit={messageMutation.mutate} 
+          onSubmit={createMessage} 
           placeholder='Create New Message'
           theme='dark' 
         /> 

@@ -10,7 +10,6 @@ import colors from '../colors';
 import Icon from '../icons';
 import styles from '../styles';
 
-import { DetailObservable } from '../Details/observable';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 import Regular from '../text/Regular';
@@ -18,7 +17,7 @@ import Regular from '../text/Regular';
 import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
-const DefaultListItem = ({ index, item }) => {             
+const DefaultListItem = ({ index, item }) => {   
     if (!item) {
         return null;
     }
@@ -34,6 +33,12 @@ const DefaultListItem = ({ index, item }) => {
         Convo: 'convos',
         Note: 'notes',
     };
+
+    function onPress() {
+        const keys = [keyMap[item.type], item.uuid];
+        queryClient.setQueryData(['details'], { context: keys, data: item });
+        queryClient.setQueryData(keys, { context: keys, data: item });
+    }
 
     const remove = async () => {
         const type = typeMap[item.type];
@@ -145,7 +150,8 @@ const DefaultListItem = ({ index, item }) => {
             <View style={styled.row}>            
                 <Pressable
                     style={styled.container}
-                    onPress={() => DetailObservable.notify(item)} 
+                    // onPress={() => DetailObservable.notify(item)} 
+                    onPress={onPress}
                 >      
                     <View style={styled.content}>
                         

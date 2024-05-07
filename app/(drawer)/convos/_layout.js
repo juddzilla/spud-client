@@ -4,12 +4,6 @@ import colors from '../../../components/UI/colors';
 
 export default function HomeLayout() {
   return (
-    <Stack 
-      screenOptions={{
-        contentStyle: {
-          backgroundColor: colors.theme.backgroundColor,
-        }
-      }}
-    />
+    <Stack />
   );
 }

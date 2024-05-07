@@ -3,12 +3,6 @@ import colors from "../../../components/UI/colors";
 
 export default function NotesLayout() {
   return (
-    <Stack 
-      screenOptions={{
-        contentStyle: {
-          backgroundColor: colors.theme.backgroundColor,
-        }
-      }}
-    />
+    <Stack />
   );
 }

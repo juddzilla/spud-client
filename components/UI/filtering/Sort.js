@@ -38,7 +38,7 @@ export default function Sort({ disabled, fields, query, size='small', theme = 'l
       },
       active: {
         backgroundColor: 'transparent',
-        borderColor: 'transparent',
+        borderColor: colors.darkText,
         color: colors.sort.active,
       },
     },

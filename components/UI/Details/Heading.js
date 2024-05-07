@@ -2,18 +2,18 @@ import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 
-import { DetailObservable  } from './observable';
-
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
 import Icon from '../icons';
 import styles from '../styles';
+import { queryClient } from '../../../contexts/query-client';
 
-export default function Heading({ headerOptions, mutations, theme = 'light' }) {    
+export default function Heading({headerOptions, mutations, title = 'implement'}) {    
     const { update } = mutations;
+    console.log('update', update);
     const [prompt, setPrompt] = useState(null);
     const [submitting, setSubmitting] = useState(false);    
-    const item = DetailObservable.getData();
+    
     const { showActionSheetWithOptions } = useActionSheet();
     const standardHeight = 44;
 
@@ -51,6 +51,10 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
               setPrompt(null);
           });
     }
+
+    function onClose() {
+        queryClient.setQueryData(['details'], { context: null, data: null });
+    }
    
     const actions = {
         addToCollection: {
@@ -69,7 +73,8 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
     return (
         <View style={{...styles.row, height: standardHeight, paddingLeft: 8, backgroundColor: '',paddingRight: 4, marginBottom: 8,}}>
             <Pressable
-                onPress={() => DetailObservable.notify(null)}
+                // onPress={() => DetailObservable.notify(null)}
+                onPress={onClose}
                 style={{width: 40, height: '100%', left: -4, ...styles.centered, left: -8}}
             >
                 <Icon name='closeModal' styles={{color: textColor, fontSize: 20}} />
@@ -88,8 +93,8 @@ export default function Heading({ headerOptions, mutations, theme = 'light' }) {
                     // textDecorationLine: 'underline',
                     
                 }}
-                update={(value) => { update({title: value})}} 
-                value={item.title}
+                update={(value) => { update.mutate({title: value})}} 
+                value={title}
             />
 
             <View style={styles.row}>

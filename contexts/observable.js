@@ -18,6 +18,7 @@ export default class GenericObserver {
   
     notify(data) {
       this.data = data;
+      console.log('this.data', this.data);
       this.observers.forEach(func => func(data));
     }
   }

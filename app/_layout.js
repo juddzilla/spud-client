@@ -50,6 +50,22 @@ export function SessionProvider(props) {
 
 function WebsocketProvider(props) {
   const { message, sendMessage } = useWebSocket('u/');
+  function insertData(oldData, newData) {
+    return [...oldData, ...newData];
+  }
+  useEffect(() => {
+    if (message) {
+      const { context, data } = message;
+      if (Object.hasOwn(data, 'add')) {
+        if (Array.isArray(data.add)) {
+          queryClient.setQueryData(context, (oldData) => {            
+            return [...oldData, ...data.add];
+          })
+        }
+      }
+      return;      
+    }
+  }, [message])
   return (
     <WebsocketContext.Provider value={{ message, sendMessage}}>
       { props.children }
@@ -57,19 +73,6 @@ function WebsocketProvider(props) {
   )
 
 }
-
-// function WebSocketeer() {
-//   const [[isLoading, session]] = useStorageState('session');
-//   // const wsUrl = generateUrl('u/');
-//   // console.log("wsUrl",wsUrl);
-//   const { connected, message, sendMessage } = useWebSocket('u/');
-
-//   useEffect(() => {
-//     console.log('index ws message', message);
-//   }, [message]);
-
-//   return <View></View>
-// }
 
 export default function RootLayout() {
     const [fontsLoaded, fontError] = useFonts({

@@ -198,21 +198,20 @@ export default function ListView({options}) {
   const textInputStyled = StyleSheet.create({    
     input: {
         container: {
-            backgroundColor: 'white',
             flexDirection: 'row', 
             alignItems: 'center', 
             flex: 1,              
             borderWidth: 1,
-            borderColor: colors.theme.text.lightest,
+            borderColor: focus ? colors.darkText : colors.white,
             borderRadius: 12,                      
             zIndex: 10,
-            
-            // width: widthAnim,
+            overflow: 'hidden',
+            marginRight: 8,
         },
         field: {                    
             height: 48,    
             paddingHorizontal: 16,
-            // backgroundColor: 'red',
+            backgroundColor: focus ? colors.white : colors.lightWhite,
             // marginRight: 0, mnmnm
             flex: 1,     
             color: colors.theme.inputs.dark.text.darkest,                            
@@ -269,7 +268,7 @@ export default function ListView({options}) {
 
   const disableSort = !Query.data || (Query.fetchStatus === 'fetching' || !Query.length === 0);
   const disabledSearch = !Query.data || (Query.fetchStatus === 'fetching' || (query.search.trim().length === 0 && !Query.length === 0));
-  
+  const createInputPlaceholderColor = focus ? colors.theme.inputs.dark.text.light : colors.darkText;
   return (
     <View style={styles.View}>
       <View style={{...styles.header, paddingVertical: 8}}>   
@@ -284,7 +283,7 @@ export default function ListView({options}) {
             <Sort
               disabled={disableSort}
               fields={filters.sort.fields}
-              query={{direction: query.sortDirection, property: query.sortProperty}} 
+              query={{direction: query.sortDirection, property: query.sortProperty}}               
               update={update}
             />
           }
@@ -321,7 +320,7 @@ export default function ListView({options}) {
                 onFocus={() => setFocus(true)}
                 placeholder={actions.placeholder || 'NEW'}
                 style={textInputStyled.input.field}
-                placeholderTextColor={colors.theme.inputs.dark.text.light}
+                placeholderTextColor={colors.darkText}
             />
             <Pressable
                 onPress={createMutation.mutate}
