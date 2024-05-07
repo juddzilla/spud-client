@@ -18,7 +18,7 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import DefaultListItem from './DefaultListItem';
 
@@ -26,13 +26,12 @@ import colors from '../colors';
 import Icon from '../icons';
 import styles from '../styles';
 
-import Talk from '../actions/Talk';
-import { DetailObservable } from '../Details/observable';
 import Sort from '../filtering/Sort';
 import Search from '../filtering/Search';
+import TalkButton from '../Talk/Button';
 import Bold from '../text/Bold';
 
-import TalkButton from '../Talk/Button';
+import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 
 export default function ListView({options}) {
@@ -63,11 +62,7 @@ export default function ListView({options}) {
   const [focus, setFocus] = useState(false);
   const [message, setMessage] = useState('');
 
-  const uri = `${storeKey[0]}/`;
-
-  const unfocusedWidth = Dimensions.get('window').width-48-40;
-  const focusedWidth = Dimensions.get('window').width-32;
-  // const widthAnim = useRef(new Animated.Value(unfocusedWidth)).current; // Initial 
+  const uri = `${storeKey[0]}/`;  
 
   const Query = useQuery({
     queryKey: storeKey, 
@@ -105,10 +100,18 @@ export default function ListView({options}) {
       }
     },
     onSuccess: async (value) => {
+      const keyMap = {
+        List: 'lists',
+        Convo: 'convos',
+        Note: 'notes',
+    };
+
       setMessage('');
       Query.refetch();      
-      if (!noRedirect) {        
-        DetailObservable.notify(value);
+      if (!noRedirect) {   
+        const keys = [keyMap[value.type], value.uuid];
+        queryClient.setQueryData(['details'], { context: keys, data: value});
+        queryClient.setQueryData(keys, { context: keys, data: value });        
       }
     },
   })

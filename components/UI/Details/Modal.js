@@ -49,12 +49,10 @@ const Title = () => {
       }
     },
     onSuccess: (data) => {
-      console.log('DATA', data);
       queryClient.setQueryData(['details'], oldData => {            
         return {...oldData, data: {...oldData.data, ...data}};
       });
-      queryClient.setQueryData(context, oldData => {     
-        console.log('oldDATA', oldData);
+      queryClient.setQueryData(context, oldData => {             
         return {...oldData, data: {...oldData.data, ...data}};
       });
       queryClient.setQueryData([context[0]], oldData => {                            
@@ -204,7 +202,6 @@ export default function DetailModal() {
     const typeMap = { Convo, Note, List };
 
     const TypeComponent = () => {
-      console.log('TypeComponent', data);
       const Component = typeMap[data.data.type];
       return (<Component item={data.data} left={left} />)
     };

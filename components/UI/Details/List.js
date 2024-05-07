@@ -3,8 +3,7 @@ import {
   Dimensions,
   Pressable, 
   StyleSheet, 
-  TouchableOpacity, 
-  TextInput, 
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -14,29 +13,25 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-import { BaseButton } from 'react-native-gesture-handler';
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
-import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
+import { BaseButton } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-
-import Fetch from '../../../interfaces/fetch';
-import Bold from '../text/Bold';
-import Light from '../text/Light';
-import Regular from '../text/Regular';
-import Icon from '../icons';
-
-import colors from '../colors';
-import Styles from '../styles';
-
-import Sort from '../filtering/Sort';
-import Search from '../filtering/Search';
+import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
 import Talk from '../actions/Talk';
 import Input from '../actions/Input';
+import colors from '../colors';
+import DebouncedInput from '../DebouncedInput';
+import Sort from '../filtering/Sort';
+import Search from '../filtering/Search';
+import Icon from '../icons';
+import Styles from '../styles';
+import Bold from '../text/Bold';
+import Light from '../text/Light';
+import Regular from '../text/Regular';
 
 import { queryClient } from '../../../contexts/query-client';
-import { DetailObservable } from './observable';
-import DebouncedInput from '../DebouncedInput';
+import Fetch from '../../../interfaces/fetch';
 
 export default function List({item, left}) {  
   const queryKeys = ['lists', item.uuid];
@@ -56,13 +51,10 @@ export default function List({item, left}) {
 
   useEffect(() => {
     const data = queryClient.getQueryData(queryKeys);
-    // console.log('LIST DATA', data);
     
-    if (!data || !data.children) {
-      console.log(0);
+    if (!data || !data.children) {      
       return;
     }
-    console.log(1);
     const items = data.children
       .filter(i => {
         if (showCompleted === null) { return true; }
@@ -100,8 +92,6 @@ export default function List({item, left}) {
 
         return values[0] - values[1];
       });
-      console.log(2);
-      console.log('ITEMS', items);
     setListItems(items);
   }, [filter, showCompleted, sort]);
   
@@ -133,33 +123,6 @@ export default function List({item, left}) {
     }    
   }, [Query.data]);
 
-  // const updateListMutation = useMutation({
-  //   mutationFn: async (data) => {
-  //     try {
-  //       return await Fetch.put(baseUri, data);
-  //     } catch (error) {
-  //       console.warn('Update List Error:', error);
-  //     }
-  //   },
-  //   onSuccess: (data) => {  // variables, context            
-  //     queryClient.setQueryData(queryKeys, oldData => {            
-  //       return {...oldData, ...data};
-  //     });
-  //     queryClient.setQueryData([queryKeys[0]], oldData => {                    
-  //       return oldData.map(old => {
-  //         if (old.uuid !== item.uuid) {
-  //           return old;
-  //         }
-  //         return {
-  //           ...old,
-  //           headline: data.title,
-  //           updated_at: data.updated_at,
-  //         }
-  //       });
-  //     });
-  //   },
-  // });
-
   const updateListItemMutation = useMutation({
     mutationFn: async (data) => {
       const { id, ...rest } = data;
@@ -170,35 +133,13 @@ export default function List({item, left}) {
         console.warn('Update List Item Error', error);
       }    
     },
-    onSuccess: (data) => {  // variables, context               
+    onSuccess: (data) => {                
       const itemIndex = listItems.findIndex(listItem => data.id === listItem.id);
       const newListItems = [...listItems];
       newListItems[itemIndex] = data;
       setListItems(newListItems);
     },
   });
-
-  // const removeListMutation = useMutation({
-  //   mutationFn: async () => {
-  //     try {
-  //       return await Fetch.remove(baseUri);      
-  //     } catch (error) {
-  //       console.warn('Delete List Error:', error);
-  //     }
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.setQueryData([queryKeys[0]], oldData => {                    
-  //       return oldData.map(old => {
-  //         if (old.uuid !== item.uuid) {
-  //           return old;
-  //         }
-  //         return null;
-  //       }).filter(Boolean);        
-  //     });
-  //     queryClient.removeQueries({ queryKey: queryKeys, exact: true });
-  //     DetailObservable.notify(null);
-  //   },
-  // });
 
   const removeListItemMutation = useMutation({
     mutationFn: async ({ id }) => {
@@ -482,20 +423,6 @@ export default function List({item, left}) {
     false: 'completedNot'
   };
 
-  // const headerOptions = [
-  //   // {
-  //   //   cb: () => {
-  //   //   console.log('do somethi');
-  //   //   },
-  //   //   name: 'addToCollection',      
-  //   // },
-  //   {
-  //       cb: removeListMutation.mutate,
-  //       name: 'remove',
-  //       theme: 'red',
-  //   },
-  // ];
-
   return (
     <View
       style={{
@@ -545,9 +472,6 @@ export default function List({item, left}) {
         <View
           style={{
             ...Styles.footer,
-            // left: -(left)/2,
-            // width: Dimensions.get('window').width,
-            // paddingHorizontal: 8,
           }}>
           <Input
             focused={focusedAction === 'create'}

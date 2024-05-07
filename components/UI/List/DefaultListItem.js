@@ -135,10 +135,6 @@ const DefaultListItem = ({ index, item }) => {
         );
     };
 
-    // function onLongPress() {
-    //     toggleSelected(uuid);
-    // }
-
     return (      
         <SwipeableItem
             key={item.id}
@@ -150,7 +146,6 @@ const DefaultListItem = ({ index, item }) => {
             <View style={styled.row}>            
                 <Pressable
                     style={styled.container}
-                    // onPress={() => DetailObservable.notify(item)} 
                     onPress={onPress}
                 >      
                     <View style={styled.content}>

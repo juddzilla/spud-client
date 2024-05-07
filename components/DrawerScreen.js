@@ -8,8 +8,6 @@ export default function DrawerScreen(title, headerRight) {
     const navigation = useNavigation();
     
     function canGoBack() {
-      // console.log("router.back", router.back);
-      // console.log("router.canGoBack()", router.canGoBack());
       return router.back && router.canGoBack();
     }
     function goBack() {

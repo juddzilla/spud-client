@@ -7,12 +7,8 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-import { DetailObservable  } from './observable';
-import Heading from './Heading';
-
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
-import Icon from '../icons';
 import styles from '../styles';
 import Light from '../text/Light';
 
@@ -33,15 +29,6 @@ export default function Note({item, left}) {
       return await Fetch.put(baseUri, data);
     } catch (e) {
       console.log('Put Note Error:', e);
-    }
-  }
-
-  async function deleteNote() {    
-    try {    
-      return await Fetch.remove(baseUri);      
-    } catch (e) {
-      console.log('Remove Note Error:', e);
-      return false;
     }
   }
 
@@ -82,26 +69,6 @@ export default function Note({item, left}) {
       });
     },
   })
-
-  const removeMutation = useMutation({
-    mutationFn: deleteNote,
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.log(`rolling back optimistic update with id ${context.id}`)
-    },
-    onSuccess: () => {  // data, variables, context                
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {
-          if (old.uuid !== item.uuid) {
-            return old;
-          }
-          return null;
-        }).filter(Boolean);        
-      });
-      queryClient.removeQueries({ queryKey: queryKeys, exact: true });
-      DetailObservable.notify(null);
-    },
-  })
   
   const styled = StyleSheet.create({
     date: {
@@ -115,14 +82,6 @@ export default function Note({item, left}) {
       }
     }
   });
-
-  const headerOptions = [
-    {
-      cb: removeMutation.mutate,
-      name: 'remove',
-      theme: 'red',
-    }
-  ];
 
   return (
     <View
