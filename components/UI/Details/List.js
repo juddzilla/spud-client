@@ -56,23 +56,13 @@ export default function List({item, left}) {
 
   useEffect(() => {
     const data = queryClient.getQueryData(queryKeys);
-    if (!data) {
-      return;
-    }
-    
-    const items = showCompleted === null ? data : data.filter(i => i.completed === showCompleted);
-
-    setListItems(items);
-  }, [showCompleted]);
-
-  useEffect(() => {
-    const data = queryClient.getQueryData(queryKeys);
-    console.log('LIST DATA', data);
+    // console.log('LIST DATA', data);
     
     if (!data || !data.children) {
+      console.log(0);
       return;
     }
-    
+    console.log(1);
     const items = data.children
       .filter(i => {
         if (showCompleted === null) { return true; }
@@ -109,13 +99,13 @@ export default function List({item, left}) {
         }
 
         return values[0] - values[1];
-      })
-
+      });
+      console.log(2);
+      console.log('ITEMS', items);
     setListItems(items);
   }, [filter, showCompleted, sort]);
   
   const Query = useQuery({
-    initialData: [],
     keepPreviousData: true,
     placeholderData: keepPreviousData,
     queryKey: queryKeys, 
@@ -126,47 +116,49 @@ export default function List({item, left}) {
         sortProperty: sort.property,
         completed: showCompleted,
       });
-        
-      const { error, children } = response;        
+      
+      const { children, error } = response; 
 
-      if (!error) {                
-        return children;
+      if (error) {
+        return Query.data;
       }
-      return [];
+
+      return { ...Query.data, children };
     },    
   });
 
   useEffect(() => {
-    console.log('QUERY.data', Query.data)
-    setListItems(Query.data);    
+    if (Query.data.children) {
+      setListItems(Query.data.children)
+    }    
   }, [Query.data]);
 
-  const updateListMutation = useMutation({
-    mutationFn: async (data) => {
-      try {
-        return await Fetch.put(baseUri, data);
-      } catch (error) {
-        console.warn('Update List Error:', error);
-      }
-    },
-    onSuccess: (data) => {  // variables, context            
-      queryClient.setQueryData(queryKeys, oldData => {            
-        return {...oldData, ...data};
-      });
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {
-          if (old.uuid !== item.uuid) {
-            return old;
-          }
-          return {
-            ...old,
-            headline: data.title,
-            updated_at: data.updated_at,
-          }
-        });
-      });
-    },
-  });
+  // const updateListMutation = useMutation({
+  //   mutationFn: async (data) => {
+  //     try {
+  //       return await Fetch.put(baseUri, data);
+  //     } catch (error) {
+  //       console.warn('Update List Error:', error);
+  //     }
+  //   },
+  //   onSuccess: (data) => {  // variables, context            
+  //     queryClient.setQueryData(queryKeys, oldData => {            
+  //       return {...oldData, ...data};
+  //     });
+  //     queryClient.setQueryData([queryKeys[0]], oldData => {                    
+  //       return oldData.map(old => {
+  //         if (old.uuid !== item.uuid) {
+  //           return old;
+  //         }
+  //         return {
+  //           ...old,
+  //           headline: data.title,
+  //           updated_at: data.updated_at,
+  //         }
+  //       });
+  //     });
+  //   },
+  // });
 
   const updateListItemMutation = useMutation({
     mutationFn: async (data) => {
@@ -186,27 +178,27 @@ export default function List({item, left}) {
     },
   });
 
-  const removeListMutation = useMutation({
-    mutationFn: async () => {
-      try {
-        return await Fetch.remove(baseUri);      
-      } catch (error) {
-        console.warn('Delete List Error:', error);
-      }
-    },
-    onSuccess: () => {
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {
-          if (old.uuid !== item.uuid) {
-            return old;
-          }
-          return null;
-        }).filter(Boolean);        
-      });
-      queryClient.removeQueries({ queryKey: queryKeys, exact: true });
-      DetailObservable.notify(null);
-    },
-  });
+  // const removeListMutation = useMutation({
+  //   mutationFn: async () => {
+  //     try {
+  //       return await Fetch.remove(baseUri);      
+  //     } catch (error) {
+  //       console.warn('Delete List Error:', error);
+  //     }
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.setQueryData([queryKeys[0]], oldData => {                    
+  //       return oldData.map(old => {
+  //         if (old.uuid !== item.uuid) {
+  //           return old;
+  //         }
+  //         return null;
+  //       }).filter(Boolean);        
+  //     });
+  //     queryClient.removeQueries({ queryKey: queryKeys, exact: true });
+  //     DetailObservable.notify(null);
+  //   },
+  // });
 
   const removeListItemMutation = useMutation({
     mutationFn: async ({ id }) => {
@@ -302,7 +294,7 @@ export default function List({item, left}) {
     onSuccess: (data) => {
       setListItems(data.results);
     }
-  })
+  });
   
   // UI OPERATIONS
   function onFilterUpdate({search}) {
@@ -327,7 +319,6 @@ export default function List({item, left}) {
 
   // UI ELEMENTS
   const EmptyState = () => {
-    const message = listItems.length !== 0;
     const completedMap = {
       false: "No 'Uncompleted' Items",
       true: '0 Completed Items',
@@ -378,14 +369,9 @@ export default function List({item, left}) {
 
       },
       checkbox: {
-        ...Styles.centered,
-        // top: 1,
+        ...Styles.centered,        
         width: 40,
-        // paddingLeft: 9,
-        // paddingRight: 9,
         height: 40,
-        // marginRight: 8,  
-        // backgroundColor: 'red',
       },
       icon: {
         color: textColor,
@@ -404,8 +390,7 @@ export default function List({item, left}) {
         
       },
       index: {
-        fontSize: 10, 
-        // color: colors.theme.text.light,            
+        fontSize: 10,     
       },
       input: {
         backgroundColor: 'transparent',
@@ -487,7 +472,7 @@ export default function List({item, left}) {
         </SwipeableItem>
       </ScaleDecorator>
     )
-  });
+  });  
 
 
   // UI CONFIG
@@ -497,19 +482,19 @@ export default function List({item, left}) {
     false: 'completedNot'
   };
 
-  const headerOptions = [
-    // {
-    //   cb: () => {
-    //   console.log('do somethi');
-    //   },
-    //   name: 'addToCollection',      
-    // },
-    {
-        cb: removeListMutation.mutate,
-        name: 'remove',
-        theme: 'red',
-    },
-  ];
+  // const headerOptions = [
+  //   // {
+  //   //   cb: () => {
+  //   //   console.log('do somethi');
+  //   //   },
+  //   //   name: 'addToCollection',      
+  //   // },
+  //   {
+  //       cb: removeListMutation.mutate,
+  //       name: 'remove',
+  //       theme: 'red',
+  //   },
+  // ];
 
   return (
     <View
