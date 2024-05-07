@@ -8,6 +8,7 @@ import styles from '../../../components/UI/styles';
 import Icon from '../../../components/UI/icons';
 import ListView from '../../../components/UI/List/View';
 
+import Light from '../../../components/UI/text/Light';
 import Regular from '../../../components/UI/text/Regular';
 
 import Fetch from '../../../interfaces/fetch';
@@ -18,7 +19,7 @@ import DrawerScreen from '../../../components/DrawerScreen';
 
 import Home, { Observer } from '../../../components/UI/Details/Home';
 
-const ItemTemplate = ({item}) => { 
+const ItemTemplate = ({index, item}) => { 
   const onPress = () => {  
     Observer.notify(item);
   };
@@ -44,9 +45,21 @@ const ItemTemplate = ({item}) => {
         justifyContent: 'center',
         ...styles.row,      
       },
-    },        
+    },
+    indexContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      maxWidth: 24,
+      minWidth: 16,      
+      
+    },
+    index: {
+      color: colors.darkText,
+      fontSize: 10,
+      letterSpacing: 0.1,
+    },    
     info: {
-      flexDirection: 'row',
+      ...styles.row,
       paddingRight: 8,
       paddingLeft: 20,
       // marginLeft: 8,
@@ -58,7 +71,11 @@ const ItemTemplate = ({item}) => {
       marginRight: 10,
       color: colors.theme.text.medium
     },
-    title: { fontSize: 14, letterSpacing: 0.1, color: colors.darkText },
+    title: {
+      color: colors.darkText,
+      fontSize: 14,
+      letterSpacing: 0.1,
+    },    
   });
 
   const RenderUnderlayLeftActions = () => {
@@ -109,7 +126,10 @@ const ItemTemplate = ({item}) => {
       >         
       <Pressable onPress={onPress}>
         <View style={styled.content}>                
-            <View style={styled.info}>                  
+            <View style={styled.info}>  
+                <View style={styled.indexContainer}>
+                  <Light style={styled.index}>{ index+1 }</Light>
+                </View>  
                 <Regular style={styled.title}>{item.headline}</Regular>              
             </View>
         </View>

@@ -55,18 +55,7 @@ export default function Note({item, left}) {
       queryClient.setQueryData(queryKeys, oldData => {            
         return {...oldData, ...data};
       });
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {
-          if (old.uuid !== item.uuid) {
-            return old;
-          }
-          return {
-            ...old,
-            headline: data.title,
-            updated_at: data.updated_at,
-          }
-        });
-      });
+      queryClient.invalidateQueries([queryKeys[0]]);
     },
   })
   

@@ -138,6 +138,7 @@ export default function List({item, left}) {
       const newListItems = [...listItems];
       newListItems[itemIndex] = data;
       setListItems(newListItems);
+      queryClient.invalidateQueries([queryKeys[0]]);
     },
   });
 
@@ -154,27 +155,7 @@ export default function List({item, left}) {
         const itemIndex = listItems.findIndex(l => l.id === variables.id);        
         listItems.splice(itemIndex, 1);
         setListItems([...listItems]);
-        
-        
-        queryClient.setQueryData([queryKeys[0]], oldData => {                    
-          return oldData.map(old => {             
-            if (old.uuid === item.uuid) {              
-              let number = parseInt(old.subheadline);
-              number--;
-              let subheadline = number + ' Item';
-              if (number !== 1) {
-                subheadline = subheadline + 's'
-              }
-
-              return {
-                ...old,
-                subheadline,
-                updated_at: data.updated_at,
-              }
-            }
-            return old;
-          });
-        });
+        queryClient.invalidateQueries([queryKeys[0]]);
       } 
     }
   })
@@ -194,30 +175,7 @@ export default function List({item, left}) {
     },
     onSuccess: (data) => {      
       setListItems([...listItems, data.results]);
-
-      queryClient.setQueryData([queryKeys[0]], oldData => {                    
-        return oldData.map(old => {             
-          if (old.uuid === item.uuid) {              
-            let number = parseInt(old.subheadline);
-            number++;
-            let subheadline = number + ' Item';            
-            if (number !== 1) {
-              subheadline = subheadline + 's';
-            }
-
-            return {
-              ...old,
-              subheadline,
-              updated_at: data.results.updated_at,
-            }
-          }
-          return old;
-        });
-      });
-
-      // queryClient.setQueryData(queryKeys, oldData => {            
-      //   return {...oldData, ...data};
-      // });
+      queryClient.invalidateQueries([queryKeys[0]]);
     }
   });
 
@@ -234,6 +192,7 @@ export default function List({item, left}) {
     },
     onSuccess: (data) => {
       setListItems(data.results);
+      queryClient.invalidateQueries([queryKeys[0]]);
     }
   });
   
@@ -297,8 +256,6 @@ export default function List({item, left}) {
 
   const ListItem = useCallback((props) => {    
     const {drag, getIndex, isActive, item} = props;     
-
-    // const marginBottom = getIndex() === listItems.length - 1 ? 64 : 0;
 
     const textColor = colors.darkText;
     
