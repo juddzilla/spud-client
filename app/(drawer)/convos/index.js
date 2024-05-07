@@ -7,7 +7,6 @@ export default function Convos() {
       placeholder: 'Create New Conversation',
       talkUri: '',
     },
-    detail:'/convos',
     filters: {
       placeholder: 'Search by Title',
       sort: {
@@ -15,8 +14,7 @@ export default function Convos() {
         fields: ['title', 'updated_at'],
       },
     },
-    storeKey: ['convos'],
-    uri:'convos/'
+    storeKey: ['convos'],    
   };
 
   return (

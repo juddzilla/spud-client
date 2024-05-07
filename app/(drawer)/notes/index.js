@@ -7,7 +7,6 @@ export default function Notes() {
       placeholder: 'Create New Note',
       talkUri: '',
     },
-    detail: '/notes',
     filters: {
       placeholder: 'Search Notes',
       sort: {
@@ -16,7 +15,6 @@ export default function Notes() {
       },
     },
     storeKey: ['notes'],
-    uri: 'notes/'
   };
 
   return (

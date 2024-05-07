@@ -37,7 +37,6 @@ import Fetch from '../../../interfaces/fetch';
 export default function ListView({options}) {
   const {
     actions,
-    createKey='title',    
     filters,
     ItemTemplate = DefaultListItem,    
     noRedirect,
@@ -94,7 +93,7 @@ export default function ListView({options}) {
   const createMutation = useMutation({
     mutationFn: async () => {      
       try {
-        return await Fetch.post(uri, { [createKey]: message });
+        return await Fetch.post(uri, { title: message });
       } catch (error) {
         console.warn('Create Error: ', error);
       }

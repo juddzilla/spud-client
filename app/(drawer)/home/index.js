@@ -123,7 +123,6 @@ export default function HomeView() {
       placeholder: 'Create New Queue Item',
       talkUri: '',
     },
-    createKey: 'body',
     filters: {
       placeholder: 'Search Queue',
     },
@@ -133,7 +132,6 @@ export default function HomeView() {
     talk: {
       message: 'Tell us how youd like us to add, modify, or delete Quick Queue items',
       view: 'home',
-
     }
   };  
 

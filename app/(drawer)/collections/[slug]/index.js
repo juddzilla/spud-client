@@ -148,7 +148,6 @@ export default function Collection() {
       placeholder: 'Create Collections',
       talkUri: '',
     },
-    createKey: 'title',
     filters: {
       placeholder: 'Search Collections',
       sort: {

@@ -6,8 +6,6 @@ export default function Collections() {
       placeholder: 'Create Collections',
       talkUri: '',
     },
-    createKey: 'title',
-    details: '/collections',
     filters: {
       placeholder: 'Search Collections',
       sort: {
@@ -15,8 +13,7 @@ export default function Collections() {
         fields: ['body', 'updated_at'],
       },
     },
-    storeKey: ['collections'],
-    uri: 'collections/',
+    storeKey: ['collections'],    
   };
 
   return (<ListView options={{...options}} />);
