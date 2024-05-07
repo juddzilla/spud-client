@@ -1,8 +1,3 @@
-// convo list of q's and a's
-// ability to click on older bit of convo to use as context (v2)
-// ability to summarize entire convo
-// archive
-
 import { useEffect, useContext, useState } from 'react';
 import {
   Dimensions,
@@ -10,10 +5,8 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import AnimatedEllipsis from 'rn-animated-ellipsis';
-
-import Heading from './Heading';
 
 import Input from '../actions/Input';
 import Talk from '../actions/Talk';
@@ -24,7 +17,6 @@ import Bold from '../text/Bold';
 import Light from '../text/Light';
 import Regular from '../text/Regular';
 
-import { queryClient } from '../../../contexts/query-client';
 import { WebsocketContext } from '../../../contexts/websocket';
 import Fetch from '../../../interfaces/fetch';
 import { convoDate } from '../../../utils/dates';
@@ -38,19 +30,20 @@ const Messages = ({uuid}) => {
   const Query = useQuery({
     queryKey: queryKeys,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);    
-      if (!response.error) {
-        setMessages(response.messages);
+      const response = await Fetch.get(baseUri);      
+      const {error, messages} = response;
+      if (error) {
+        return Query.data;
       }
-      return response.messages || [];
+      return { ...Query.data, children: messages };
     },
   });
 
   useEffect(() => {
-    if (!Query.data) {
+    if (!Query.data.children) {
       return;
     }
-    const sorted = Query.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const sorted = Query.data.children.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     setMessages(sorted);
   }, [Query.data])
 
@@ -124,14 +117,12 @@ const Messages = ({uuid}) => {
 }
 
 export default function Convo({item, left}) {    
-  const queryKeys = ['convos', item.uuid];
-
   const { sendMessage } = useContext(WebsocketContext);
 
   function createMessage(text) {
     sendMessage({
       action: 'create',
-      context: queryKeys,
+      context: ['convos', item.uuid],
       data: { body: text, },
     });
   }
