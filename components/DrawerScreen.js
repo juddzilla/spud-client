@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { Drawer } from 'expo-router/drawer';
 import { useNavigation } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from './UI/icons';
 
 export default function DrawerScreen(title, headerRight) {    
@@ -31,7 +31,7 @@ export default function DrawerScreen(title, headerRight) {
                 return (
                   <TouchableOpacity onPress={toggleMenu}>
                     <Icon name="navicon" />
-                  </TouchableOpacity>                  
+                  </TouchableOpacity>                                    
                 )
               }
               return (
