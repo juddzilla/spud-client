@@ -22,7 +22,7 @@ import styles from '../styles';
 import Fetch from '../../../interfaces/fetch';
 
 const initialData = { context: [], data: null, children: [] };
-const standardHeight = 44;
+const standardHeight = 56;
 const textColor = colors.darkText;
 
 const Title = () => {
@@ -79,7 +79,7 @@ const Title = () => {
           height: '100%',            
           marginRight: 16,        
           paddingHorizontal: 4,  
-          color: textColor,
+          color: colors.white,
           backgroundColor: 'transparent',
           // textDecorationLine: 'underline',
           
@@ -208,11 +208,13 @@ export default function DetailModal() {
 
     const styled = StyleSheet.create({
       heading: {
+        backgroundColor: colors.darkText, 
         ...styles.row,
         height: standardHeight, 
-        marginBottom: 8,
-        width:  Dimensions.get('window').width - left,
-        left: - left,
+        // marginBottom: 8,
+        width:  Dimensions.get('window').width,
+        left: - (left*2),
+        paddingHorizontal: left,
       }
     })
     return (
@@ -248,7 +250,7 @@ export default function DetailModal() {
                     onPress={onClose}
                     style={{width: 40, backgroundColor: 'transparent', height: '100%', ...styles.centered, left: 0}}
                 >
-                    <Icon name='closeModal' styles={{color: textColor, fontSize: 20}} />
+                    <Icon name='closeModal' styles={{color: colors.white, fontSize: 20}} />
                 </Pressable>
                 
                 <Title />
@@ -261,7 +263,7 @@ export default function DetailModal() {
                           style={{width: 40, ...styles.centered, height: standardHeight}}
                       >
                           
-                          <Icon name={actions[option.name].icon} styles={{size: 20, color: textColor}} />                    
+                          <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white}} />                    
                       </Pressable>
                   )) }
                 </View>  

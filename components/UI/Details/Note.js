@@ -86,20 +86,22 @@ export default function Note({item, left}) {
           <Light>Loading</Light>
         ) : 
         (
-          <DebouncedInput
-            multiline={true}
-            placeholder='(untitled)'
-            style={{
-              flexWrap: 'wrap',
-              fontSize: 20,        
-              paddingHorizontal: 16,
-              paddingTop: 16,
-              backgroundColor: 'transparent', 
-              color: colors.darkText,
-            }}
-            update={(value) => { updateMutation.mutate({body: value})}} 
-            value={body}
-          />
+          <View style={{backgroundColor: colors.white, flex: 1, borderRadius: 4}}>
+            <DebouncedInput
+              multiline={true}
+              placeholder='(untitled)'
+              style={{
+                flexWrap: 'wrap',
+                fontSize: 20,        
+                paddingHorizontal: 16,
+                paddingTop: 16,
+                backgroundColor: 'transparent', 
+                color: colors.darkText,
+              }}
+              update={(value) => { updateMutation.mutate({body: value})}} 
+              value={body}
+            />
+          </View>
         ) 
       
       }

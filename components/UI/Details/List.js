@@ -262,9 +262,10 @@ export default function List({item, left}) {
     const styled = StyleSheet.create({
       container: {
         flexDirection: 'row',
-        marginBottom: 1,
+        marginBottom: 4,
         marginHorizontal: 0,    
-
+        backgroundColor: colors.white, 
+        borderRadius: 4,
       },
       checkbox: {
         ...Styles.centered,        

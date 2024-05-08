@@ -48,23 +48,41 @@ const Messages = ({uuid}) => {
   }, [Query.data])
 
   const Message = ({ index, item }) => {
+
     const styled = StyleSheet.create({
       message: {
-        paddingHorizontal: 8, 
-        paddingTop: 8,
-        marginTop: 10,     
-        borderRadius: 8,
-        flex: 1,
+        paddingHorizontal: 8,       
+        marginBottom: 24,
+        // overflow: 'hidden',
+        // backgroundColor: colors.white,
+        // paddingVertical: 16,
       },
       header: {        
-        flexDirection: 'row',
-        justifyContent: 'space-between',        
+        // flexDirection: item.type === 'user' ? 'row-reverse' : 'row',
+        // alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        // height: 24,
+        flexDirection: 'row', 
         alignItems: 'flex-end',
-        height: 20,
-        marginBottom: 6,
+        marginBottom: 4,
+        paddingHorizontal: 0,
+        // paddingTop: 4,
       },
-      body: { color: colors.darkText, lineHeight: 24, paddingHorizontal: 6 },
-      date: { color: colors.lightText, fontSize: 10, marginLeft: 6, paddingBottom: 1 },
+      body: {
+        // flexDirection: item.type === 'user' ? 'row' : 'row-reverse',
+        // justifyContent: 'flex-end',
+        // alignItems: 'center',
+        // borderRadius: 4,
+        
+        lineHeight: 24, 
+        // paddingVertical: 10,
+        paddingHorizontal: 1,
+        // right: item.type === 'user' ? -8 : 8,
+        // left: item.type === 'system' ? -8 : 0,
+        // marginRight: 48,
+
+       },
+      date: { paddingBottom: 1, color: colors.lightText, fontSize: 10, marginHorizontal: 6 },
       user: { color: colors.black },
     });
 
@@ -77,15 +95,22 @@ const Messages = ({uuid}) => {
       <View style={styled.message}>
         <View style={styled.header}>
           <Bold style={styled.user}>{ displayNameMap[item.type] }</Bold>
-          { item.created_at && 
-            <Light style={styled.date}>{convoDate(item.created_at)}</Light>
-          }
+          {/* { item.created_at && 
+            
+          <Light style={styled.date}>{convoDate(item.created_at)}</Light>
+          } */}
+          
         </View>
-        { (index === awaitingIndex && item.body === 'awaiting') ? (
-          <AnimatedEllipsis numberOfDots={5} style={{fontSize: 20, color: colors.white}}/>
-        ) : (
-          <Regular style={styled.body}>{ item.body }</Regular>
-        )}
+        <View>            
+          { (index === awaitingIndex && item.body === 'awaiting') ? (
+            <AnimatedEllipsis numberOfDots={5} style={{fontSize: 20, color: colors.white}}/>
+          ) : (
+            <View style={styled.body}>
+
+              <Regular style={{ color: colors.darkText, }}>{ item.body }</Regular>              
+            </View>
+            )}
+        </View>
       </View>
     )
   };
@@ -93,6 +118,7 @@ const Messages = ({uuid}) => {
     container: {
       flex: 1,
       paddingBottom: 8,
+      paddingHorizontal: 12,
     }  
   });
 
@@ -104,7 +130,7 @@ const Messages = ({uuid}) => {
   };
 
   return (
-    <View style={flatlist.container}>
+    <View style={{...flatlist.container}}>
       <FlatList          
         data={messages}
         renderItem={Message}
@@ -131,8 +157,9 @@ export default function Convo({item, left}) {
     <View
       style={{
         ...styles.View,        
-        left: -(left),
-        width: Dimensions.get('window').width - (left*2),        
+        left: -(left*2),
+        width: Dimensions.get('window').width,     
+        backgroundColor: colors.white,
       }}
     >   
       <Messages uuid={item.uuid}/>

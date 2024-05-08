@@ -90,7 +90,12 @@ export default function RootLayout() {
     }, [fontsLoaded, fontError]);
 
     return (
-      <GestureHandlerRootView style={{ backgroundColor: colors.theme.inputs.light.backgroundColor, flex: 1 }}  onLayout={onLayoutRootView}>
+      <GestureHandlerRootView
+        style={{
+          backgroundColor: colors.theme.inputs.light.backgroundColor, 
+          flex: 1 
+        }}
+        onLayout={onLayoutRootView}>
           { fontsLoaded ? (
             <QueryClientProvider client={queryClient}>
               <SessionProvider>
