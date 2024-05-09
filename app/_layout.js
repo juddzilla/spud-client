@@ -10,6 +10,7 @@ import {
   View,
  } from 'react-native';
 import { Slot } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   QueryClient,
   QueryClientProvider,
@@ -28,12 +29,13 @@ import { queryClient } from '../contexts/query-client';
 
 import colors from '../components/UI/colors';
 import { useStorageState } from '../interfaces/storage';
-import { generateUrl, useWebSocket } from '../interfaces/websocket';
+import { useWebSocket } from '../interfaces/websocket';
 
 import DetailModal from '../components/UI/Details/Modal';
-import TalkModal from '../components/UI/Talk/Modal';
 
 import { WebsocketContext } from '../contexts/websocket';
+
+import TalkProvider from '../components/UI/Talk/Provider';
 
 export function SessionProvider(props) {
   const [[isLoading, session], setSession] = useStorageState('session');
@@ -100,18 +102,22 @@ export default function RootLayout() {
             <QueryClientProvider client={queryClient}>
               <SessionProvider>
                 <WebsocketProvider>
-                  <ActionSheetProvider>              
-                    <SafeAreaView style={{ flex: 1}}>
-                      {/* <KeyboardAvoidingView
-                        behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
-                        style={{ flex: 1}}
-                      >
-                      </KeyboardAvoidingView> */}
-                      <Slot />
-                      <DetailModal />
-                      <TalkModal />
-                    </SafeAreaView>
-                  </ActionSheetProvider>
+                  <SafeAreaProvider>
+                    <TalkProvider>
+                      <ActionSheetProvider>              
+                        <SafeAreaView style={{ flex: 1}}>
+                          {/* <KeyboardAvoidingView
+                            behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                            style={{ flex: 1}}
+                          >
+                          </KeyboardAvoidingView> */}
+                          <Slot />
+                          <DetailModal />
+                          
+                        </SafeAreaView>
+                      </ActionSheetProvider>
+                    </TalkProvider>
+                  </SafeAreaProvider>
                 </WebsocketProvider>                
               </SessionProvider>
             </QueryClientProvider>

@@ -1,75 +1,39 @@
-import { useEffect, useState } from 'react';
-import { Animated, Dimensions, Pressable, StyleSheet, View } from 'react-native';
+import { useContext } from 'react';
+import { Pressable, View } from 'react-native';
 
-import { TalkObservable } from './observable';
+import { TalkContext } from '../../../contexts/talk';
 
 import colors from '../colors';
 import Icon from '../icons';
-import Bold from '../text/Bold';
 
 import styles from '../styles';
 
-export default function TalkButton(type) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function TalkButton({ keys }) {
+    const { setTalkContext } = useContext(TalkContext);
 
-    const micIcon = {
-        color: !isOpen ? 'white' : 'black', 
-        name: !isOpen ? 'mic' : 'micOff',
-    };
-
-    useEffect(() => {
-        TalkObservable.subscribe((value) => {      
-            setIsOpen(value !== null);
-        })
-        return () => {
-            TalkObservable.unsubscribe();
-            setIsOpen(false);
-        }
-    }, []);
-
-    function toggle() {
-        const value = isOpen ? false : type;
-        TalkObservable.notify(value);    
+    function toggle() {  
+        setTalkContext(keys);
     }
 
     return (
       <View
         style={{          
-          backgroundColor: 'red',
+          // backgroundColor: 'yellow',
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',          
+          justifyContent: 'center',       
         }}>
           <Pressable            
             onPress={toggle}
-            style={({ pressed }) => ({
-              justifyContent: 'center',               
-              // shadowColor: colors.darkestBg,
-              // shadowOffset: {
-              //   width: 0,
-              //   height: 5,
-              // },
-              // shadowOpacity: 0.3,
-              // shadowRadius: 6.27,
-
-              // elevation: 10,
-              // zIndex: 10,
-              // position: 'absolute',
-              // bottom: 40,
-              // right: 0,
-              // backgroundColor: 'black',
-              // height: 48,
-              // overflow: 'hidden'
-            })}
+            style={{justifyContent: 'center'}}
           >
             <View
                 style={{
-                  backgroundColor: isOpen ? 'black' : colors.brand,
+                  backgroundColor: colors.phoneBlue,
                   borderBottomLeftRadius: '50%',
                   borderBottomRightRadius: 8,
                   borderTopLeftRadius: '50%',
                   borderTopRightRadius: '50%',
-                  // borderRadius: '50%',                     
                   width: 40, 
                   height: 40, 
                   ...styles.centered,
@@ -77,20 +41,15 @@ export default function TalkButton(type) {
                 }}
             >
               <Icon
-                name={micIcon.name}
+                name='mic'
                 styles={{
-                  size: 24, 
-                  // position: 'absolute', 
-                  // bottom: 36, 
-                  // left: 6, 
-                  // color: 'white',
-                  // transform: [{ rotate: "-90deg" }]
+                  size: 24,
                 }}
               />
             </View>
           </Pressable>
           
-          <View
+          {/* <View
             style={{
               backgroundColor: 'rgba(255,255,255,0.5)',
               opacity: isOpen ? 1 : 0,
@@ -121,7 +80,7 @@ export default function TalkButton(type) {
             >
               <Bold style={{textAlign: 'center',}}>You can add, remove, reorder, or delete list items</Bold>
             </View>
-          </View>                         
+          </View>                          */}
       </View>     
     )
 }

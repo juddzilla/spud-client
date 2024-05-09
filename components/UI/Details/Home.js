@@ -3,16 +3,11 @@ import {
     useRef,
     useState,
 } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { BaseButton } from 'react-native-gesture-handler';
-import { router } from 'expo-router';
-import {Picker} from '@react-native-picker/picker';
+import { View } from 'react-native';
+
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import RNPickerSelect from 'react-native-picker-select';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import Fetch from '../../../interfaces/fetch';
 

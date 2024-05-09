@@ -18,7 +18,8 @@ import { BaseButton } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
-import Talk from '../actions/Talk';
+// import Talk from '../actions/Talk';
+import TalkButton from '../Talk/Button';
 import Input from '../actions/Input';
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
@@ -386,10 +387,11 @@ export default function List({item, left}) {
       style={{
         ...Styles.View,
         left: -(left),
-        width: Dimensions.get('window').width - (left*2),                            
+        width: Dimensions.get('window').width - (left*2),   
+        backgroundColor: colors.theme.inputs.light.backgroundColor,                               
       }}
     >        
-        <View style={{flex: 1,}}>
+        <View style={{flex: 1, paddingHorizontal: 8,   }}>
 
           <View
             style={{
@@ -430,6 +432,8 @@ export default function List({item, left}) {
         <View
           style={{
             ...Styles.footer,
+            paddingHorizontal: 16,
+            backgroundColor: colors.darkText,
           }}>
           <Input
             focused={focusedAction === 'create'}
@@ -439,7 +443,7 @@ export default function List({item, left}) {
             theme='dark'
           />        
           { [null, 'talk'].includes(focusedAction) &&          
-            <Talk />          
+            <TalkButton keys={queryKeys} />          
           }  
         </View>       
       </View>

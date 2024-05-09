@@ -332,7 +332,7 @@ export default function ListView({options}) {
             </Pressable>
         </Animated.View>  
         { (!focus && talk) &&
-          <TalkButton type={talk} />          
+          <TalkButton keys={storeKey} />          
         }
       </View>
       </View>

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
-import Modal from "react-native-modal";
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Convo from './Convo';
 import List from './List';
@@ -23,7 +24,6 @@ import Fetch from '../../../interfaces/fetch';
 
 const initialData = { context: [], data: null, children: [] };
 const standardHeight = 56;
-const textColor = colors.darkText;
 
 const Title = () => {
   const [title, setTitle] = useState('');
@@ -97,6 +97,11 @@ export default function DetailModal() {
   const { showActionSheetWithOptions } = useActionSheet(); 
   const [context, setContext] = useState([]);
 
+  const insets = useSafeAreaInsets();
+
+  const windowWidth = Dimensions.get('window').width;
+  const slideAnim = useRef(new Animated.Value(windowWidth)).current;
+
   const actions = {
     addToCollection: {
         icon: 'collectionAdd',
@@ -108,27 +113,46 @@ export default function DetailModal() {
         icon: 'summarize',
     },
   };
+
+  const slideIn = () => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const slideOut = () => {
+    Animated.timing(slideAnim, {
+      toValue: windowWidth,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+  };
     
-    useEffect(() => {
-      if (!prompt && submitting) {            
-          setSubmitting(false);
-      }
+  useEffect(() => {
+    if (!prompt && submitting) {            
+        setSubmitting(false);
+    }
   }, [prompt]);
 
-    const { data } = useQuery({
-      initialData,
-      queryKey: ['details'],
-      queryFn: async () => {
-        setContext(data.context);
-        return data;
-      }
-    });
+  const { data } = useQuery({
+    initialData,
+    queryKey: ['details'],
+    queryFn: async () => {
+      setContext(data.context);
+      return data;
+    }
+  });
 
-    useEffect(() => {
-      if (data.context.length) {
-        setContext(data.context);
-      }
-    }, [data])
+  useEffect(() => {
+    if (data.context.length) {
+      setContext(data.context);
+      slideIn();      
+    } else {
+      slideOut();
+    }
+  }, [data]);
 
     function chooseAction(option) { 
       let cancelButtonIndex = null;
@@ -203,10 +227,16 @@ export default function DetailModal() {
 
     const TypeComponent = () => {
       const Component = typeMap[data.data.type];
-      return (<Component item={data.data} left={left} />)
+      return (<Component item={data.data} left={0} />)
     };
 
     const styled = StyleSheet.create({
+      animatedView: {
+        position: 'absolute',
+        top: 0, 
+        left: 0, 
+        height: Dimensions.get('window').height,            
+      },
       heading: {
         backgroundColor: colors.darkText, 
         ...styles.row,
@@ -214,63 +244,73 @@ export default function DetailModal() {
         // marginBottom: 8,
         width:  Dimensions.get('window').width,
         left: - (left*2),
-        paddingHorizontal: left,
+        paddingHorizontal: 8,
+      },
+      content: {
+        flexDirection: 'column',
+        paddingTop: insets.top, 
+        paddingBottom: insets.bottom,
+        flex: 1,
+        paddingHorizontal: 0,   
+        backgroundColor: colors.brand, 
+      },
+      backButton: {
+        width: 40, 
+        backgroundColor: 'transparent', 
+        height: '100%', 
+        ...styles.centered, 
+        left: 0
+      },
+      backIcon: {
+        color: colors.white, 
+        fontSize: 24
+      },
+      options: {
+        ...styles.centered, 
+        height: standardHeight,
+        width: 40, 
+      },
+      optionsIcon: {
+        color: colors.white,
+        size: 20, 
       }
-    })
+    });
+    
     return (
-        <View
-          style={{position: 'absolute', top: 0, left: 0, flex: 1}}
-        >
-          <Modal
-            backdropColor={colors.darkBg}  
-            backdropOpacity={1}
-            animationIn='fadeIn'
-            animationInTiming={100}
-            transparent={true}
-            isVisible={true}
-            onBackdropPress={onClose}  
-            style={{ }}
-          >
-            
-            <View 
-              style={{
-                flexDirection: 'column',
-                paddingTop: 40, 
-                flex: 1,
-                paddingHorizontal: 0,   
-              }}              
-              onLayout={(event) => {
-                const diff = Dimensions.get('window').width - event.nativeEvent.layout.width;                
-                setLeft(diff/4);
-              }}
-            >
+      <Animated.View                
+        style={[
+          styled.animatedView,
+          { transform: [{translateX: slideAnim}] },
+        ]}
+      >
+        <StatusBar  style="light" />      
+        <View style={styled.content}>              
+          <View style={styled.heading}>
+              <Pressable
+                  onPress={onClose}
+                  style={styled.backButton}
+              >
+                  <Icon name='chevronLeft' styles={styled.backIcon} />
+              </Pressable>
               
-              <View style={styled.heading}>
-                <Pressable
-                    onPress={onClose}
-                    style={{width: 40, backgroundColor: 'transparent', height: '100%', ...styles.centered, left: 0}}
-                >
-                    <Icon name='closeModal' styles={{color: colors.white, fontSize: 20}} />
-                </Pressable>
-                
-                <Title />
+              <Title />
 
-                <View style={styles.row}>
-                  { headerOptions.map(option => (
-                      <Pressable
-                          key={option.name}
-                          onPress={ () => { chooseAction(option)}}
-                          style={{width: 40, ...styles.centered, height: standardHeight}}
-                      >
-                          
-                          <Icon name={actions[option.name].icon} styles={{size: 20, color: colors.white}} />                    
-                      </Pressable>
-                  )) }
-                </View>  
-              </View>
-              { TypeComponent() }
+              <View style={styles.row}>
+                { headerOptions.map(option => (
+                    <Pressable
+                        key={option.name}
+                        onPress={ () => { chooseAction(option)}}
+                        style={styled.options}
+                    >
+                        
+                        <Icon name={actions[option.name].icon} styles={styled.optionsIcon} />                    
+                    </Pressable>
+                )) }
+              </View>  
             </View>
-          </Modal>
-        </View>
+            { TypeComponent() }
+          </View>       
+        
+        </Animated.View>
     );
   };

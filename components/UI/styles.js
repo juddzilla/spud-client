@@ -32,8 +32,8 @@ const View = { flex: 1,  };
 const footer = {
     backgroundColor: 'transparent',    
     paddingVertical: 8,
-    paddingRight: 4,
-    paddingLeft: 16,
+    // paddingRight: 4,
+    // paddingLeft: 16,
     
     flexDirection: 'row', 
     // height: 64,

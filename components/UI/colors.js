@@ -123,6 +123,7 @@ const colors = {
     remove: red.primary,
     removeHint: red.light,
     theme,
+    phoneBlue: 'rgb(74,164,223)'
 }
 
 export default colors;
