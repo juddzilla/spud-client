@@ -57,11 +57,20 @@ function WebsocketProvider(props) {
   }
   useEffect(() => {
     if (message) {
-      const { context, data } = message;
-      if (Object.hasOwn(data, 'add')) {
+      console.log('new message', message);
+      const { action, context, data } = message;
+      if (action && action === 'refresh') {
+
+        queryClient.refetchQueries({ queryKey: context })
+      } else if (Object.hasOwn(data, 'add')) {
         if (Array.isArray(data.add)) {
-          queryClient.setQueryData(context, (oldData) => {            
-            return [...oldData, ...data.add];
+          queryClient.setQueryData(context, (oldData) => {              
+            if (Object.hasOwn(oldData, 'children')) {
+              return {...oldData, children: [...oldData.children, ...data.add]};
+            } else {
+
+              return [...oldData, ...data.add];
+            }
           })
         }
       }

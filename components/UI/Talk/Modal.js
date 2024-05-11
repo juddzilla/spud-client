@@ -1,11 +1,14 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { TalkContext } from '../../../contexts/talk';
-import Bold from '../text/Bold';
-import { WebsocketContext } from '../../../contexts/websocket';
+
 import Recorder from './Recorder';
 import styles from '../styles';
+import Bold from '../text/Bold';
+
+import { queryClient } from '../../../contexts/query-client';
+import { TalkContext } from '../../../contexts/talk';
+import { WebsocketContext } from '../../../contexts/websocket';
 
 export default function TalkModal() {
     const { talkContext, setTalkContext } = useContext(TalkContext);
@@ -39,16 +42,23 @@ export default function TalkModal() {
       };
 
     async function submit(uri) {
+        let queryKeys = [...talkContext];
+        queryKeys[0] = queryKeys[0].split(':')[0]
+        const queryData = queryClient.getQueryData(queryKeys);    
         const str = await FileSystem.readAsStringAsync(uri, {
             encoding: FileSystem.EncodingType.Base64,
           });
         const base64String = `data:audio/m4a;base64,${str}`;
-        console.log('Base64 encoded string:', base64String);  
-        // sendMessage({
-        //     action: 'create',
-        //     context: talkContext,
-        //     data: { audio: base64String, },
-        //   });
+        const message = {
+            action: 'stt',
+            context: talkContext,
+            data: { audio: base64String },         
+          };
+
+          if (queryData.params) {
+            message.params = queryData.params;
+          }
+        sendMessage(message);
     }
 
 
@@ -79,14 +89,18 @@ export default function TalkModal() {
                     onTouchEnd={onPress}                    
                     style={{flex: 1, ...styles.centered}}
                 >
-
                     <View
                         onStartShouldSetResponder={() => true} 
                         onTouchEnd={(e) => e.stopPropagation()}
-                        style={{backgroundColor: 'red', height: 40, }}
                     >
-                        <Bold>MESSAGE GOES HERE</Bold></View>
+
+                        <View                    
+                            style={{backgroundColor: 'red', height: 40, }}
+                        >
+                            <Bold>MESSAGE GOES HERE</Bold>
+                        </View>
                         <Recorder submit={submit} />
+                    </View>
                     </View>            
             </Animated.View>
         

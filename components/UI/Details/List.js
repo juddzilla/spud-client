@@ -100,13 +100,14 @@ export default function List({item, left}) {
     keepPreviousData: true,
     placeholderData: keepPreviousData,
     queryKey: queryKeys, 
-    queryFn: async () => {        
-      const response = await Fetch.get(baseUri, {
+    queryFn: async () => {
+      const params = {
         search: filter,
         sortDirection: sort.direction,
         sortProperty: sort.property,
         completed: showCompleted,
-      });
+      };
+      const response = await Fetch.get(baseUri, params);
       
       const { children, error } = response; 
 
@@ -114,7 +115,7 @@ export default function List({item, left}) {
         return Query.data;
       }
 
-      return { ...Query.data, children };
+      return { ...Query.data, children, params };
     },    
   });
 

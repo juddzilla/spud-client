@@ -6,7 +6,7 @@ export default function Recorder({ submit }) {
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-  async function startRecording() {
+  async function startRecording() {    
     try {
       if (permissionResponse.status !== 'granted') {
         console.log('Requesting permission..');
@@ -48,8 +48,21 @@ export default function Recorder({ submit }) {
     );       
   }
 
+  const styles = StyleSheet.create({
+    container: {
+      // flex: 1,
+      justifyContent: 'center',
+      backgroundColor: '#ecf0f1',
+      padding: 10,
+    },
+  });
+
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container} 
+      // onStartShouldSetResponder={() => true} 
+      // onTouchEnd={(e) => e.stopPropagation()}
+    >
       <Button
         title={recording ? 'Stop Recording' : 'Start Recording'}
         onPress={recording ? stopRecording : startRecording}
@@ -64,22 +77,3 @@ export default function Recorder({ submit }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
-    padding: 10,
-  },
-});
-
-// import { View } from 'react-native';
-// import Bold from '../text/Bold';
-
-// export default function Recorder() {
-//     return (
-//         <View>
-//             <Bold>Recorder</Bold>
-//         </View>
-//     )
-// }

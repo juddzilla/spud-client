@@ -52,6 +52,10 @@ export function useWebSocket(path, params={}) {
         };
     }, [session]);
 
+    // useEffect(() => {
+    //   console.log('new message', message);
+    // }, [message])
+
   const sendMessage = (data) => {
     if (webSocket && webSocket.readyState === WebSocket.OPEN) {
       webSocket.send(JSON.stringify(data));
