@@ -1,12 +1,40 @@
+// https://fostermade.co/blog/making-speech-to-text-work-with-react-native-and-expo
+
 import { useState } from 'react';
 import { View, StyleSheet, Button } from 'react-native';
-import { Audio } from 'expo-av';
+import {
+  Audio,
+  InterruptionModeAndroid,
+  InterruptionModeIOS,
+ } from 'expo-av';
 
 export default function Recorder({ submit }) {
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-  async function startRecording() {    
+  async function startRecording() {
+    const recordingOptions = {
+      // android not currently in use, but parameters are required
+      android: {
+          extension: '.m4a',
+          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+      },
+      ios: {
+          extension: '.wav',
+          audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+          sampleRate: 44100,
+          numberOfChannels: 1,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+      },
+  };
+
     try {
       if (permissionResponse.status !== 'granted') {
         console.log('Requesting permission..');
@@ -14,13 +42,18 @@ export default function Recorder({ submit }) {
       }
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
+        interruptionModeIOS: InterruptionModeIOS.DoNotMix,
         playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+        playThroughEarpieceAndroid: true,
+    
       });
 
-      console.log('Starting recording..');
+      
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-        (sound) => { console.log('ting', sound)}
+        recordingOptions,
+        (sound) => { /* do something for ui */ }
         // sound.metering is the db -180 -> 0
       );
       setRecording(recording);
