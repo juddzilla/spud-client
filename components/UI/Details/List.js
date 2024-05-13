@@ -48,8 +48,6 @@ export default function List({item, left}) {
   const [showCompleted, setShowCompleted] = useState(null);
   const [sort, setSort] = useState(initialSort);
 
-  const [focusedAction, setFocusedAction] = useState(null);
-
   useEffect(() => {
     const data = queryClient.getQueryData(queryKeys);
     
@@ -436,16 +434,12 @@ export default function List({item, left}) {
             paddingHorizontal: 16,
             backgroundColor: colors.darkText,
           }}>
-          <Input
-            focused={focusedAction === 'create'}
-            setFocused={setFocusedAction}
+          <Input            
             onSubmit={createListItemMutation.mutate} 
             placeholder='Create New List Item'
             theme='dark'
           />        
-          { [null, 'talk'].includes(focusedAction) &&          
-            <TalkButton keys={queryKeys} />          
-          }  
+          <TalkButton keys={queryKeys} />
         </View>       
       </View>
   );

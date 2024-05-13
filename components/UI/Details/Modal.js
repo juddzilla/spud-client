@@ -283,7 +283,7 @@ export default function DetailModal() {
           { transform: [{translateX: slideAnim}] },
         ]}
       >
-        <StatusBar  style="light" />      
+        <StatusBar style="light" />      
         <View style={styled.content}>              
           <View style={styled.heading}>
               <Pressable

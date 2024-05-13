@@ -14,18 +14,19 @@ export default function Recorder({ submit }) {
 
   async function startRecording() {
     const recordingOptions = {
+      isMeteringEnabled: true,
       // android not currently in use, but parameters are required
       android: {
           extension: '.m4a',
-          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
-          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+          audioEncoder: Audio.AndroidAudioEncoder.AAC,
           sampleRate: 44100,
           numberOfChannels: 2,
           bitRate: 128000,
       },
       ios: {
           extension: '.wav',
-          audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+          audioQuality: Audio.IOSAudioQuality.HIGH,
           sampleRate: 44100,
           numberOfChannels: 1,
           bitRate: 128000,
@@ -53,7 +54,10 @@ export default function Recorder({ submit }) {
       
       const { recording } = await Audio.Recording.createAsync(
         recordingOptions,
-        (sound) => { /* do something for ui */ }
+        (sound) => {
+          /* do something for ui */ 
+          console.log('SOUND', sound); 
+        }
         // sound.metering is the db -180 -> 0
       );
       setRecording(recording);
@@ -67,7 +71,7 @@ export default function Recorder({ submit }) {
     await endRecording();
     const uri = recording.getURI();
     console.log('Recording stopped and stored at', uri);   
-    submit(uri);
+    // submit(uri);
   }
 
   async function endRecording() {
