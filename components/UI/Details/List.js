@@ -34,7 +34,7 @@ import Regular from '../text/Regular';
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 
-export default function List({item, left}) {  
+export default function List({item}) {  
   const queryKeys = ['lists', item.uuid];
   const baseUri = `lists/${item.uuid}/`;
   const itemsUri = `${baseUri}items/`;
@@ -385,8 +385,7 @@ export default function List({item, left}) {
     <View
       style={{
         ...Styles.View,
-        left: -(left),
-        width: Dimensions.get('window').width - (left*2),   
+        width: Dimensions.get('window').width,
         backgroundColor: colors.theme.inputs.light.backgroundColor,                               
       }}
     >        

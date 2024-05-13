@@ -4,8 +4,7 @@ import DrawerScreen from '../../../components/DrawerScreen';
 export default function Convos() {  
   const options = {
     actions: {
-      placeholder: 'Create New Conversation',
-      talkUri: '',
+      placeholder: 'Create New Conversation',      
     },
     filters: {
       placeholder: 'Search by Title',
@@ -14,6 +13,7 @@ export default function Convos() {
         fields: ['title', 'updated_at'],
       },
     },
+    menuOptions: [{display: 'Summarize', name: 'summarize'}],
     storeKey: ['convos'],    
   };
 

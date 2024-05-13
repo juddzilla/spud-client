@@ -17,7 +17,7 @@ import Talk from '../actions/Talk';
 import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';
 
-export default function Note({item, left}) {  
+export default function Note({item}) {  
   const queryKeys = ['notes', item.uuid];
   const baseUri = `notes/${item.uuid}/`;
 
@@ -76,9 +76,8 @@ export default function Note({item, left}) {
     <View
       style={{
         ...styles.View,
-        left: - (left),
         paddingBottom: 15,
-        width: Dimensions.get('window').width - (left*2),               
+        width: Dimensions.get('window').width,               
       }}
     >                
       { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 

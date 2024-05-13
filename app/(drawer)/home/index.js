@@ -141,7 +141,7 @@ export default function HomeView() {
   const options = {
     actions: {
       placeholder: 'Create New Queue Item',
-      talkUri: '',
+      
     },
     filters: {
       placeholder: 'Search Queue',
@@ -159,7 +159,7 @@ export default function HomeView() {
     <View style={{flex:1}}>      
       { DrawerScreen('Quick Queue') }
       <ListView options={{...options}} />
-      <Home />
+      {/* <Home /> */}
     </View>
   );
 }

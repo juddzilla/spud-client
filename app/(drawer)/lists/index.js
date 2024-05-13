@@ -5,7 +5,7 @@ export default function Lists() {
   const options = {
     actions: {
       placeholder: 'Create New List',
-      talkUri: '',
+      
     },    
     filters: {
       placeholder: 'Search Lists',

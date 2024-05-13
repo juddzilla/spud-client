@@ -5,7 +5,7 @@ export default function Notes() {
   const options = {
     actions: {
       placeholder: 'Create New Note',
-      talkUri: '',
+      
     },
     filters: {
       placeholder: 'Search Notes',

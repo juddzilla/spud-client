@@ -142,7 +142,7 @@ const Messages = ({uuid}) => {
   )
 }
 
-export default function Convo({item, left}) {    
+export default function Convo({item}) {    
   const { sendMessage } = useContext(WebsocketContext);
 
   function createMessage(text) {
@@ -156,8 +156,7 @@ export default function Convo({item, left}) {
   return (
     <View
       style={{
-        ...styles.View,        
-        left: -(left*2),
+        ...styles.View, 
         width: Dimensions.get('window').width,     
         backgroundColor: colors.white,
       }}

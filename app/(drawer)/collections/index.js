@@ -4,7 +4,7 @@ export default function Collections() {
   const options = {
     actions: {
       placeholder: 'Create Collections',
-      talkUri: '',
+      
     },
     filters: {
       placeholder: 'Search Collections',

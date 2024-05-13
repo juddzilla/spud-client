@@ -61,48 +61,47 @@ export default function TalkModal() {
         sendMessage(message);
     }
 
-
     function onPress(e) {
         setTalkContext(null);
     }
   
     return (
-            <Animated.View                
-                style={[
-                    {
-                        position: 'absolute',
-                        top: 0, 
-                        left: 0, 
-                        backgroundColor: 'rgba(255,255,255,0.4)',
-                        height: Dimensions.get('window').height,
-                        width: Dimensions.get('window').width,
-                        zIndex: 1000,
-                        flex: 1,
-                    },
+        <Animated.View                
+            style={[
                 {
-                    transform: [{translateY: slideAnim}],
+                    position: 'absolute',
+                    top: 0, 
+                    left: 0, 
+                    backgroundColor: 'rgba(255,255,255,0.4)',
+                    height: Dimensions.get('window').height,
+                    width: Dimensions.get('window').width,
+                    zIndex: 1000,
+                    flex: 1,
                 },
-                ]}
+            {
+                transform: [{translateY: slideAnim}],
+            },
+            ]}
+        >
+            
+            <View
+                onTouchEnd={onPress}                    
+                style={{flex: 1, ...styles.centered}}
             >
-                
                 <View
-                    onTouchEnd={onPress}                    
-                    style={{flex: 1, ...styles.centered}}
+                    onStartShouldSetResponder={() => true} 
+                    onTouchEnd={(e) => e.stopPropagation()}
                 >
-                    <View
-                        onStartShouldSetResponder={() => true} 
-                        onTouchEnd={(e) => e.stopPropagation()}
-                    >
 
-                        <View                    
-                            style={{backgroundColor: 'red', height: 40, }}
-                        >
-                            <Bold>MESSAGE GOES HERE</Bold>
-                        </View>
-                        <Recorder submit={submit} />
+                    <View                    
+                        style={{backgroundColor: 'red', height: 40, }}
+                    >
+                        <Bold>MESSAGE GOES HERE</Bold>
                     </View>
-                    </View>            
-            </Animated.View>
+                    <Recorder submit={submit} />
+                </View>
+                </View>            
+        </Animated.View>
         
     )
 }
