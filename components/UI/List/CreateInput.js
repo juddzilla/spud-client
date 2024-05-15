@@ -1,0 +1,139 @@
+import { useState } from 'react';
+  
+  import {
+    Pressable,
+    StyleSheet,
+    TextInput,
+  } from 'react-native';
+  
+  import Animated from 'react-native-reanimated';
+  
+  import colors from '../colors';
+  import Icon from '../icons';
+
+  import { useQuery, useMutation } from '@tanstack/react-query';
+
+  import { queryClient } from '../../../contexts/query-client';
+
+  import Fetch from '../../../interfaces/fetch';
+
+  
+  export default function CreateInput({keys, noRedirect, placeholder}) {    
+    const [focus, setFocus] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const textInputStyled = StyleSheet.create({    
+        input: {
+            container: {
+                flexDirection: 'row', 
+                alignItems: 'center', 
+                flex: 1,              
+                borderWidth: 1,
+                borderColor: focus ? colors.darkText : colors.white,
+                borderRadius: 12,                      
+                zIndex: 10,
+                overflow: 'hidden',
+                marginRight: 8,
+            },
+            field: {                    
+                height: 48,    
+                paddingHorizontal: 16,
+                backgroundColor: focus ? colors.white : colors.lightWhite,
+                // marginRight: 0, mnmnm
+                flex: 1,     
+                color: colors.theme.inputs.dark.text.darkest,                            
+            },
+            icons: {
+                leading: {
+                    size:12, 
+                    color: focus ? 'transparent' : colors.theme.inputs.dark.text.light, 
+                    position: 'absolute',
+                    zIndex: 1, 
+                    left: 12,
+                },
+                trailing: {
+                    size: 16, 
+                    color: focus ? colors.darkestBg : '#d4d4d4',
+                    zIndex: 1,
+                }
+            },
+            send: {
+                height: 40,
+                width: 40,
+                justifyContent: 'center',
+                alignItems: 'center',                
+                opacity: (focus && message.trim().length) ? 1 : 0,
+                position: 'absolute', 
+                right: 4,
+                backgroundColor: 'green'
+            },
+        },
+        modal: {
+            container: {
+                flex: 1,
+                paddingTop: 100,
+                paddingHorizontal: 16,
+            },
+            content: {
+                fontSize: 36, 
+                textAlign: 'center',
+            }
+        }
+      });
+
+    function onPress() {
+        createMutation.mutate(message);
+        setMessage('');
+    }
+
+    const Query = useQuery({
+        enabled: false,
+        queryKey: keys,
+        queryFn: async () => await Fetch.get(`${keys[0]}/`)
+    });
+
+    const createMutation = useMutation({    
+        mutationFn: async (title) => {              
+          try {
+            return await Fetch.post(`${keys[0]}/`, { title });
+          } catch (error) {
+            console.warn('Create Error: ', error);
+          }
+        },
+        onSuccess: async (value) => {
+            const keyMap = {
+                List: 'lists',
+                Convo: 'convos',
+                Note: 'notes',
+            };
+          
+            Query.refetch();      
+
+            if (!noRedirect) {   
+                const keys = [keyMap[value.type], value.uuid];
+                queryClient.setQueryData(['details'], { context: keys, data: value});
+                queryClient.setQueryData(keys, { context: keys, data: value });        
+            }
+        },
+      })
+
+    return (
+        <Animated.View style={textInputStyled.input.container}>                            
+            <TextInput
+                value={message}
+                onBlur={() => setFocus(false)}
+                onChangeText={(text) => setMessage(text)}
+                onFocus={() => setFocus(true)}
+                placeholder={placeholder}
+                style={textInputStyled.input.field}
+                placeholderTextColor={colors.darkText}
+            />
+            <Pressable
+                onPress={onPress}
+                style={textInputStyled.input.send}
+            >
+                <Icon name='send' styles={textInputStyled.input.icons.trailing} />
+            </Pressable>
+        </Animated.View>  
+    )
+  }

@@ -1,17 +1,19 @@
-import {
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import colors from '../colors';
 
 import Icon, { sorting } from '../icons';
 
-export default function Sort({ disabled, fields, query, size='small', theme = 'light', update }) {    
+import { queryClient } from '../../../contexts/query-client';
+
+export default function Sort({ fields, keys, size='small', theme='light', update }) {        
   let height = 40;
   let width = 48;
 
+  const Query = queryClient.getQueryData(keys);
+  
+  const disabled = !Query ||  Query.results.length === 0;
+  
   if (size === 'small') {
       height = 32;
       width = 40;
@@ -45,11 +47,10 @@ export default function Sort({ disabled, fields, query, size='small', theme = 'l
   };
 
   const buttonTheme = buttonThemes[theme];
-
-  const SortButton = (property) => {
-    const isActive = query.property === property;
+  
+  const SortButton = (property) => {      
+    const isActive = Query.params.sortProperty === property;  
     const styles = isActive ? buttonTheme.active : buttonTheme.inactive;
-
     const buttonStyle = StyleSheet.create({
       alignItems: 'center',
       height,
@@ -70,7 +71,7 @@ export default function Sort({ disabled, fields, query, size='small', theme = 'l
       let iconSize = size === 'small' ? 16 : 22;
             
       if (isActive) {      
-        name = query.direction === 'asc' ? sorting[property].asc : sorting[property].desc;
+        name = Query.params.sortDirection === 'asc' ? sorting[property].asc : sorting[property].desc;
         iconSize = size === 'small' ? 19 : 24;
       }
   
@@ -79,15 +80,16 @@ export default function Sort({ disabled, fields, query, size='small', theme = 'l
 
     const properties = sortIcon(property);
     
+    function chooseSort(property) {     
 
-    function chooseSort() {      
       if (disabled) {
         return;
       }
       let direction = 'desc';
       if (isActive) {
-        direction = ['asc', 'desc'].filter(dir => dir !== query.direction)[0];
+        direction = ['asc', 'desc'].filter(dir => dir !== Query.params.sortDirection)[0];
       }
+
       update({ sortProperty: property, sortDirection: direction});
     }
 

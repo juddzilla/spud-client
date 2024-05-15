@@ -400,12 +400,18 @@ export default function List({item}) {
           >        
             <Sort
               fields={sortOn} 
-              query={sort} 
+              query={Query}
               size='small' 
               theme='dark' 
               update={onSortUpdate}
+              value={sort} 
             />
-            <Search placeholder={'Filter'} size='small' update={onFilterUpdate} />
+            <Search
+              placeholder={'Filter'} 
+              query={Query}
+              size='small' 
+              update={onFilterUpdate}
+            />
             <Pressable
               onPress={toggleShowCompleted}
               style={{width: 40, height: 40, marginRight: 8,alignItems: 'center', justifyContent: 'center'}}

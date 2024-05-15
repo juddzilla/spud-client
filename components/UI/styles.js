@@ -16,7 +16,7 @@ const row = { alignItems: 'center', flexDirection: 'row' };
 
 const header = {
     alignItems: 'center',
-    flexDirection: 'row-reverse',    
+    flexDirection: 'row',    
     justifyContent: 'space-between',
     paddingHorizontal: 8,
     input: {

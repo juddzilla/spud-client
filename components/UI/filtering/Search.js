@@ -5,16 +5,22 @@ import colors from '../colors';
 import Icon from '../icons';
 import styles from '../styles';
 
+import { queryClient } from '../../../contexts/query-client';
+
 import { useDebouncedValue } from '../../../utils/debounce';
 
-export default function Search({ disabled, placeholder, size='small', update }) {        
+export default function Search({ keys, placeholder, size='small', update }) {        
+    console.log('SEARCH');
     const [focused, setFocused] = useState(false);
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
+    const Query = queryClient.getQueryData(keys);
 
+
+    const disabled = !Query.count === null || !Query.results.length;    
+    
     let height = 40;    
     let searchIconSize = 14;
-    let closeIconSize = 12;
 
     if (size === 'small') {
         height = 32;
@@ -22,7 +28,9 @@ export default function Search({ disabled, placeholder, size='small', update }) 
     }
 
     useEffect(() => {
-        update({search});        
+        if (search.trim().length) {
+            update({search});        
+        }
       }, [debouncedSearch]);      
 
     const focusedOrHasSearch = focused || search.trim().length > 0;
@@ -57,7 +65,7 @@ export default function Search({ disabled, placeholder, size='small', update }) 
             color: colors.darkText,                
             paddingLeft: 18,
             paddingRight: 44,     
-            flex: 1,   
+            flex: 1,
         },
         close: { 
             button: {
@@ -75,13 +83,18 @@ export default function Search({ disabled, placeholder, size='small', update }) 
             },
          },
     });
-     
+
+    function clearSearch() {
+        setSearch('');
+        update({search: ''});
+    }
+
     return (
         <View style={style.container}>        
             <TextInput
                 editable={!!disabled === false}
                 value={search}
-                onChangeText={(text) => setSearch(text)} 
+                onChangeText={setSearch} 
                 onBlur={() => setFocused(false)}
                 onFocus={() => setFocused(true)}
                 placeholder={placeholder}
@@ -93,7 +106,7 @@ export default function Search({ disabled, placeholder, size='small', update }) 
             }>                         
                 { search.length > 0 ?            
                     (<Pressable
-                        onPress={() => setSearch('')}
+                        onPress={clearSearch}
                         style={style.close.button}>
                         <Icon name='close' styles={style.close.icon} /> 
                     </Pressable>) :
