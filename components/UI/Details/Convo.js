@@ -2,6 +2,7 @@ import { useEffect, useContext, useState } from 'react';
 import {
   Dimensions,
   FlatList,
+  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
@@ -9,6 +10,9 @@ import { useQuery } from '@tanstack/react-query';
 import AnimatedEllipsis from 'rn-animated-ellipsis';
 
 import Input from './Input';
+import Exit from './Exit';
+import Title from './Title';
+import Menu from './Menu';
 import Talk from '../actions/Talk';
 
 import colors from '../colors';
@@ -21,7 +25,8 @@ import { WebsocketContext } from '../../../contexts/websocket';
 import Fetch from '../../../interfaces/fetch';
 import { convoDate } from '../../../utils/dates';
 
-const Messages = ({uuid}) => {
+
+const Messages = ({uuid}) => {  
   const queryKeys = ['convos', uuid];
   const baseUri = `${queryKeys.join('/')}/`;
   const awaitingIndex = 1000000;
@@ -143,12 +148,13 @@ const Messages = ({uuid}) => {
 }
 
 export default function Convo({item}) {    
+  const queryKeys = item.context;
   const { sendMessage } = useContext(WebsocketContext);
 
   function createMessage(text) {
     sendMessage({
       action: 'create',
-      context: ['convos', item.uuid],
+      context: queryKeys,
       data: { body: text, },
     });
   }
@@ -161,10 +167,20 @@ export default function Convo({item}) {
         backgroundColor: colors.white,
       }}
     >   
-      <Messages uuid={item.uuid}/>
+      <View style={{...styles.row, height: 40}}>
+        <Exit />
+        <View style={{...styles.row, justifyContent: 'flex-end', flex: 1}}>                     
+          <Menu />
+        </View>
+      </View>
+      <View style={{flex: 1, paddingLeft: 20}}>
+        <Title />
+        <Messages uuid={queryKeys[1]}/>
+      </View>
 
       <View style={{...styles.footer}}>
         <Input
+          keys={queryKeys}
           onSubmit={createMessage} 
           placeholder='Create New Message'
           theme='dark' 
