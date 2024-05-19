@@ -106,7 +106,7 @@ export default function Home() {
         const options = ['Search Web', 'Start Convo', 'Create Note', 'Add To List', 'Cancel'];
         const cancelButtonIndex = options.length - 1;
         const destructiveButtonIndex = null;
-        const title = `What would you like to do with: "${item.headline}"`;        
+        const title = `What would you like to do with: "${item.title}"`;        
 
         showActionSheetWithOptions({
             cancelButtonIndex,

@@ -12,7 +12,7 @@ export default function Sort({ fields, keys, size='small', theme='light', update
 
   const Query = queryClient.getQueryData(keys);
   
-  const disabled = !Query ||  Query.results.length === 0;
+  const disabled = !Query || !Query.results || Query.results.length === 0;
   
   if (size === 'small') {
       height = 32;
@@ -49,7 +49,7 @@ export default function Sort({ fields, keys, size='small', theme='light', update
   const buttonTheme = buttonThemes[theme];
   
   const SortButton = (property) => {      
-    const isActive = Query.params.sortProperty === property;  
+    const isActive = Query.params && Query.params.sortProperty === property;  
     const styles = isActive ? buttonTheme.active : buttonTheme.inactive;
     const buttonStyle = StyleSheet.create({
       alignItems: 'center',

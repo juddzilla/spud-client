@@ -6,14 +6,20 @@ import {
     TextInput,
     View,
 } from 'react-native';
+
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { queryClient } from '../../../contexts/query-client';
+
+import Fetch from '../../../interfaces/fetch';
 import Icon from '../icons';
 import colors from '../colors';
 import styles from '../styles';
-export default function Input({ onSubmit, placeholder, theme='light' }) {
+export default function Input({ keys, placeholder, theme='light' }) {
     const [message, setMessage] = useState('');
     const [focus, setFocus] = useState(false);
     const inputRef = useRef(); 
-
+    
+    const baseUri = keys.join('/')+'/';
     const height = 48;
 
     let inputTheme = {
@@ -44,10 +50,49 @@ export default function Input({ onSubmit, placeholder, theme='light' }) {
         }
     }
 
+    const Query = useQuery({
+        enabled: false,
+        queryKey: keys,
+        queryFn: async () => {
+            const queryData = queryClient.getQueryData(keys);
+            const response =  await Fetch.get(`${keys[0]}/`, queryData.params || {})
+            return {...response, params: queryData.params};
+        }
+    });
+
+    const createListItemMutation = useMutation({
+        mutationFn: async (text) => {
+          if (!text.trim().length) {
+            return;
+          }
+          const data = { body: text.trim() };
+    
+          try {
+            return await Fetch.post(baseUri, data)
+          } catch (error) {
+            console.warn('Create List Item Error:', error);
+          }
+        },
+        onSuccess: (data) => {      
+            console.log('onsuc', data);
+            // setListItems([...listItems, data.results]);
+            // queryClient.invalidateQueries([keys[0]]);
+            console.log('keys', keys);
+            Query.refetch(); 
+            // queryClient.setQueryData(keys, old => {
+            //     const newData = {...old};
+            //     newData.results.push(data.results)
+            //     console.log('newData', newData);
+            //     return newData;
+            // })
+        }
+      });
+    
+
     const style = inputTheme[focus ? 'active' : 'inactive'];
     
     function onSubmitMessage() {               
-        onSubmit(message);
+        createListItemMutation.mutate(message);
         setMessage('');  
         // inputRef.current.blur();
     }

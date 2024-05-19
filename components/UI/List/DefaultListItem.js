@@ -17,7 +17,7 @@ import Regular from '../text/Regular';
 import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
-const DefaultListItem = ({ index, item }) => {   
+const DefaultListItem = ({ index, item }) => {
     if (!item) {
         return null;
     }
@@ -36,8 +36,8 @@ const DefaultListItem = ({ index, item }) => {
 
     function onPress() {
         const keys = [keyMap[item.type], item.uuid];
-        queryClient.setQueryData(['details'], { context: keys, data: item });
-        queryClient.setQueryData(keys, { context: keys, data: item });
+        queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });        
+        queryClient.setQueryData(keys, { context: keys, ...item });        
     }
 
     const remove = async () => {
@@ -155,7 +155,7 @@ const DefaultListItem = ({ index, item }) => {
                             <Regular style={styled.index}>{ index+1 } </Regular>
                         </View>
                         <View>
-                            <Bold style={styled.title}>{item.headline}</Bold>
+                            <Bold style={styled.title}>{item.title}</Bold>
                             <View style={styled.info}>
                                 { item.subheadline &&
                                     <Regular style={styled.subtitle}>{ item.subheadline }</Regular>

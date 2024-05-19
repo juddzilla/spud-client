@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useMutation } from '@tanstack/react-query';
 
@@ -12,10 +12,9 @@ import Fetch from '../../../interfaces/fetch';
 export default function Menu() {
     const { context } = queryClient.getQueryData(['details']);
     const { showActionSheetWithOptions } = useActionSheet(); 
+    
 
-    console.log('contextiew', context);
-    const initialData = { context: [], data: null, children: [] };
-    const standardHeight = 56;
+    const initialData = { context: [], data: null, children: [] };    
     
     const addToCollectionText = 'Add To Collection';
     const cancelText = 'Cancel';
@@ -117,21 +116,40 @@ export default function Menu() {
     const styled = StyleSheet.create({        
         options: {
           ...styles.centered, 
-          height: standardHeight,
+          height: 40,
           width: 40, 
         },
         optionsIcon: {
-          color: colors.white,
-          size: 20, 
+          color: colors.darkText,  
         }
       });
 
+    const viewOptions = [
+        {
+            onPress: openOptionsMenu,
+            style: styled.options,
+            icon: 'dots',
+            size: 20,
+        },
+    ];
+
     return (
-        <Pressable
-            onPress={openOptionsMenu}
-            style={styled.options}
-        >              
-            <Icon name='dots' styles={styled.optionsIcon} />
-        </Pressable>
+        <View style={styles.row}>
+            { viewOptions.map(option => (
+                <Pressable
+                    key={option.icon}
+                    onPress={option.onPress}
+                    style={{...styled.options, ...option.style}}
+                >              
+                    <Icon name={option.icon} styles={{...styled.optionsIcon, size: option.size}} />
+                </Pressable>
+            ))}
+            {/* <Pressable
+                onPress={openOptionsMenu}
+                style={styled.options}
+            >              
+                <Icon name='dots' styles={styled.optionsIcon} />
+            </Pressable> */}
+        </View>
     );
 }

@@ -42,12 +42,12 @@ export default function ListView({options}) {
         search: '',  
     }, 
     results: []
-};
+  };
 
-if (Object.keys(sortDefaults).length) {
-    initialData.params.sortDirection = sortDefaults.direction;
-    initialData.params.sortProperty = sortDefaults.property;
-} 
+  if (Object.keys(sortDefaults).length) {
+      initialData.params.sortDirection = sortDefaults.direction;
+      initialData.params.sortProperty = sortDefaults.property;
+  } 
 
   const DataQuery = useQuery({
     initialData,
@@ -75,8 +75,7 @@ if (Object.keys(sortDefaults).length) {
       .then(response => queryClient.setQueryData(storeKey, response));
   }
 
-  function onRefresh() {
-    console.log('onre');
+  function onRefresh() {    
     if (DataQuery.fetchStatus !== 'fetching') {
       DataQuery.refetch();
     }

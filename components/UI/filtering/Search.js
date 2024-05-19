@@ -10,14 +10,12 @@ import { queryClient } from '../../../contexts/query-client';
 import { useDebouncedValue } from '../../../utils/debounce';
 
 export default function Search({ keys, placeholder, size='small', update }) {        
-    console.log('SEARCH');
     const [focused, setFocused] = useState(false);
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
     const Query = queryClient.getQueryData(keys);
-
-
-    const disabled = !Query.count === null || !Query.results.length;    
+    
+    const disabled = !Query || Query.count === null || !Query.results || !Query.results.length;    
     
     let height = 40;    
     let searchIconSize = 14;
@@ -28,9 +26,7 @@ export default function Search({ keys, placeholder, size='small', update }) {
     }
 
     useEffect(() => {
-        if (search.trim().length) {
-            update({search});        
-        }
+        update({search});
       }, [debouncedSearch]);      
 
     const focusedOrHasSearch = focused || search.trim().length > 0;
@@ -104,7 +100,7 @@ export default function Search({ keys, placeholder, size='small', update }) {
             <View style={
                 style.icon.container
             }>                         
-                { search.length > 0 ?            
+                { search.trim().length > 0 ?            
                     (<Pressable
                         onPress={clearSearch}
                         style={style.close.button}>

@@ -8,7 +8,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import AnimatedEllipsis from 'rn-animated-ellipsis';
 
-import Input from '../actions/Input';
+import Input from './Input';
 import Talk from '../actions/Talk';
 
 import colors from '../colors';
