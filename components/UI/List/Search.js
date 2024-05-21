@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet,TextInput, View } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 
 import colors from '../colors';
 import Icon from '../icons';
@@ -9,21 +10,28 @@ import { queryClient } from '../../../contexts/query-client';
 
 import { useDebouncedValue } from '../../../utils/debounce';
 
-export default function Search({ keys, placeholder, size='small', update }) {        
+import Fetch from '../../../interfaces/fetch';
+
+export default function Search({ keys, placeholder }) {   
+    const [disabled, setDisabled] = useState(true);     
     const [focused, setFocused] = useState(false);
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebouncedValue(search, 500);
-    const Query = queryClient.getQueryData(keys);
+    const uri = `${keys[0]}/`;  
     
-    const disabled = !Query || Query.count === null || !Query.results || !Query.results.length;    
+    const DataQuery = useQuery({
+        enabled: false,
+        queryKey: keys,
+      });
     
-    let height = 40;    
-    let searchIconSize = 14;
-
-    if (size === 'small') {
-        height = 32;
-        searchIconSize = 12;
-    }
+      useEffect(() => {  
+        if (DataQuery.data) {
+          setDisabled(search.trim().length === 0 && DataQuery.data.results.length === 0);
+        }
+      }, [DataQuery.data]);    
+    
+    let height = 32;    
+    let searchIconSize = 12;
 
     useEffect(() => {
         update({search});
@@ -72,10 +80,8 @@ export default function Search({ keys, placeholder, size='small', update }) {
                 ...styles.centered,                
             },
             icon: {
-                color: disabled ? colors.button.disabled : colors.button.enabled, 
-                // color: colors.lightWhite, 
-                size: 18,
-                
+                color: disabled ? colors.button.disabled : colors.button.enabled,                 
+                size: 18,                
             },
          },
     });
@@ -84,6 +90,15 @@ export default function Search({ keys, placeholder, size='small', update }) {
         setSearch('');
         update({search: ''});
     }
+
+    function update(param) {
+        if (DataQuery.status === 'pending') {
+            return;
+        }
+        const params = {...DataQuery.data.params, ...param};
+        Fetch.get(uri, params)
+          .then(response => queryClient.setQueryData(keys, response));
+      }
 
     return (
         <View style={style.container}>        

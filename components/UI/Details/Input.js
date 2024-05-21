@@ -50,16 +50,6 @@ export default function Input({ keys, placeholder, theme='light' }) {
         }
     }
 
-    const Query = useQuery({
-        enabled: false,
-        queryKey: keys,
-        queryFn: async () => {
-            const queryData = queryClient.getQueryData(keys);
-            const response =  await Fetch.get(`${keys[0]}/`, queryData.params || {})
-            return {...response, params: queryData.params};
-        }
-    });
-
     const createListItemMutation = useMutation({
         mutationFn: async (text) => {
           if (!text.trim().length) {
@@ -74,17 +64,12 @@ export default function Input({ keys, placeholder, theme='light' }) {
           }
         },
         onSuccess: (data) => {      
-            console.log('onsuc', data);
-            // setListItems([...listItems, data.results]);
-            // queryClient.invalidateQueries([keys[0]]);
-            console.log('keys', keys);
-            Query.refetch(); 
-            // queryClient.setQueryData(keys, old => {
-            //     const newData = {...old};
-            //     newData.results.push(data.results)
-            //     console.log('newData', newData);
-            //     return newData;
-            // })
+            queryClient.setQueryData(keys, old => {
+                const oldCopy = JSON.parse(JSON.stringify(old));
+                const results = oldCopy.results;
+                results.push(data.results);
+                return {...oldCopy, results };
+            });
         }
       });
     

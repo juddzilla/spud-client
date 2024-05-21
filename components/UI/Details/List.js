@@ -108,16 +108,31 @@ const ListList = ({context}) => {
   const [items, setItems] = useState([]);
   const {listParams} = useContext(ListParamsContext);
 
-  const DataQuery = useQuery({
-    enabled: false,    
+  const initialData = {
+    count: null, 
+    next: null, 
+    params: {
+        page: 1,
+        per: 100,
+        search: '',
+        sortDirection: 'desc',
+        sortProperty: 'order',
+        completed: null,
+    }, 
+    results: []
+  };
+
+  const DataQuery = useQuery({       
+    initialData,
     keepPreviousData: true,
     placeholderData: keepPreviousData,
     queryFn: async () => await Fetch.get(baseUri),    
     queryKey: context, 
   });
-  
+
+
   useEffect(() => {
-    if (DataQuery.data.results) {      
+    if (DataQuery.data.results) {            
       const newItems = filterItems(DataQuery.data.results, listParams);          
       setItems(newItems);
     }
@@ -383,30 +398,7 @@ const Header = () => {
 export default function List({item}) {  
   console.log('LIST');
   const queryKeys = item.context;
-  const baseUri = queryKeys.join('/')+'/';
   
-  const initialData = {
-    count: null, 
-    next: null, 
-    params: {
-        page: 1,
-        per: 100,
-        search: '',
-        sortDirection: 'desc',
-        sortProperty: 'order',
-        completed: null,
-    }, 
-    results: []
-  };
-  
-  const DataQuery = useQuery({
-    initialData,
-    keepPreviousData: true,
-    placeholderData: keepPreviousData,
-    queryFn: async () => await Fetch.get(baseUri),    
-    queryKey: queryKeys, 
-  });
-
   const listStyles = StyleSheet.create({
     content: {flex: 1, paddingLeft: 20},
     footer: {
@@ -431,16 +423,16 @@ export default function List({item}) {
           <View style={{flex: 1}}>
             <ListList context={queryKeys} />            
           </View>          
+          <View
+            style={{...listStyles.footer, position: 'absolute', bottom: 0}}>
+            <Input            
+              keys={queryKeys}
+              placeholder='Create New List Item'
+              theme='dark'
+            />        
+            <TalkButton keys={queryKeys} />
+          </View>       
         </View>
-        <View
-          style={listStyles.footer}>
-          <Input            
-            keys={queryKeys}
-            placeholder='Create New List Item'
-            theme='dark'
-          />        
-          <TalkButton keys={queryKeys} />
-        </View>       
       </View>
     </ListParamsProvider>
   );

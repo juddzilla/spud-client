@@ -36,6 +36,7 @@ import { useState } from 'react';
                 marginRight: 8,
             },
             field: {                    
+                backgroundColor: 'red', 
                 height: 48,    
                 paddingHorizontal: 16,
                 backgroundColor: focus ? colors.white : colors.lightWhite,
@@ -68,17 +69,6 @@ import { useState } from 'react';
                 backgroundColor: 'green'
             },
         },
-        modal: {
-            container: {
-                flex: 1,
-                paddingTop: 100,
-                paddingHorizontal: 16,
-            },
-            content: {
-                fontSize: 36, 
-                textAlign: 'center',
-            }
-        }
       });
 
     function onPress() {
@@ -100,7 +90,7 @@ import { useState } from 'react';
             console.warn('Create Error: ', error);
           }
         },
-        onSuccess: async (value) => {
+        onSuccess: async (item) => {
             const keyMap = {
                 List: 'lists',
                 Convo: 'convos',
@@ -110,9 +100,9 @@ import { useState } from 'react';
             Query.refetch();      
 
             if (!noRedirect) {   
-                const keys = [keyMap[value.type], value.uuid];
-                queryClient.setQueryData(['details'], { context: keys, data: value});
-                queryClient.setQueryData(keys, { context: keys, data: value });        
+                const keys = [keyMap[item.type], item.uuid];
+                queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type});
+                queryClient.setQueryData(keys, { context: keys, ...item });        
             }
         },
       })

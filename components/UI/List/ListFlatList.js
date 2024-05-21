@@ -19,8 +19,55 @@
   import { queryClient } from '../../../contexts/query-client';
   import Fetch from '../../../interfaces/fetch';
 
-export default function ListFlatList({keys, nextPage, onRefresh, renderItem}) {  
-    const Query = queryClient.getQueryData(keys);
+export default function ListFlatList({filters, keys, renderItem}) {  
+    const uri = `${keys[0]}/`;  
+    const sortDefaults = (filters && Object.hasOwn(filters, 'sort')) ? filters.sort.defaults : {};    
+    const initialData = {
+      count: null, 
+      next: null, 
+      params: {
+          page: 1,
+          per: 20,
+          search: '',  
+      }, 
+      results: []
+    };
+
+    if (Object.keys(sortDefaults).length) {
+      initialData.params.sortDirection = sortDefaults.direction;
+      initialData.params.sortProperty = sortDefaults.property;
+    } 
+
+    const DataQuery = useQuery({
+      initialData,
+      queryKey: keys,     
+      queryFn: async () => {                                 
+          const response =  await Fetch.get(uri, initialData.params);          
+          return {...response, params: initialData.params};          
+      },
+      keepPreviousData: true,
+      placeholderData: keepPreviousData,
+    });
+
+    useEffect(() => {
+    
+    }, [DataQuery.data]);
+
+    function nextPage() {
+      if (DataQuery.fetchStatus !== 'fetching' && DataQuery.data.next) {      
+        Fetch.get(DataQuery.data.next)
+          .then(response => {
+            const results = [...DataQuery.data.results, ...response.results];
+            queryClient.setQueryData(keys, {...response, results});
+          });
+      }    
+    }
+  
+    function onRefresh() {    
+      if (DataQuery.fetchStatus !== 'fetching') {
+        DataQuery.refetch();
+      }
+    }
     
     const ListEmptyComponent = () => {      
         const Empty = (props) => (
@@ -38,9 +85,9 @@ export default function ListFlatList({keys, nextPage, onRefresh, renderItem}) {
             </View>
         );    
 
-        if (Query.params.search.trim().length > 0) {
+        if (DataQuery.data.params.search.trim().length > 0) {
         return (
-            <Empty><Bold>No matches for "{Query.params.search}"</Bold></Empty>
+            <Empty><Bold>No matches for "{DataQuery.data.params.search}"</Bold></Empty>
         ) 
         }
         
@@ -50,15 +97,16 @@ export default function ListFlatList({keys, nextPage, onRefresh, renderItem}) {
     };
 
   const ListHeaderComponent = () => {   
-    if (Query.count === 0) {
+    if (!DataQuery.data || DataQuery.data.count === 0) {
         return null;
     }    
 
     let headerMessage = '';    
-    if (Query.count === null) {        
-        headerMessage = 'Loading';      
-    } else {        
-      headerMessage = `Showing ${Query.results.length} of ${Query.count}`
+    
+    if (DataQuery.data.count === null) {        
+      headerMessage = 'Loading';      
+    } else {              
+      headerMessage = `Showing ${DataQuery.data.results.length} of ${DataQuery.data.count}`
     }
 
     return (
@@ -75,8 +123,8 @@ export default function ListFlatList({keys, nextPage, onRefresh, renderItem}) {
     }
   }
 
-  function display() {
-    if (Query.count === null) {
+  function display() {    
+    if (DataQuery.status === 'pending' || DataQuery.data && DataQuery.data.count === null) {
         return (
             <View>
                 <Bold>Loading</Bold>
@@ -85,7 +133,7 @@ export default function ListFlatList({keys, nextPage, onRefresh, renderItem}) {
     }
     return (
         <FlatList
-            data={Query.results}
+            data={DataQuery.data.results}
             renderItem={renderItem}
             initialNumToRender={20}
             keyExtractor={(item, index) => `${item.uuid}+${index}`}                      

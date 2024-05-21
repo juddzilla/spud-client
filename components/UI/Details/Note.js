@@ -7,6 +7,9 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
+import Exit from './Exit';
+import Menu from './Menu';
+import Title from './Title';
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
 import styles from '../styles';
@@ -18,8 +21,8 @@ import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';
 
 export default function Note({item}) {  
-  const queryKeys = ['notes', item.uuid];
-  const baseUri = `notes/${item.uuid}/`;
+  const queryKeys = item.context;
+  const baseUri = queryKeys.join('/')+'/';
 
   const [body, setBody] = useState(item.body);
   const [updatedAt, setUpdatedAt] = useState(item.updatedAt);
@@ -86,6 +89,13 @@ export default function Note({item}) {
         ) : 
         (
           <View style={{backgroundColor: colors.white, flex: 1, borderRadius: 4}}>
+            <View style={{...styles.row, height: 40}}>
+              <Exit />
+              <View style={{...styles.row, justifyContent: 'flex-end', flex: 1}}>                     
+                <Menu />
+              </View>
+            </View>
+            <Title />
             <DebouncedInput
               multiline={true}
               placeholder='(untitled)'

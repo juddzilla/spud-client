@@ -24,7 +24,6 @@ export default function Title() {
   });
 
   useEffect(() => {
-      console.log('MODAL TITLE DATA', data);
       if (data && data.title) {
         setTitle(data.title);
       }

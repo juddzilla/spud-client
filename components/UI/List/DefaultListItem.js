@@ -44,7 +44,10 @@ const DefaultListItem = ({ index, item }) => {
         const type = typeMap[item.type];
         const key = keyMap[item.type];          
         await Fetch.remove(`${type.toLowerCase()}/${item.uuid}/`);        
-        queryClient.setQueryData([key], oldData => oldData.filter(i => i.uuid !== item.uuid));        
+        queryClient.setQueryData([key], old => {
+            const oldCopy = JSON.parse(JSON.stringify(old));            
+            return oldCopy.filter(i => i.uuid !== item.uuid)
+        });        
     }
     
     const styled = StyleSheet.create({
