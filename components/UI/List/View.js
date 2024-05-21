@@ -1,20 +1,15 @@
 import { View } from 'react-native';
 
-import ListFlatList from './ListFlatList';
-
-import {
-  keepPreviousData,
-  useQuery,
-} from '@tanstack/react-query';
-
-import DefaultListItem from './DefaultListItem';
 import CreateInput from './CreateInput';
+import DefaultListItem from './DefaultListItem';
+import FlatList from './FlatList';
+import Search from './Search';
+import Sort from './Sort';
 
 import styles from '../styles';
-
-import Sort from './Sort';
-import Search from './Search';
 import TalkButton from '../Talk/Button';
+
+import DrawerScreen from '../../DrawerScreen';
 
 export default function ListView({options}) {  
   const {
@@ -25,52 +20,39 @@ export default function ListView({options}) {
     storeKey, 
   } = options;
 
-  
-  function update(param) {
-    // const params = {...DataQuery.data.params, ...param};
-    // Fetch.get(uri, params)
-    //   .then(response => queryClient.setQueryData(storeKey, response));
-  }
-
-  // function onRefresh() {    
-  //   if (DataQuery.fetchStatus !== 'fetching') {
-  //     DataQuery.refetch();
-  //   }
-  // }
-
   return (
-    <View style={styles.View}>
-      <View style={{...styles.header, paddingVertical: 8}}>   
-        <Search            
-          keys={storeKey}
-          placeholder={filters.placeholder}          
-        />
-        { Object.hasOwn(filters, 'sort') &&
-          <Sort     
-            keys={storeKey}    
-            fields={filters.sort.fields}
-          />
-        }        
-      </View>
-      <View style={{flex: 1, backgroundColor: 'yellow', paddingBottom: 0}}>
-        <ListFlatList    
-          filters={filters}      
-          keys={storeKey}
-          // nextPage={nextPage}
-          // onRefresh={onRefresh}
-          renderItem={ItemTemplate}
-        />       
-      
-        <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0}}>
-          <CreateInput
+    <>
+      <DrawerScreen title={storeKey[0]} />
+      <View style={styles.View}>
+        <View style={{...styles.header, paddingVertical: 8}}>   
+          <Search            
             keys={storeKey}
-            noRedirect={noRedirect}
-            placeholder={actions.placeholder}
-            
+            placeholder={filters.placeholder}          
           />
-          <TalkButton keys={storeKey} />                  
+          { Object.hasOwn(filters, 'sort') &&
+            <Sort     
+              keys={storeKey}    
+              fields={filters.sort.fields}
+            />
+          }        
         </View>
-      </View>
-    </View>       
+        <View style={{flex: 1, paddingBottom: 0}}>
+          <FlatList    
+            filters={filters}      
+            keys={storeKey}
+            renderItem={ItemTemplate}
+          />       
+        
+          <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0}}>
+            <CreateInput
+              keys={storeKey}
+              noRedirect={noRedirect}
+              placeholder={actions.placeholder}            
+            />
+            <TalkButton keys={storeKey} />                  
+          </View>
+        </View>
+      </View>       
+    </>
   );  
 }

@@ -4,7 +4,8 @@ import { useNavigation } from 'expo-router';
 import { TouchableOpacity, View } from 'react-native';
 import Icon from './UI/icons';
 
-export default function DrawerScreen(title, headerRight) {    
+export default function DrawerScreen(props) {    
+    const { title, headerRight } = props;
     const navigation = useNavigation();
     
     function canGoBack() {

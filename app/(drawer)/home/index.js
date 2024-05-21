@@ -15,8 +15,6 @@ import Fetch from '../../../interfaces/fetch';
 
 import { queryClient } from '../../../contexts/query-client';
 
-import DrawerScreen from '../../../components/DrawerScreen';
-
 import Home, { Observer } from '../../../components/UI/Details/Home';
 
 const ItemTemplate = ({index, item}) => { 
@@ -157,7 +155,6 @@ export default function HomeView() {
 
   return (
     <View style={{flex:1}}>      
-      { DrawerScreen('Quick Queue') }
       <ListView options={{...options}} />
       {/* <Home /> */}
     </View>

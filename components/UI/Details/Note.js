@@ -15,7 +15,7 @@ import DebouncedInput from '../DebouncedInput';
 import styles from '../styles';
 import Light from '../text/Light';
 
-import Talk from '../actions/Talk';
+import TalkButton from '../Talk/Button';
 
 import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';
@@ -118,8 +118,8 @@ export default function Note({item}) {
       <View style={{...styles.footer, paddingHorizontal: 4, }}>
         <View style={styled.date.container}>
           <Light style={styled.date.body}> {relativeDate(updatedAt)}</Light>          
-        </View>        
-        <Talk />
+        </View> 
+        <TalkButton keys={queryKeys} />        
       </View>
     </View>
   )

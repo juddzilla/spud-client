@@ -112,9 +112,7 @@ export default function Search({ keys, placeholder }) {
                 placeholderTextColor={colors.darkText}
                 style={style.input}
             />
-            <View style={
-                style.icon.container
-            }>                         
+            <View style={style.icon.container}>                         
                 { search.trim().length > 0 ?            
                     (<Pressable
                         onPress={clearSearch}

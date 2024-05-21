@@ -7,7 +7,7 @@ import {
     View,
 } from 'react-native';
 
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../../../contexts/query-client';
 
 import Fetch from '../../../interfaces/fetch';

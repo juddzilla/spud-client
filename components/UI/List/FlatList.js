@@ -1,4 +1,3 @@
-  import { useEffect } from 'react';
   import {
     Dimensions,
     FlatList,
@@ -11,9 +10,7 @@
   } from '@tanstack/react-query';
   
   import colors from '../colors';
-  
-  import styles from '../styles';
-  
+  import styles from '../styles';  
   import Bold from '../text/Bold';
   
   import { queryClient } from '../../../contexts/query-client';
@@ -49,10 +46,6 @@ export default function ListFlatList({filters, keys, renderItem}) {
       placeholderData: keepPreviousData,
     });
 
-    useEffect(() => {
-    
-    }, [DataQuery.data]);
-
     function nextPage() {
       if (DataQuery.fetchStatus !== 'fetching' && DataQuery.data.next) {      
         Fetch.get(DataQuery.data.next)
@@ -85,10 +78,16 @@ export default function ListFlatList({filters, keys, renderItem}) {
             </View>
         );    
 
-        if (DataQuery.data.params.search.trim().length > 0) {
-        return (
-            <Empty><Bold>No matches for "{DataQuery.data.params.search}"</Bold></Empty>
-        ) 
+        if (DataQuery.status === 'pending') {
+          return (
+            <Empty><Bold>LLLLERDING</Bold></Empty>
+          ) 
+        }
+
+        if (DataQuery.data && DataQuery.data.params.search.trim().length > 0) {
+          return (
+              <Empty><Bold>No matches for "{DataQuery.data.params.search}"</Bold></Empty>
+          ) 
         }
         
         return (
@@ -97,17 +96,10 @@ export default function ListFlatList({filters, keys, renderItem}) {
     };
 
   const ListHeaderComponent = () => {   
-    if (!DataQuery.data || DataQuery.data.count === 0) {
-        return null;
-    }    
-
-    let headerMessage = '';    
-    
-    if (DataQuery.data.count === null) {        
-      headerMessage = 'Loading';      
-    } else {              
+    let headerMessage = 'Loadingff ';  
+    if (DataQuery.data && DataQuery.data.count !== null) {      
       headerMessage = `Showing ${DataQuery.data.results.length} of ${DataQuery.data.count}`
-    }
+    } 
 
     return (
       <View style={{...styles.row, paddingLeft: 20, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>
@@ -124,16 +116,12 @@ export default function ListFlatList({filters, keys, renderItem}) {
   }
 
   function display() {    
-    if (DataQuery.status === 'pending' || DataQuery.data && DataQuery.data.count === null) {
-        return (
-            <View>
-                <Bold>Loading</Bold>
-            </View>
-        )
-    }
+    const data = (DataQuery.status === 'pending' || DataQuery.data && DataQuery.data.count === null)
+      ? []
+      : DataQuery.data.results;
     return (
         <FlatList
-            data={DataQuery.data.results}
+            data={data}
             renderItem={renderItem}
             initialNumToRender={20}
             keyExtractor={(item, index) => `${item.uuid}+${index}`}                      

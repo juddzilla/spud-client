@@ -13,7 +13,7 @@ import Input from './Input';
 import Exit from './Exit';
 import Title from './Title';
 import Menu from './Menu';
-import Talk from '../actions/Talk';
+import TalkButton from '../Talk/Button';
 
 import colors from '../colors';
 import styles from '../styles';
@@ -185,7 +185,7 @@ export default function Convo({item}) {
           placeholder='Create New Message'
           theme='dark' 
         /> 
-        <Talk />
+        <TalkButton keys={queryKeys} />
       </View>
     </View>
   )

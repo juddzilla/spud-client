@@ -29,7 +29,7 @@ export default function DetailModal() {
   const slideOut = () => {    
     Animated.timing(slideAnim, {
       toValue: windowWidth,
-      duration: 180,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   };
@@ -43,18 +43,18 @@ export default function DetailModal() {
       },
     });
 
-  useEffect(() => {    
+  useEffect(() => {  
     const op = data && data.context.length ? slideIn : slideOut;
     op();
   }, [data]);
   
-  if (!data || !data.context.length) {
-    return null;
-  }
-
+  
   const typeMap = { Convo, Note, List };
-
+  
   const TypeComponent = () => {    
+      if (!data || !data.context.length) {
+        return null;
+      }
     const Component = typeMap[data.type];
     return (<Component item={data} />)
   };
@@ -64,7 +64,8 @@ export default function DetailModal() {
       position: 'absolute',
       top: 0, 
       left: 0, 
-      height: Dimensions.get('window').height,            
+      height: Dimensions.get('window').height,   
+      width: '100%',
     },    
     content: {
       flexDirection: 'column',

@@ -1,5 +1,4 @@
 import ListView from '../../../components/UI/List/View';
-import DrawerScreen from '../../../components/DrawerScreen';
 
 export default function Notes() {  
   const options = {
@@ -18,8 +17,7 @@ export default function Notes() {
   };
 
   return (
-    <>
-      { DrawerScreen('Your Notes') }
+    <>      
       <ListView options={{...options}} />
     </>
 );

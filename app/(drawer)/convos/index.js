@@ -1,5 +1,4 @@
 import ListView from '../../../components/UI/List/View';
-import DrawerScreen from '../../../components/DrawerScreen';
 
 export default function Convos() {  
   const options = {
@@ -18,9 +17,6 @@ export default function Convos() {
   };
 
   return (
-    <>
-      { DrawerScreen('Your Conversations') }
-      <ListView options={{...options}} />
-    </>
+    <ListView options={{...options}} />    
   );
 }

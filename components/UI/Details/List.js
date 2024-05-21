@@ -380,7 +380,7 @@ const Header = () => {
   }
 
   return (
-    <View style={{...styles.row, height: 40}}>
+    <View style={{...styles.row, height: 44 }}>
       <Exit />
       <View style={{...styles.row, justifyContent: 'flex-end', flex: 1}}>             
         <Pressable

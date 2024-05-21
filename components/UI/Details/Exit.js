@@ -15,7 +15,7 @@ export default function Exit() {
       width: 40,
       height: '100%', 
       ...styles.centered, 
-      left: 0
+      left: 0,
     },
     backIcon: {
       color: colors.darkText, 
@@ -32,7 +32,7 @@ export default function Exit() {
       onPress={onClose}
       style={styled.backButton}
     >
-      <Icon name='chevronLeft' styles={styled.backIcon} />
+      <Icon name='close' styles={styled.backIcon} />
     </Pressable>
   )
   
