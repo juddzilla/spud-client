@@ -3,10 +3,10 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
  } from 'react';
-import {
+
+ import {
   Dimensions,
   Pressable, 
   StyleSheet, 
@@ -98,6 +98,12 @@ const EmptyListState = () => {
         </View>
       ) }
     </View>
+  )
+};
+
+const ListFooterComponent = () => {
+  return (
+    <View style={{height: 56, width: '100%', backgroundColor: 'transparent'}}></View>
   )
 }
 
@@ -206,7 +212,11 @@ const ListList = ({context}) => {
   });
 
   const ListItem = useCallback((props) => {    
-    const {drag, getIndex, isActive, item} = props;     
+    const {drag, getIndex, isActive, item} = props;   
+    
+    const number = getIndex()+1;
+
+    const marginBottom = number === items.length ? 56 : 0;
     
     const styled = StyleSheet.create({
       container: {
@@ -214,6 +224,7 @@ const ListList = ({context}) => {
         marginHorizontal: 0,
         flex: 1,
         marginRight: 4,
+        marginBottom
       },
       checkbox: {
         ...styles.centered,        
@@ -271,23 +282,28 @@ const ListList = ({context}) => {
         [percentOpen]
       );
 
+      const rightActionStyled = StyleSheet.create({
+        base: {alignItems: 'flex-end', justifyContent: 'center', height: 44},
+        view: {            
+          justifyContent: 'center',
+          alignItems: 'center',              
+          width: 60,
+          flex: 1,
+          ...animStyle,
+        },
+        icon: {backgroundColor: colors.remove, transform: [{ translateX: -16 }]}
+      })
+
       return (
-        <BaseButton style={{alignItems: 'flex-end', justifyContent: 'center', height: 44}} onPress={() => { removeListItemMutation.mutate(item) }}>
-          <Animated.View
-            style={{            
-              justifyContent: 'center',
-              alignItems: 'center',              
-              width: 60,
-              flex: 1,
-              ...animStyle,
-            }}>            
-            <Icon name='trash' styles={{backgroundColor: colors.remove, transform: [{ translateX: -16 }]}} />
+        <BaseButton style={rightActionStyled.base} onPress={() => { removeListItemMutation.mutate(item) }}>
+          <Animated.View style={rightActionStyled.view}>            
+            <Icon name='trash' styles={rightActionStyled.icon} />
           </Animated.View>
         </BaseButton>
       );
     };
 
-    const number = getIndex()+1;
+
 
     return (
       <ScaleDecorator>
@@ -338,13 +354,14 @@ const ListList = ({context}) => {
   }
   
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, paddingBottom: 0}}>
       <DraggableFlatList
         activationDistance={20}           
         data={items}
         initialNumToRender={20}
         keyExtractor={item => item.id}   
         ListEmptyComponent={<EmptyListState />}
+        // ListFooterComponent={<ListFooterComponent />}
         onDragEnd={onReorder}
         renderItem={ListItem}
         refreshing={true}
@@ -403,8 +420,13 @@ export default function List({item}) {
     content: {flex: 1, paddingLeft: 20},
     footer: {
       ...styles.footer,
-      paddingHorizontal: 16,
-      backgroundColor: colors.darkText,
+      paddingHorizontal: 8,
+      position: 'absolute', 
+      bottom: 0,
+      left: 0,
+      backgroundColor: 'transparent',
+      flex: 1,
+      width: Dimensions.get('window').width
     }
   });
 
@@ -420,11 +442,12 @@ export default function List({item}) {
         <Header />           
         <View style={listStyles.content}>
           <Title />
+          
           <View style={{flex: 1}}>
             <ListList context={queryKeys} />            
           </View>          
-          <View
-            style={{...listStyles.footer, position: 'absolute', bottom: 0}}>
+          
+          <View style={listStyles.footer}>
             <Input            
               keys={queryKeys}
               placeholder='Create New List Item'

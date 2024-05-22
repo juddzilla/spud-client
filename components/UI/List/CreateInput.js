@@ -28,17 +28,28 @@ import { useState } from 'react';
                 flexDirection: 'row', 
                 alignItems: 'center', 
                 flex: 1,              
-                borderWidth: 1,
-                borderColor: focus ? colors.darkText : colors.white,
-                borderRadius: 12,                      
+                      
                 zIndex: 10,
-                overflow: 'hidden',
+                // overflow: 'hidden',
                 marginRight: 8,
+
+                shadowColor: colors.darkText,
+                shadowOffset: {
+                    width: 2,
+                    height: 1,
+                },
+                shadowOpacity: 0.58,
+                shadowRadius: 3,
+                elevation: 10,
             },
             field: {                    
-                backgroundColor: 'red', 
+                // backgroundColor: 'red', 
                 height: 48,    
+                borderWidth: 1,
+                borderColor: focus ? colors.darkText : colors.white,
+                borderRadius: 12,                
                 paddingHorizontal: 16,
+                borderRadius: 12,                      
                 backgroundColor: focus ? colors.white : colors.lightWhite,
                 // marginRight: 0, mnmnm
                 flex: 1,     
@@ -66,7 +77,7 @@ import { useState } from 'react';
                 opacity: (focus && message.trim().length) ? 1 : 0,
                 position: 'absolute', 
                 right: 4,
-                backgroundColor: 'green'
+                // backgroundColor: 'green'
             },
         },
       });

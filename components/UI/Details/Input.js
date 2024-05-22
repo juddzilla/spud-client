@@ -99,9 +99,16 @@ export default function Input({ keys, placeholder, theme='light' }) {
             borderWidth: 1,
             borderColor: focus ? colors.darkText : colors.white,
             borderRadius: 8,
-            marginBottom: 4,            
+            marginRight: 8,            
             
-            // zIndex: 10,
+            shadowColor: colors.darkText,
+            shadowOffset: {
+                width: 2,
+                height: 1,
+            },
+            shadowOpacity: 0.58,
+            shadowRadius: 3,
+            elevation: 10,
         },
         input: {
             color: style.color,

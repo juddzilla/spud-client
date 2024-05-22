@@ -9,6 +9,7 @@
     useQuery,
   } from '@tanstack/react-query';
   
+  import Search from './Search';
   import colors from '../colors';
   import styles from '../styles';  
   import Bold from '../text/Bold';
@@ -102,8 +103,19 @@ export default function ListFlatList({filters, keys, renderItem}) {
     } 
 
     return (
-      <View style={{...styles.row, paddingLeft: 20, backgroundColor: colors.darkBg, height: 40, marginBottom: 4}}>
-        <Bold style={{fontSize: 12, color: colors.lightText}}>{ headerMessage }</Bold>        
+      <View style={{
+        ...styles.row, 
+        justifyContent: 'space-between', 
+        paddingLeft: 20, 
+        backgroundColor: colors.darkBg, 
+        height: 48, 
+        marginBottom: 4,        
+        paddingRight:8,
+      }}>
+        <View style={{marginRight: 16}}>
+          <Bold style={{fontSize: 12, color: colors.lightText}}>{ headerMessage }</Bold>  
+        </View>
+        <Search keys={keys} />      
       </View>
     )
   };

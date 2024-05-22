@@ -12,7 +12,7 @@ import { useDebouncedValue } from '../../../utils/debounce';
 
 import Fetch from '../../../interfaces/fetch';
 
-export default function Search({ keys, placeholder }) {   
+export default function Search({ keys }) {   
     const [disabled, setDisabled] = useState(true);     
     const [focused, setFocused] = useState(false);
     const [search, setSearch] = useState('');
@@ -43,11 +43,15 @@ export default function Search({ keys, placeholder }) {
         container: {
             ...styles.row,   
             backgroundColor: focusedOrHasSearch ? colors.lightWhite : 'transparent', 
+            
             borderWidth: 1,
+            // borderRadius: height / 2,
             borderRadius: height / 2,
+            overflow: 'hidden',
             borderColor: focusedOrHasSearch? colors.darkText : colors.white,               
-            // borderColor: 'red',
-            flex: 1,
+            
+            
+            // flex: 1,
             justifyContent: 'space-between',
             marginRight: 8,
             
@@ -61,6 +65,9 @@ export default function Search({ keys, placeholder }) {
                 height,
                 width: height,
                 ...styles.centered,
+                // backgroundColor: 'red',
+                // borderWidth: 1,
+            borderColor: focusedOrHasSearch? colors.darkText : colors.white,    
             },
          },
         input: {            
@@ -69,7 +76,7 @@ export default function Search({ keys, placeholder }) {
             color: colors.darkText,                
             paddingLeft: 18,
             paddingRight: 44,     
-            flex: 1,
+            // flex: 1,
         },
         close: { 
             button: {
@@ -101,17 +108,19 @@ export default function Search({ keys, placeholder }) {
       }
 
     return (
-        <View style={style.container}>        
-            <TextInput
-                editable={!!disabled === false}
-                value={search}
-                onChangeText={setSearch} 
-                onBlur={() => setFocused(false)}
-                onFocus={() => setFocused(true)}
-                placeholder={placeholder}
-                placeholderTextColor={colors.darkText}
-                style={style.input}
-            />
+        <View style={style.container}>      
+            { focused &&            
+                <TextInput
+                    editable={!!disabled === false}
+                    value={search}
+                    onChangeText={setSearch} 
+                    onBlur={() => setFocused(false)}
+                    onFocus={() => setFocused(true)}
+                    placeholder='Search'
+                    placeholderTextColor={colors.darkText}
+                    style={style.input}
+                />
+            }  
             <View style={style.icon.container}>                         
                 { search.trim().length > 0 ?            
                     (<Pressable

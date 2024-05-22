@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import CreateInput from './CreateInput';
 import DefaultListItem from './DefaultListItem';
 import FlatList from './FlatList';
-import Search from './Search';
 import Sort from './Sort';
 
 import styles from '../styles';
@@ -20,22 +19,21 @@ export default function ListView({options}) {
     storeKey, 
   } = options;
 
+  function headerRight() {
+    if (Object.hasOwn(filters, 'sort')) {
+      return (
+        <Sort     
+          keys={storeKey}    
+          fields={filters.sort.fields}
+        />
+      )
+    }
+  }
+
   return (
     <>
-      <DrawerScreen title={storeKey[0]} />
-      <View style={styles.View}>
-        <View style={{...styles.header, paddingVertical: 8}}>   
-          <Search            
-            keys={storeKey}
-            placeholder={filters.placeholder}          
-          />
-          { Object.hasOwn(filters, 'sort') &&
-            <Sort     
-              keys={storeKey}    
-              fields={filters.sort.fields}
-            />
-          }        
-        </View>
+      <DrawerScreen headerRight={headerRight} title={storeKey[0]} />
+      <View style={styles.View}>        
         <View style={{flex: 1, paddingBottom: 0}}>
           <FlatList    
             filters={filters}      
@@ -43,7 +41,7 @@ export default function ListView({options}) {
             renderItem={ItemTemplate}
           />       
         
-          <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0}}>
+          <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8}}>
             <CreateInput
               keys={storeKey}
               noRedirect={noRedirect}
