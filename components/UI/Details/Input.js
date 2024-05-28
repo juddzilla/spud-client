@@ -1,85 +1,39 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
-    Animated,
     Pressable,
     StyleSheet,
     TextInput,
     View,
 } from 'react-native';
 
-import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '../../../contexts/query-client';
-
-import Fetch from '../../../interfaces/fetch';
 import Icon from '../icons';
 import colors from '../colors';
 import styles from '../styles';
-export default function Input({ keys, placeholder, theme='light' }) {
+export default function Input({ onSubmit, placeholder }) {
     const [message, setMessage] = useState('');
     const [focus, setFocus] = useState(false);
     const inputRef = useRef(); 
     
-    const baseUri = keys.join('/')+'/';
     const height = 48;
 
-    let inputTheme = {
-        inactive: {
-            backgroundColor: colors.white,
-            borderColor: colors.white,
-            color: colors.sort.inactive,
-        },
+    const inputTheme = {
         active: {
-            backgroundColor: 'red',
-            borderColor: 'green',
-            color: colors.sort.active,
+            backgroundColor: 'transparent',
+            borderColor: colors.lightWhite,
+            color: colors.darkText,
+        },
+        inactive: {
+            backgroundColor: colors.lightWhite,
+            borderColor: colors.lightWhite,
+            color: 'red'// colors.darkText,
         },
     };
-
-    if (theme === 'dark') {
-        inputTheme = {
-            active: {
-                backgroundColor: 'transparent',
-                borderColor: colors.lightWhite,
-                color: colors.darkText,
-            },
-            inactive: {
-                backgroundColor: colors.lightWhite,
-                borderColor: colors.lightWhite,
-                color: 'red'// colors.darkText,
-            },
-        }
-    }
-
-    const createListItemMutation = useMutation({
-        mutationFn: async (text) => {
-          if (!text.trim().length) {
-            return;
-          }
-          const data = { body: text.trim() };
-    
-          try {
-            return await Fetch.post(baseUri, data)
-          } catch (error) {
-            console.warn('Create List Item Error:', error);
-          }
-        },
-        onSuccess: (data) => {      
-            queryClient.setQueryData(keys, old => {
-                const oldCopy = JSON.parse(JSON.stringify(old));
-                const results = oldCopy.results;
-                results.push(data.results);
-                return {...oldCopy, results };
-            });
-        }
-      });
-    
 
     const style = inputTheme[focus ? 'active' : 'inactive'];
     
     function onSubmitMessage() {               
-        createListItemMutation.mutate(message);
-        setMessage('');  
-        // inputRef.current.blur();
+        onSubmit(message);
+        setMessage('');
     }
 
     function onBlur() {
@@ -126,15 +80,8 @@ export default function Input({ keys, placeholder, theme='light' }) {
         send: {
             color: colors.darkText,
             size: 16, 
-            // zIndex: 1,
         },
       });
-
-    //   useEffect(() => {
-    //     if (message === '') {
-    //         setTimeout(() => { inputRef.current.blur(); }, 0)            
-    //     }
-    //   }, [message])
 
     return (
         <View style={styled.container}>            

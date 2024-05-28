@@ -7,6 +7,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
+import { DetailStyles } from './styles';
 import Exit from './Exit';
 import Menu from './Menu';
 import Title from './Title';
@@ -63,6 +64,29 @@ export default function Note({item}) {
   })
   
   const styled = StyleSheet.create({
+    view: {
+      ...DetailStyles.view,
+      paddingBottom: 15,
+    },
+    content: {
+      ...DetailStyles.content
+    },
+    header: {
+      ...DetailStyles.header,
+    },
+    menu: {
+      ...DetailStyles.menu
+    },
+    note: {
+      flexWrap: 'wrap',
+      fontSize: 18,        
+      paddingHorizontal: 16,
+      // paddingTop: 16,
+      paddingBottom: 36,
+      backgroundColor: 'transparent', 
+      color: colors.darkText,
+      lineHeight: 28,
+    },
     date: {
       container: {      
         flexDirection: 'row',
@@ -77,36 +101,27 @@ export default function Note({item}) {
 
   return (
     <View
-      style={{
-        ...styles.View,
-        paddingBottom: 15,
-        width: Dimensions.get('window').width,               
-      }}
+      style={styled.view}
     >                
       { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 
         (
           <Light>Loading</Light>
         ) : 
         (
-          <View style={{backgroundColor: colors.white, flex: 1, borderRadius: 4}}>
-            <View style={{...styles.row, height: 40}}>
+          <View style={styled.content}>
+            <View style={styled.header}>
               <Exit />
-              <View style={{...styles.row, justifyContent: 'flex-end', flex: 1}}>                     
+              <View style={styled.menu}>                     
                 <Menu />
               </View>
             </View>
+            
             <Title />
+            
             <DebouncedInput
               multiline={true}
               placeholder='(untitled)'
-              style={{
-                flexWrap: 'wrap',
-                fontSize: 20,        
-                paddingHorizontal: 16,
-                paddingTop: 16,
-                backgroundColor: 'transparent', 
-                color: colors.darkText,
-              }}
+              style={styled.note}
               update={(value) => { updateMutation.mutate({body: value})}} 
               value={body}
             />
@@ -115,10 +130,7 @@ export default function Note({item}) {
       
       }
       
-      <View style={{...styles.footer, paddingHorizontal: 4, }}>
-        <View style={styled.date.container}>
-          <Light style={styled.date.body}> {relativeDate(updatedAt)}</Light>          
-        </View> 
+      <View style={styles.footer}>
         <TalkButton keys={queryKeys} />        
       </View>
     </View>

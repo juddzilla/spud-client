@@ -48,39 +48,6 @@ export default function TalkButton({ keys }) {
               />
             </View>
           </Pressable>
-          
-          {/* <View
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.5)',
-              opacity: isOpen ? 1 : 0,
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              // top: (Dimensions.get('window').height - 64 - 16 - 1) * -1,                            
-              // left: (Dimensions.get('window').width  - 16 - 1) * -1,
-              width: Dimensions.get('window').width,
-              height: isOpen ? Dimensions.get('window').height : 0,
-              zIndex: 1,
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: colors.brand,
-                opacity: 1,
-                position: 'absolute',
-                bottom: 44,
-                width: Dimensions.get('window').width,
-                height: Dimensions.get('window').height / 2,
-                height: 74,
-                paddingLeft: 16,                
-                justifyContent: 'center',
-                alignItems: 'center',                
-                paddingRight: 92,                
-              }}
-            >
-              <Bold style={{textAlign: 'center',}}>You can add, remove, reorder, or delete list items</Bold>
-            </View>
-          </View>                          */}
       </View>     
     )
 }

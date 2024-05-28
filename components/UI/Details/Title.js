@@ -61,7 +61,22 @@ export default function Title() {
   });
 
   return (
-    <View style={{...styles.row, marginBottom: 8,  paddingRight: 16, height: 56}}>
+    <View style={{
+      ...styles.row, 
+      // marginBottom: 8,  
+      paddingHorizontal: 16, 
+      height: 56,
+      backgroundColor: colors.white, 
+
+      // shadowColor: colors.darkText,
+      // shadowOffset: {
+      //     width: 0,
+      //     height: 8,
+      // },
+      // shadowOpacity: 0.2,
+      // shadowRadius: 4,
+      // elevation: 0.1,
+    }}>
 
         <DebouncedInput
           multiline={false}

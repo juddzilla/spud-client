@@ -30,14 +30,16 @@ const header = {
 const View = { flex: 1,  };
 
 const footer = {
+    // backgroundColor: 'green',
     backgroundColor: 'transparent',    
-    paddingVertical: 8,
-    // paddingRight: 4,
-    // paddingLeft: 16,
-    
+    bottom: 0,
+    flex: 1,
     flexDirection: 'row', 
-    // height: 64,
     justifyContent: 'flex-end',     
+    left: 0,
+    paddingBottom: 8,
+    paddingHorizontal: 8,
+    position: 'absolute', 
     width: '100%',
 };
 

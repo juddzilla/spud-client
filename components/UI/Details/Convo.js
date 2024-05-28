@@ -1,14 +1,13 @@
 import { useEffect, useContext, useState } from 'react';
 import {
-  Dimensions,
   FlatList,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import AnimatedEllipsis from 'rn-animated-ellipsis';
 
+import { DetailStyles } from './styles';
 import Input from './Input';
 import Exit from './Exit';
 import Title from './Title';
@@ -55,38 +54,27 @@ const Messages = ({uuid}) => {
   const Message = ({ index, item }) => {
 
     const styled = StyleSheet.create({
+      ellipsis: {
+        fontSize: 20, 
+        color: colors.darkText,
+      },
       message: {
         paddingHorizontal: 8,       
         marginBottom: 24,
-        // overflow: 'hidden',
-        // backgroundColor: colors.white,
-        // paddingVertical: 16,
       },
       header: {        
-        // flexDirection: item.type === 'user' ? 'row-reverse' : 'row',
-        // alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        // height: 24,
+        justifyContent: 'space-between',        
         flexDirection: 'row', 
         alignItems: 'flex-end',
         marginBottom: 4,
         paddingHorizontal: 0,
-        // paddingTop: 4,
+        // backgroundColor: 'yellow', 
       },
-      body: {
-        // flexDirection: item.type === 'user' ? 'row' : 'row-reverse',
-        // justifyContent: 'flex-end',
-        // alignItems: 'center',
-        // borderRadius: 4,
-        
-        lineHeight: 24, 
-        // paddingVertical: 10,
-        paddingHorizontal: 1,
-        // right: item.type === 'user' ? -8 : 8,
-        // left: item.type === 'system' ? -8 : 0,
-        // marginRight: 48,
-
-       },
+      text: {
+        color: colors.darkText,
+        fontSize: 16,
+        lineHeight: 24,
+      },
       date: { paddingBottom: 1, color: colors.lightText, fontSize: 10, marginHorizontal: 6 },
       user: { color: colors.black },
     });
@@ -100,30 +88,31 @@ const Messages = ({uuid}) => {
       <View style={styled.message}>
         <View style={styled.header}>
           <Bold style={styled.user}>{ displayNameMap[item.type] }</Bold>
-          {/* { item.created_at && 
+          { item.created_at && 
             
           <Light style={styled.date}>{convoDate(item.created_at)}</Light>
-          } */}
+          }
           
         </View>
         <View>            
           { (index === awaitingIndex && item.body === 'awaiting') ? (
-            <AnimatedEllipsis numberOfDots={5} style={{fontSize: 20, color: colors.white}}/>
+            <AnimatedEllipsis numberOfDots={5} style={styled.ellipsis}/>
           ) : (
-            <View style={styled.body}>
+            <View>
 
-              <Regular style={{ color: colors.darkText, }}>{ item.body }</Regular>              
+              <Regular style={styled.text}>{ item.body }</Regular>              
             </View>
             )}
         </View>
       </View>
     )
   };
+
   const flatlist = StyleSheet.create({
     container: {
       flex: 1,
-      paddingBottom: 8,
-      paddingHorizontal: 12,
+      paddingBottom: 44,
+      paddingHorizontal: 8,
     }  
   });
 
@@ -159,31 +148,36 @@ export default function Convo({item}) {
     });
   }
 
+  const styled = StyleSheet.create({
+    view: {
+      ...DetailStyles.view
+    },
+    flex1: { flex: 1 },
+    heading: {
+      ...DetailStyles.header
+    },
+    menu: {
+      ...DetailStyles.menu
+    },
+  })
+
   return (
-    <View
-      style={{
-        ...styles.View, 
-        width: Dimensions.get('window').width,     
-        backgroundColor: colors.white,
-      }}
-    >   
-      <View style={{...styles.row, height: 40}}>
+    <View style={styled.view}>   
+      <View style={styled.heading}>
         <Exit />
-        <View style={{...styles.row, justifyContent: 'flex-end', flex: 1}}>                     
+        <View style={styled.menu}>                     
           <Menu />
         </View>
       </View>
-      <View style={{flex: 1, paddingLeft: 20}}>
+      <View style={styled.flex1}>
         <Title />
         <Messages uuid={queryKeys[1]}/>
       </View>
 
-      <View style={{...styles.footer}}>
+      <View style={styles.footer}>
         <Input
-          keys={queryKeys}
           onSubmit={createMessage} 
-          placeholder='Create New Message'
-          theme='dark' 
+          placeholder='Create New Message'          
         /> 
         <TalkButton keys={queryKeys} />
       </View>

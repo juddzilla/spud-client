@@ -7,7 +7,6 @@ import {
  } from 'react';
 
  import {
-  Dimensions,
   Pressable, 
   StyleSheet, 
   TouchableOpacity,
@@ -30,6 +29,7 @@ import { BaseButton } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
+import { DetailStyles } from './styles';
 import Input from './Input';
 import TalkButton from '../Talk/Button';
 import colors from '../colors';
@@ -47,7 +47,6 @@ const ListParamsContext = createContext({});
 
 const initialFilters = { completed: null, search: ''};
 const textColor = colors.darkText;
-
 
 function ListParamsProvider(props) {
   const [listParams, setListParams] = useState(initialFilters);
@@ -100,12 +99,6 @@ const EmptyListState = () => {
     </View>
   )
 };
-
-const ListFooterComponent = () => {
-  return (
-    <View style={{height: 56, width: '100%', backgroundColor: 'transparent'}}></View>
-  )
-}
 
 const ListList = ({context}) => {   
   const baseUri = `lists/${context[1]}/`;
@@ -354,7 +347,7 @@ const ListList = ({context}) => {
   }
   
   return (
-    <View style={{flex: 1, paddingBottom: 0}}>
+    <View style={{flex: 1, paddingHorizontal: 16, paddingBottom: 0}}>
       <DraggableFlatList
         activationDistance={20}           
         data={items}
@@ -396,15 +389,33 @@ const Header = () => {
     checkboxToggleIcon = checkboxToggleIconMap[listParams.completed];
   }
 
+  const styled = StyleSheet.create({    
+    header: {
+      ...DetailStyles.header,
+    },
+    menu: {
+      ...DetailStyles.menu
+    },
+    button: {
+      width: 40, 
+      height: 40, 
+      ...styles.centered,
+    },
+    icon: {
+      size: 22, 
+      color: colors.darkText
+    },
+  })
+
   return (
-    <View style={{...styles.row, height: 44 }}>
+    <View style={styled.header}>
       <Exit />
-      <View style={{...styles.row, justifyContent: 'flex-end', flex: 1}}>             
+      <View style={styled.menu}>             
         <Pressable
           onPress={toggleShowCompleted}
-          style={{width: 40, height: 40, alignItems: 'center', justifyContent: 'center'}}
+          style={styled.button}
         >
-          <Icon name={checkboxToggleIcon} styles={{size: 22, color: colors.darkText }} />
+          <Icon name={checkboxToggleIcon} styles={styled.icon} />
         </Pressable>  
         <Menu />
       </View>
@@ -415,47 +426,70 @@ const Header = () => {
 export default function List({item}) {  
   console.log('LIST');
   const queryKeys = item.context;
-  
-  const listStyles = StyleSheet.create({
-    content: {flex: 1, paddingLeft: 20},
-    footer: {
-      ...styles.footer,
-      paddingHorizontal: 8,
-      position: 'absolute', 
-      bottom: 0,
-      left: 0,
-      backgroundColor: 'transparent',
-      flex: 1,
-      width: Dimensions.get('window').width
+  const baseUri = queryKeys.join('/')+'/';
+
+  const styled = StyleSheet.create({
+    view: {
+      ...DetailStyles.view,
+      backgroundColor: colors.theme.inputs.light.backgroundColor,   
+    },
+    flex1: {flex: 1},
+    content: {
+      ...DetailStyles.content
+    },
+    header: {
+      ...DetailStyles.header,
+    },
+    menu: {
+      ...DetailStyles.menu
+    },
+  });
+
+  const createListItemMutation = useMutation({
+    mutationFn: async (text) => {
+      if (!text.trim().length) {
+        return;
+      }
+      const data = { body: text.trim() };
+
+      try {
+        return await Fetch.post(baseUri, data)
+      } catch (error) {
+        console.warn('Create List Item Error:', error);
+      }
+    },
+    onSuccess: (data) => {      
+        queryClient.setQueryData(queryKeys, old => {
+            const oldCopy = JSON.parse(JSON.stringify(old));
+            const results = oldCopy.results;
+            results.push(data.results);
+            return {...oldCopy, results };
+        });
     }
   });
 
   return (
     <ListParamsProvider>
       <View
-        style={{
-          ...styles.View,
-          width: Dimensions.get('window').width,
-          backgroundColor: colors.theme.inputs.light.backgroundColor,                               
-        }}
+        style={styled.view}
       >   
         <Header />           
-        <View style={listStyles.content}>
+        <View style={styled.content}>
           <Title />
           
-          <View style={{flex: 1}}>
+          <View style={styled.flex1}>
             <ListList context={queryKeys} />            
           </View>          
           
-          <View style={listStyles.footer}>
-            <Input            
-              keys={queryKeys}
-              placeholder='Create New List Item'
-              theme='dark'
-            />        
-            <TalkButton keys={queryKeys} />
-          </View>       
         </View>
+
+        <View style={styles.footer}>
+          <Input            
+            onSubmit={createListItemMutation.mutate}
+            placeholder='Create New List Item'            
+          />        
+          <TalkButton keys={queryKeys} />
+        </View>       
       </View>
     </ListParamsProvider>
   );
