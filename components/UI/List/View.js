@@ -1,3 +1,4 @@
+
 import { View } from 'react-native';
 
 import CreateInput from './CreateInput';
@@ -11,12 +12,13 @@ import TalkButton from '../Talk/Button';
 import DrawerScreen from '../../DrawerScreen';
 
 export default function ListView({options}) {  
+  console.log(0);
   const {
     actions,
     filters,
     ItemTemplate = DefaultListItem,    
     noRedirect,
-    storeKey, 
+    storeKey,     
   } = options;
 
   function headerRight() {
@@ -32,7 +34,7 @@ export default function ListView({options}) {
 
   return (
     <>
-      <DrawerScreen headerRight={headerRight} title={storeKey[0]} />
+      <DrawerScreen headerRight={headerRight} title={'name me'} />
       <View style={styles.View}>        
         <View style={{flex: 1, paddingBottom: 0}}>
           <FlatList    
@@ -41,14 +43,14 @@ export default function ListView({options}) {
             renderItem={ItemTemplate}
           />       
         
-          <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8}}>
+          {/* <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8}}>
             <CreateInput
               keys={storeKey}
               noRedirect={noRedirect}
               placeholder={actions.placeholder}            
             />
             <TalkButton keys={storeKey} />                  
-          </View>
+          </View> */}
         </View>
       </View>       
     </>

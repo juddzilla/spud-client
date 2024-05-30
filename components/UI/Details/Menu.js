@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useMutation } from '@tanstack/react-query';
@@ -7,23 +8,25 @@ import Icon from '../icons';
 import styles from '../styles';
 
 import { queryClient } from '../../../contexts/query-client';
+import { CollectionsContext } from '../../../contexts/collections';
 import Fetch from '../../../interfaces/fetch';
 
-export default function Menu() {
+export default function Menu({ noCollectionsToggle }) {
     const { context } = queryClient.getQueryData(['details']);
     const { showActionSheetWithOptions } = useActionSheet(); 
+    const { showCollections, setShowCollections } = useContext(CollectionsContext);
     
 
     const initialData = { context: [], data: null, children: [] };    
     
-    const addToCollectionText = 'Add To Collection';
+    // const addToCollectionText = 'Add To Collection';
     const cancelText = 'Cancel';
     const deleteText = 'Delete';
     const lockNoteText = 'Lock Note';
     const summarizeToNoteText = 'Summarize To Note';
     
     function openOptionsMenu() {
-        const topLevelOptions = [addToCollectionText, deleteText, cancelText];        
+        const topLevelOptions = [deleteText, cancelText];        
         if (context[0] === 'convos') {
             topLevelOptions.unshift(summarizeToNoteText)
         } else if (context[0] === 'notes') {
@@ -45,8 +48,8 @@ export default function Menu() {
                 confirmDeletion()
             } else if (topLevelOptions[selectedIndex] === summarizeToNoteText) {
                 confirmSummarizeToNote();
-            } else if (topLevelOptions[selectedIndex] === addToCollectionText) {
-                chooseCollection();
+            // } else if (topLevelOptions[selectedIndex] === addToCollectionText) {
+            //     chooseCollection();
             } else if (topLevelOptions[selectedIndex] === lockNoteText) {
                 confirmLockNote();
             }
@@ -80,9 +83,15 @@ export default function Menu() {
         console.log('SUMMARIZE TO NOTE');
     }
 
-    function chooseCollection() {
-        console.log('Add To Collection');
-    }
+    // function chooseCollection() {
+    //     console.log('Add To Collection');
+        
+    //     queryClient.setQueryData(['details'], old => {
+    //         const oldCopy = JSON.parse(JSON.stringify(old));
+    //         return { ...oldCopy, showCollections: true};
+    //     })
+
+    // }
 
     function confirmLockNote() {
         console.log('Lock Note');
@@ -133,8 +142,20 @@ export default function Menu() {
         },
     ];
 
+    function toggleCollections() {
+        setShowCollections(!showCollections);
+    }
+
     return (
         <View style={styles.row}>
+            { !noCollectionsToggle &&            
+                <Pressable
+                        onPress={toggleCollections}
+                        style={{...styled.options}}
+                    >              
+                        <Icon name='collection' styles={{...styled.optionsIcon, size: 20}} />
+                </Pressable>
+            }
             { viewOptions.map(option => (
                 <Pressable
                     key={option.icon}

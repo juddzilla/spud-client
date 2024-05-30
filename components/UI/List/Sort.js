@@ -39,7 +39,7 @@ export default function Sort({ fields, keys }) {
   };
 
   function update(param) {
-    const params = {...DataQuery.data.params, ...param};
+    const params = {...DataQuery.data.params, ...param};    
     Fetch.get(uri, params)
       .then(response => queryClient.setQueryData(keys, response));
   }

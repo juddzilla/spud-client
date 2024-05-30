@@ -1,14 +1,17 @@
+import { useContext } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import colors from '../colors';
 import Icon from '../icons';
 import styles from '../styles';
 
 import { queryClient } from '../../../contexts/query-client';
+import { CollectionsContext } from '../../../contexts/collections';
 
 const initialData = { context: [], title: null, type: null };
 
 export default function Exit() {
   const queryKey = ['details'];
+  const { setShowCollections } = useContext(CollectionsContext);
 
   const styled = StyleSheet.create({    
     backButton: {
@@ -25,6 +28,7 @@ export default function Exit() {
 
   function onClose() {
     queryClient.setQueryData(queryKey, initialData);
+    setShowCollections(null);
   }
 
   return (

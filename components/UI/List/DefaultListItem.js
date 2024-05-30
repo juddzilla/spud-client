@@ -17,33 +17,22 @@ import Regular from '../text/Regular';
 import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
-const DefaultListItem = ({ index, item }) => {
+
+const DefaultListItem = ({ index, item }) => {    
     if (!item) {
         return null;
     }
-
-    const typeMap = {
-        List: 'Lists',
-        Convo: 'Convos',
-        Note: 'Notes',
-    };
-
-    const keyMap = {
-        List: 'lists',
-        Convo: 'convos',
-        Note: 'notes',
-    };
+    console.log('item',item);
+    const key = item.type.toLowerCase()+'s';
 
     function onPress() {
-        const keys = [keyMap[item.type], item.uuid];
+        const keys = [key, item.uuid];
         queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });        
         queryClient.setQueryData(keys, { context: keys, ...item });        
     }
 
-    const remove = async () => {
-        const type = typeMap[item.type];
-        const key = keyMap[item.type];          
-        await Fetch.remove(`${type.toLowerCase()}/${item.uuid}/`);        
+    const remove = async () => {                
+        await Fetch.remove(`${key}/${item.uuid}/`);        
         queryClient.setQueryData([key], old => {
             const oldCopy = JSON.parse(JSON.stringify(old));            
             return oldCopy.filter(i => i.uuid !== item.uuid)
@@ -146,29 +135,27 @@ const DefaultListItem = ({ index, item }) => {
             snapPointsLeft={[60]}
             overSwipe={20}              
         >          
-            <View style={styled.row}>            
-                <Pressable
-                    style={styled.container}
-                    onPress={onPress}
-                >      
-                    <View style={styled.content}>
-                        
-                        <View style={styled.indexContainer}>
+            <View style={styled.row}>         
+            <Pressable
+                style={styled.container}
+                onPress={onPress}
+            >      
+                <View style={styled.content}>                        
+                    <View style={styled.indexContainer}>
 
-                            <Regular style={styled.index}>{ index+1 } </Regular>
-                        </View>
-                        <View>
-                            <Bold style={styled.title}>{item.title}</Bold>
-                            <View style={styled.info}>
-                                { item.subheadline &&
-                                    <Regular style={styled.subtitle}>{ item.subheadline }</Regular>
-                                }
-                                <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
-                            </View>
+                        <Regular style={styled.index}>{ index+1 } </Regular>
+                    </View>
+                    <View>
+                        <Bold style={styled.title}>{item.title}</Bold>
+                        <View style={styled.info}>
+                            { item.subheadline &&
+                                <Regular style={styled.subtitle}>{ item.subheadline }</Regular>
+                            }
+                            <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
                         </View>
                     </View>
-                </Pressable>            
-
+                </View>
+            </Pressable>    
             </View>
         </SwipeableItem>        
     )

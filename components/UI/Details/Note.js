@@ -15,7 +15,6 @@ import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
 import styles from '../styles';
 import Light from '../text/Light';
-
 import TalkButton from '../Talk/Button';
 
 import Fetch from '../../../interfaces/fetch';
@@ -69,7 +68,8 @@ export default function Note({item}) {
       paddingBottom: 15,
     },
     content: {
-      ...DetailStyles.content
+      ...DetailStyles.content,
+      
     },
     header: {
       ...DetailStyles.header,
@@ -111,20 +111,29 @@ export default function Note({item}) {
           <View style={styled.content}>
             <View style={styled.header}>
               <Exit />
-              <View style={styled.menu}>                     
+              <View style={styled.menu}>        
                 <Menu />
               </View>
             </View>
             
             <Title />
+
+            <View style={{
+              flex: 1, 
+              // backgroundColor: 'red', 
+              // borderRadius: 8, 
+              // marginHorizontal: 4,
+              // transform: [{ scale: 0.95}]
+            }}>            
+              <DebouncedInput
+                multiline={true}
+                placeholder='(untitled)'
+                style={styled.note}
+                update={(value) => { updateMutation.mutate({body: value})}} 
+                value={body}
+              />
+            </View>
             
-            <DebouncedInput
-              multiline={true}
-              placeholder='(untitled)'
-              style={styled.note}
-              update={(value) => { updateMutation.mutate({body: value})}} 
-              value={body}
-            />
           </View>
         ) 
       

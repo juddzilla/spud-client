@@ -1,3 +1,4 @@
+  import { useEffect, useState } from 'react';
   import {
     Dimensions,
     FlatList,
@@ -18,7 +19,10 @@
   import Fetch from '../../../interfaces/fetch';
 
 export default function ListFlatList({filters, keys, renderItem}) {  
-    const uri = `${keys[0]}/`;  
+    // const uri = `${keys[0]}/`;  
+    const [items, setItems] = useState([]);
+    const uri = keys.join('/')+'/';  
+    console.log('keyss`s', keys);
     const sortDefaults = (filters && Object.hasOwn(filters, 'sort')) ? filters.sort.defaults : {};    
     const initialData = {
       count: null, 
@@ -39,15 +43,24 @@ export default function ListFlatList({filters, keys, renderItem}) {
     const DataQuery = useQuery({
       initialData,
       queryKey: keys,     
-      queryFn: async () => {                                 
-          const response =  await Fetch.get(uri, initialData.params);          
+      queryFn: async () => {  
+        console.log('uri', uri)                               ;
+          const response =  await Fetch.get(uri, initialData.params);    
+          console.log('response', response);
           return {...response, params: initialData.params};          
       },
       keepPreviousData: true,
       placeholderData: keepPreviousData,
     });
 
-    function nextPage() {
+    useEffect(() => {
+      if (DataQuery.data) {
+        console.log(0, DataQuery.data);
+        setItems(DataQuery.data.results);
+      }
+    }, [DataQuery.data])
+
+    function nextPage() {      
       if (DataQuery.fetchStatus !== 'fetching' && DataQuery.data.next) {      
         Fetch.get(DataQuery.data.next)
           .then(response => {
@@ -59,7 +72,7 @@ export default function ListFlatList({filters, keys, renderItem}) {
   
     function onRefresh() {    
       if (DataQuery.fetchStatus !== 'fetching') {
-        DataQuery.refetch();
+        // DataQuery.refetch();
       }
     }
     
@@ -85,7 +98,7 @@ export default function ListFlatList({filters, keys, renderItem}) {
           ) 
         }
 
-        if (DataQuery.data && DataQuery.data.params.search.trim().length > 0) {
+        if (DataQuery.data.params && DataQuery.data.params.search.trim().length > 0) {
           return (
               <Empty><Bold>No matches for "{DataQuery.data.params.search}"</Bold></Empty>
           ) 
@@ -133,7 +146,7 @@ export default function ListFlatList({filters, keys, renderItem}) {
       : DataQuery.data.results;
     return (
         <FlatList
-            data={data}
+            data={DataQuery.data.results}
             renderItem={renderItem}
             initialNumToRender={20}
             keyExtractor={(item, index) => `${item.uuid}+${index}`}                      
@@ -152,7 +165,20 @@ export default function ListFlatList({filters, keys, renderItem}) {
 
   return (
     <View style={{flex: 1}}>
-        {display()}
+        {/* {display()} */}
+        <FlatList
+            data={items}
+            renderItem={renderItem}
+            initialNumToRender={20}
+            keyExtractor={(item, index) => `${item.uuid}+${index}`}                      
+            ListEmptyComponent={ListEmptyComponent}
+            ListHeaderComponent={ListHeaderComponent}
+            onRefresh={onRefresh}
+            // onEndReached={onEndReached}
+            // onEndReachedThreshold={0.1}
+            //if set to true, the UI will show a loading indicator
+            refreshing={false}
+        />
     </View>
   )
 }

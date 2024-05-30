@@ -7,6 +7,7 @@ import {
  } from 'react';
 
  import {
+  FlatList,
   Pressable, 
   StyleSheet, 
   TouchableOpacity,
@@ -103,7 +104,8 @@ const EmptyListState = () => {
 };
 
 const ListList = ({context}) => {   
-  const baseUri = `lists/${context[1]}/`;
+  console.log('context', context);
+  const baseUri = context.join('/')+'/';
   const itemsUri = `${baseUri}items/`;
   const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
   const [items, setItems] = useState([]);
@@ -133,48 +135,49 @@ const ListList = ({context}) => {
 
 
   useEffect(() => {
-    if (DataQuery.data.results) {            
-      const newItems = filterItems(DataQuery.data.results, listParams);          
-      setItems(newItems);
+    if (DataQuery.data.results) {      
+      console.log('DataQuery.data.results', DataQuery.data.results);
+      // const newItems = filterItems(DataQuery.data.results, listParams);          
+      setItems(DataQuery.data.results);
     }
 
   }, [DataQuery.data, listParams]);
 
 
-  function filterItems(list, filter) {
-    return list.filter(i => {
-      if (filter.completed === null) { return true; }
-      return i.completed === filter.completed;
-    });
-  }
+  // function filterItems(list, filter) {
+  //   return list.filter(i => {
+  //     if (filter.completed === null) { return true; }
+  //     return i.completed === filter.completed;
+  //   });
+  // }
 
-  function onReorder({data}) {
-    const newItems = filterItems(data, listParams);          
-    setItems(newItems);    
-    const dataIds = data.map(d => d.id);
-    const queryData = queryClient.getQueryData(context);
-    const queryDataIds = queryData.results.map(d => d.id);
-    const areEqual = JSON.stringify(dataIds) === JSON.stringify(queryDataIds);
+  // function onReorder({data}) {
+  //   const newItems = filterItems(data, listParams);          
+  //   setItems(newItems);    
+  //   const dataIds = data.map(d => d.id);
+  //   const queryData = queryClient.getQueryData(context);
+  //   const queryDataIds = queryData.results.map(d => d.id);
+  //   const areEqual = JSON.stringify(dataIds) === JSON.stringify(queryDataIds);
 
-    if (!areEqual) {
-      const reordered = data.reduce((acc, cur, index) => {
-        cur.order = index;
-        acc.items.push(cur);
-        acc.ids.push(cur.id);
-        return acc;
-      }, { items: [], ids: []});
+  //   if (!areEqual) {
+  //     const reordered = data.reduce((acc, cur, index) => {
+  //       cur.order = index;
+  //       acc.items.push(cur);
+  //       acc.ids.push(cur.id);
+  //       return acc;
+  //     }, { items: [], ids: []});
 
-      reorderMutation.mutate({order: reordered.ids});
-    }
-  }
+  //     reorderMutation.mutate({order: reordered.ids});
+  //   }
+  // }
 
-  const reorderMutation = useMutation({
-    mutationFn: async (order) => await Fetch.put(itemsUri, order),
-    onSuccess: (data) => {      
-      const newItems = filterItems(reorderMutation.data.results, listParams);          
-      setItems(newItems);
-    }
-  });
+  // const reorderMutation = useMutation({
+  //   mutationFn: async (order) => await Fetch.put(itemsUri, order),
+  //   onSuccess: (data) => {      
+  //     const newItems = filterItems(reorderMutation.data.results, listParams);          
+  //     setItems(newItems);
+  //   }
+  // });
 
   const removeListItemMutation = useMutation({
     mutationFn: async ({ id }) => {
@@ -191,60 +194,38 @@ const ListList = ({context}) => {
     }
   })
 
-  const updateListItemMutation = useMutation({
-    mutationFn: async (data) => {
-      const { id, ...rest } = data;
-      try {
-        const response = await Fetch.put(itemUri(id), rest);
-        return response;
-      } catch (error) {
-        console.warn('Update List Item Error', error);
-      }    
-    },
-    onSuccess: (data) => {  
-      queryClient.invalidateQueries([context[0]]);
-    },
-  });
 
   const ListItem = useCallback((props) => {    
     const {drag, getIndex, isActive, item} = props;   
     
     const number = getIndex()+1;
-
-    const marginBottom = number === items.length ? 56 : 0;
     
     const styled = StyleSheet.create({
       container: {
         flexDirection: 'row',
-        marginHorizontal: 0,
-        flex: 1,
-        marginRight: 4,
-        marginBottom
-      },
-      checkbox: {
-        ...styles.centered,        
-        height: 40,
-        paddingRight: 4,
-        position: 'absolute'
-      },
+        // marginHorizontal: 0,
+        // flex: 1,
+        // marginRight: 4,
+        // marginBottom
+      },      
       icon: {
         color: textColor,
-        size: 16,
-        left: 1,    
+        size: 24,
+        // left: 1,    
       },
       body: {
-        flex: 1,
+        // flex: 1,
         paddingLeft: 12,   
-        backgroundColor: 'transparent' ,
       },
       indexContainer: {
-        ...styles.centered,
-        // marginLeft: 16,
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        marginRight: 16,
         height: 20,
         width: 20, 
-        borderWidth: item.completed ? 1 : 2,
-        borderRadius: 4,
-        borderColor: item.completed ? colors.lightText : colors.darkText,
+        // borderWidth: item.completed ? 1 : 2,
+        // borderRadius: 4,
+        // borderColor: item.completed ? colors.lightText : colors.darkText,
         
       },
       index: {
@@ -312,30 +293,19 @@ const ListList = ({context}) => {
           <TouchableOpacity
             activeOpacity={1}
             onLongPress={drag}
+            onPress={() => { console.log('pressed', item)}}
             disabled={isActive}          
-            style={{flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12}}
+            style={{...styles.row, marginBottom: 12}}
           >
-            <View style={styled.indexContainer}>
-              { !item.completed &&              
-                <Regular style={styled.index}>{ number }</Regular>
-              }
-              <Pressable style={styled.checkbox} onPress={() => updateListItemMutation.mutate({ id: item.id, completed: !item.completed })}>
-                { item.completed &&
-                  <Icon name='check' styles={styled.icon} />
-                }
-                {/* <Icon name={checkboxIcon} styles={styled.icon} />                 */}
-              </Pressable>
+            <View style={styled.indexContainer}>              
+              <Regular style={styled.index}>{ number }</Regular>
+              
             </View>
+            <Icon name={item.type.toLowerCase()} styles={styled.icon} />              
             <View style={styled.container}>
               <View style={styled.body}>
-                <DebouncedInput
-                  editable={!item.completed}
-                  multiline={true}
-                  placeholder='(text)'
-                  style={styled.input}
-                  update={(value) => { updateListItemMutation.mutate({ id: item.id, body: value })}} 
-                  value={item.body}
-                />  
+                <Regular style={{fontSize: 18}}>{item.related_item.title}</Regular>
+                
               </View>
             </View>
           </TouchableOpacity>        
@@ -344,6 +314,7 @@ const ListList = ({context}) => {
     )
   }); 
 
+  console.log('ITEMS', items);
   if (!items || !items.length) {
     return null;  
   }
@@ -354,13 +325,13 @@ const ListList = ({context}) => {
         activationDistance={20}           
         data={items}
         initialNumToRender={20}
-        keyExtractor={item => item.id}   
+        keyExtractor={(item) => `${item.type}+${item.related_item.uuid}`}                      
         ListEmptyComponent={<EmptyListState />}
         // ListFooterComponent={<ListFooterComponent />}
-        onDragEnd={onReorder}
+        // onDragEnd={onReorder}
         renderItem={ListItem}
         refreshing={true}
-      />
+      />      
     </View>
   );
 };
@@ -413,22 +384,22 @@ const Header = () => {
     <View style={styled.header}>
       <Exit />
       <View style={styled.menu}>             
-        <Pressable
+        {/* <Pressable
           onPress={toggleShowCompleted}
           style={styled.button}
         >
           <Icon name={checkboxToggleIcon} styles={styled.icon} />
-        </Pressable>  
-        <Menu />
+        </Pressable>   */}
+        <Menu noCollectionsToggle={true}/>
       </View>
     </View>
   )
 }
 
-export default function List({item}) {  
-  console.log('LIST');
+export default function Collection({item}) {  
+  console.log('Collection');
+  
   const queryKeys = item.context;
-  const baseUri = queryKeys.join('/')+'/';
 
   const styled = StyleSheet.create({
     view: {
@@ -447,29 +418,6 @@ export default function List({item}) {
     },
   });
 
-  const createListItemMutation = useMutation({
-    mutationFn: async (text) => {
-      if (!text.trim().length) {
-        return;
-      }
-      const data = { body: text.trim() };
-
-      try {
-        return await Fetch.post(baseUri, data)
-      } catch (error) {
-        console.warn('Create List Item Error:', error);
-      }
-    },
-    onSuccess: (data) => {      
-        queryClient.setQueryData(queryKeys, old => {
-            const oldCopy = JSON.parse(JSON.stringify(old));
-            const results = oldCopy.results;
-            results.push(data.results);
-            return {...oldCopy, results };
-        });
-    }
-  });
-
   return (
     <ListParamsProvider>
       <View
@@ -479,19 +427,13 @@ export default function List({item}) {
         <View style={styled.content}>
           <Title />
           
-          <Hide>
-            <View style={styled.flex1}>
-              <ListList context={queryKeys} />            
-            </View>          
-          </Hide>
+          <View style={styled.flex1}>
+            <ListList context={queryKeys} />            
+          </View>                    
           
         </View>
 
-        <View style={styles.footer}>
-          <Input            
-            onSubmit={createListItemMutation.mutate}
-            placeholder='Create New List Item'            
-          />        
+        <View style={styles.footer}>          
           <TalkButton keys={queryKeys} />
         </View>       
       </View>

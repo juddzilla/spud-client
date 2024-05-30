@@ -34,7 +34,9 @@ export default function Search({ keys }) {
     let searchIconSize = 12;
 
     useEffect(() => {
-        update({search});
+        if (search.trim().length && search !== DataQuery.data.params.search) {
+            update({search});
+        }
       }, [debouncedSearch]);      
 
     const focusedOrHasSearch = focused || search.trim().length > 0;
