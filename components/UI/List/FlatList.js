@@ -136,29 +136,6 @@ export default function ListFlatList({ filters, keys, renderItem }) {
     }
   }
 
-  function display() {
-    const data = (DataQuery.status === 'pending' || DataQuery.data && DataQuery.data.count === null)
-      ? []
-      : DataQuery.data.results;
-    return (
-      <FlatList
-        data={DataQuery.data.results}
-        renderItem={renderItem}
-        initialNumToRender={20}
-        keyExtractor={(item, index) => `${item.uuid}+${index}`}
-        ListEmptyComponent={ListEmptyComponent}
-        ListHeaderComponent={ListHeaderComponent}
-        onRefresh={onRefresh}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.1}
-        //if set to true, the UI will show a loading indicator
-        refreshing={false}
-      />
-    )
-
-  }
-
-
   return (
     <View style={{ flex: 1 }}>
       {/* {display()} */}
@@ -168,7 +145,7 @@ export default function ListFlatList({ filters, keys, renderItem }) {
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
         ListEmptyComponent={ListEmptyComponent}
-        ListHeaderComponent={ListHeaderComponent}
+        // ListHeaderComponent={ListHeaderComponent}
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

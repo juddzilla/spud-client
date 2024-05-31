@@ -5,10 +5,14 @@ import CreateInput from './CreateInput';
 import DefaultListItem from './DefaultListItem';
 import FlatList from './FlatList';
 import Sort from './Sort';
+import Search from './Search';
+import ListHeader from './Header';
 
+import colors from '../colors';
 import styles from '../styles';
-import TalkButton from '../Talk/Button';
+import Bold from '../text/Bold';
 
+import TalkButton from '../Talk/Button';
 import DrawerScreen from '../../DrawerScreen';
 
 export default function ListView({ options }) {
@@ -21,22 +25,13 @@ export default function ListView({ options }) {
     title,
   } = options;
 
-  function headerRight() {
-    if (Object.hasOwn(filters, 'sort')) {
-      return (
-        <Sort
-          keys={storeKey}
-          fields={filters.sort.fields}
-        />
-      )
-    }
-  }
 
   return (
     <>
       <DrawerScreen title={title} />
       <View style={styles.View}>
         <View style={{ flex: 1, paddingBottom: 0 }}>
+          <ListHeader keys={storeKey} />
           <FlatList
             filters={filters}
             keys={storeKey}
