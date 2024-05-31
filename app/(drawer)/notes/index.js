@@ -14,6 +14,7 @@ export default function Notes() {
       },
     },
     storeKey: ['notes'],
+    title: 'Notes'
   };
 
   return (

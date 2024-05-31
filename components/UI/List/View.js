@@ -11,21 +11,21 @@ import TalkButton from '../Talk/Button';
 
 import DrawerScreen from '../../DrawerScreen';
 
-export default function ListView({options}) {  
-  console.log(0);
+export default function ListView({ options }) {
   const {
     actions,
     filters,
-    ItemTemplate = DefaultListItem,    
+    ItemTemplate = DefaultListItem,
     noRedirect,
-    storeKey,     
+    storeKey,
+    title,
   } = options;
 
   function headerRight() {
     if (Object.hasOwn(filters, 'sort')) {
       return (
-        <Sort     
-          keys={storeKey}    
+        <Sort
+          keys={storeKey}
           fields={filters.sort.fields}
         />
       )
@@ -34,15 +34,15 @@ export default function ListView({options}) {
 
   return (
     <>
-      <DrawerScreen headerRight={headerRight} title={'name me'} />
-      <View style={styles.View}>        
-        <View style={{flex: 1, paddingBottom: 0}}>
-          <FlatList    
-            filters={filters}      
+      <DrawerScreen title={title} />
+      <View style={styles.View}>
+        <View style={{ flex: 1, paddingBottom: 0 }}>
+          <FlatList
+            filters={filters}
             keys={storeKey}
             renderItem={ItemTemplate}
-          />       
-        
+          />
+
           {/* <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8}}>
             <CreateInput
               keys={storeKey}
@@ -52,7 +52,7 @@ export default function ListView({options}) {
             <TalkButton keys={storeKey} />                  
           </View> */}
         </View>
-      </View>       
+      </View>
     </>
-  );  
+  );
 }

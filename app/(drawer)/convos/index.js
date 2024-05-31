@@ -14,6 +14,7 @@ export default function Convos() {
     },
     menuOptions: [{display: 'Summarize', name: 'summarize'}],
     storeKey: ['convos'],    
+    title: 'Convos'
   };
 
   return (

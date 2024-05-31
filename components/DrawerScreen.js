@@ -5,7 +5,7 @@ import { TouchableOpacity, View } from 'react-native';
 import Icon from './UI/icons';
 
 export default function DrawerScreen(props) {    
-    const { title, headerRight } = props;
+    const { headerRight, title } = props;
     const navigation = useNavigation();
     
     function canGoBack() {
@@ -20,29 +20,29 @@ export default function DrawerScreen(props) {
     }
 
     return (
-        <Drawer.Screen
-          options={{
-            title,
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: 'transparent',
-            },
-            headerLeft: () => {
-              if (!canGoBack()) {
-                return (
-                  <TouchableOpacity onPress={toggleMenu}>
-                    <Icon name="navicon" />
-                  </TouchableOpacity>                                    
-                )
-              }
+      <Drawer.Screen
+        options={{
+          title,
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: 'transparent',
+          },
+          headerLeft: () => {
+            if (!canGoBack()) {
               return (
-                <TouchableOpacity onPress={goBack}>
-                    <Icon name="leftArrowLong" />
-                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleMenu}>
+                  <Icon name="navicon" />
+                </TouchableOpacity>                                    
               )
-            },
-            headerRight: headerRight || null,
-          }}
-        />
+            }
+            return (
+              <TouchableOpacity onPress={goBack}>
+                  <Icon name="leftArrowLong" />
+              </TouchableOpacity>
+            )
+          },
+          headerRight: headerRight || null,
+        }}
+      />
     )
 }

@@ -1,17 +1,13 @@
 import ListView from '../../../components/UI/List/View';
 
 import {
-  Dimensions,
-  FlatList,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Link } from 'expo-router';
 
-import { BaseButton, RectButton } from 'react-native-gesture-handler';
-import SwipeableItem, { OpenDirection, useSwipeableItemParams, } from "react-native-swipeable-item";
+import { RectButton } from 'react-native-gesture-handler';
+import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import colors from '../../../components/UI/colors';
@@ -25,11 +21,10 @@ import Light from '../../../components/UI/text/Light';;
 import { relativeDate } from '../../../utils/dates';
 
 const ItemTemplate = ({ index, item }) => {    
-  console.log('IIIIT');
   if (!item) {
       return null;
   }
-  console.log('item222',item);
+  
   const key = item.type.toLowerCase()+'s';
 
   function onPress() {
@@ -180,8 +175,13 @@ export default function Collections() {
       },
     },
     storeKey: ['collections'],  
-    ItemTemplate,  
+    ItemTemplate,
+    title: 'Collections'
   };
 
-  return (<ListView options={{...options}} />);
+  return (
+    <>
+      <ListView options={{...options}} />
+    </>
+  );
 }

@@ -13,28 +13,28 @@ import styles from '../styles';
 export default function Title() {
   const queryKey = ['details'];
   const [title, setTitle] = useState('');
-    
-  const { data } = useQuery({    
+
+  const { data } = useQuery({
     queryKey,
     queryFn: async () => {
-        const queryData = queryClient.getQueryData(queryKey);
+      const queryData = queryClient.getQueryData(queryKey);
       setTitle(data.data.title);
       return queryData;
     }
   });
 
   useEffect(() => {
-      if (data && data.title) {
-        setTitle(data.title);
-      }
+    if (data && data.title) {
+      setTitle(data.title);
+    }
   }, [data])
 
   const titleMutation = useMutation({
-    mutationFn: async(data) => {
+    mutationFn: async (data) => {
       try {
         const { context } = queryClient.getQueryData(queryKey);
         const baseUri = `${context.join('/')}/`;
-        return await Fetch.put(baseUri, {title: data});
+        return await Fetch.put(baseUri, { title: data });
       } catch (error) {
         console.warn('Update List Error:', error);
       }
@@ -42,19 +42,19 @@ export default function Title() {
     onSuccess: (data) => {
       const { title, updated_at } = data;
       const { context } = queryClient.getQueryData(queryKey);
-      queryClient.setQueryData(context, oldData => ({...oldData, title, updated_at }));
-      queryClient.setQueryData([context[0]], oldData => {                                    
+      queryClient.setQueryData(context, oldData => ({ ...oldData, title, updated_at }));
+      queryClient.setQueryData([context[0]], oldData => {
         return {
-            ...oldData,
-            results: oldData.results.map(old => {
-              if (old.uuid !== context[1]) { return old; }
-              
-              return {
-                ...old,
-                title,
-                updated_at,
-              }
-            })
+          ...oldData,
+          results: oldData.results.map(old => {
+            if (old.uuid !== context[1]) { return old; }
+
+            return {
+              ...old,
+              title,
+              updated_at,
+            }
+          })
         }
       });
     },
@@ -62,11 +62,11 @@ export default function Title() {
 
   return (
     <View style={{
-      ...styles.row, 
+      ...styles.row,
       // marginBottom: 8,  
-      paddingHorizontal: 16, 
+      paddingHorizontal: 16,
       height: 56,
-      backgroundColor: colors.white, 
+      backgroundColor: colors.white,
 
       // shadowColor: colors.darkText,
       // shadowOffset: {
@@ -78,18 +78,18 @@ export default function Title() {
       // elevation: 0.1,
     }}>
 
-        <DebouncedInput
-          multiline={false}
-          placeholder='title goes here'
-          style={{
-            fontSize: 26,
-            color: colors.darkText,
-            backgroundColor: 'transparent',
-            fontFamily: 'Inter-Bold',              
-          }}
-          update={titleMutation.mutate} 
-          value={title}
-        />
+      <DebouncedInput
+        multiline={false}
+        placeholder='title goes here'
+        style={{
+          fontSize: 26,
+          color: colors.darkText,
+          backgroundColor: 'transparent',
+          fontFamily: 'Inter-Bold',
+        }}
+        update={titleMutation.mutate}
+        value={title}
+      />
     </View>
-  );    
+  );
 }

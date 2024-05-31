@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -136,6 +137,7 @@ const ItemTemplate = ({index, item}) => {
 )};
 
 export default function HomeView() { 
+  
   const options = {
     actions: {
       placeholder: 'Create New Queue Item',
@@ -147,16 +149,14 @@ export default function HomeView() {
     ItemTemplate,
     noRedirect: true,
     storeKey: ['queue'],
-    talk: {
-      message: 'Tell us how youd like us to add, modify, or delete Quick Queue items',
-      view: 'home',
-    }
+    title: 'Quick Queue'
   };  
 
   return (
     <View style={{flex:1}}>      
       <ListView options={{...options}} />
       {/* <Home /> */}
-    </View>
+    </View>    
   );
 }
+ 

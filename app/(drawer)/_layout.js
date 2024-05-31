@@ -20,7 +20,7 @@ export default function DrawerLayout() {
             options={{
               drawerIcon: () => <Icon name='home' />,
               drawerLabel: "Home",
-              title: "Home",
+              title: "HomeTitle",
             }}          
           />
           <Drawer.Screen

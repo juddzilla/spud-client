@@ -3,6 +3,7 @@ import React,
     createContext,
     useCallback,
     useEffect,
+    useState,
   } from 'react';
 import { 
   SafeAreaView,
@@ -119,10 +120,9 @@ export default function RootLayout() {
                             behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
                             style={{ flex: 1}}
                           >
-                          </KeyboardAvoidingView> */}
-                          <Slot />
-                          <DetailModal />
-                          
+                          </KeyboardAvoidingView> */}                                                                   
+                          <Slot />                          
+                          <DetailModal />                          
                         </SafeAreaView>
                       </ActionSheetProvider>
                     </TalkProvider>

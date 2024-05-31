@@ -18,59 +18,58 @@ import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
 
-const DefaultListItem = ({ index, item }) => {    
+const DefaultListItem = ({ index, item }) => {
     if (!item) {
         return null;
     }
-    console.log('item',item);
-    const key = item.type.toLowerCase()+'s';
+    const key = item.type.toLowerCase() + 's';
 
     function onPress() {
         const keys = [key, item.uuid];
-        queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });        
-        queryClient.setQueryData(keys, { context: keys, ...item });        
+        queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });
+        queryClient.setQueryData(keys, { context: keys, ...item });
     }
 
-    const remove = async () => {                
-        await Fetch.remove(`${key}/${item.uuid}/`);        
+    const remove = async () => {
+        await Fetch.remove(`${key}/${item.uuid}/`);
         queryClient.setQueryData([key], old => {
-            const oldCopy = JSON.parse(JSON.stringify(old));            
+            const oldCopy = JSON.parse(JSON.stringify(old));
             return oldCopy.filter(i => i.uuid !== item.uuid)
-        });        
+        });
     }
-    
+
     const styled = StyleSheet.create({
         container: {
             ...styles.row,
-            padding: 12,      
+            padding: 12,
             paddingLeft: 0,
             flex: 1,
         },
         checkbox: {
             alignItems: 'center',
-            height: 40, 
-            justifyContent: 'center', 
+            height: 40,
+            justifyContent: 'center',
             width: 40,
             top: 1,
         },
         content: {
-            flex: 1,       
+            flex: 1,
             paddingLeft: 8,
-            ...styles.row,   
+            ...styles.row,
             // backgroundColor: 'green', 
-            alignItems: 'flex-start', 
+            alignItems: 'flex-start',
         },
         date: {
             color: colors.theme.text.medium,
-            fontSize: 12, 
+            fontSize: 12,
         },
         icon: {
-            color: item.selected ? colors.text : colors.theme.text.light,    
-            size: 15,    
+            color: item.selected ? colors.text : colors.theme.text.light,
+            size: 15,
         },
         index: {
-            fontSize: 12, 
-            color: colors.theme.text.light,            
+            fontSize: 12,
+            color: colors.theme.text.light,
         },
         indexContainer: {
             width: 34,
@@ -82,7 +81,7 @@ const DefaultListItem = ({ index, item }) => {
             ...styles.row,
             flexWrap: 'wrap',
         },
-        row : {
+        row: {
             backgroundColor: colors.white,
             ...styles.row,
             marginBottom: 2,
@@ -107,57 +106,57 @@ const DefaultListItem = ({ index, item }) => {
         );
 
         return (
-        <RectButton
-            onPress={remove}
-            style={ {
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'flex-end', 
-                marginBottom: 2,                
-            }}
-        >
-            <Animated.View
-                style={{                            
-                    
-                    ...animStyle
-                }}>
+            <RectButton
+                onPress={remove}
+                style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    marginBottom: 2,
+                }}
+            >
+                <Animated.View
+                    style={{
+
+                        ...animStyle
+                    }}>
                     <Icon name='trash' />
-            </Animated.View>
-        </RectButton>
+                </Animated.View>
+            </RectButton>
         );
     };
 
-    return (      
+    return (
         <SwipeableItem
             key={item.id}
             item={item}
             renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
             snapPointsLeft={[60]}
-            overSwipe={20}              
-        >          
-            <View style={styled.row}>         
-            <Pressable
-                style={styled.container}
-                onPress={onPress}
-            >      
-                <View style={styled.content}>                        
-                    <View style={styled.indexContainer}>
+            overSwipe={20}
+        >
+            <View style={styled.row}>
+                <Pressable
+                    style={styled.container}
+                    onPress={onPress}
+                >
+                    <View style={styled.content}>
+                        <View style={styled.indexContainer}>
 
-                        <Regular style={styled.index}>{ index+1 } </Regular>
-                    </View>
-                    <View>
-                        <Bold style={styled.title}>{item.title}</Bold>
-                        <View style={styled.info}>
-                            { item.subheadline &&
-                                <Regular style={styled.subtitle}>{ item.subheadline }</Regular>
-                            }
-                            <Light style={styled.date}>{ relativeDate(item.updated_at) }</Light>
+                            <Regular style={styled.index}>{index + 1} </Regular>
+                        </View>
+                        <View>
+                            <Bold style={styled.title}>{item.title}</Bold>
+                            <View style={styled.info}>
+                                {item.subheadline &&
+                                    <Regular style={styled.subtitle}>{item.subheadline}</Regular>
+                                }
+                                <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
+                            </View>
                         </View>
                     </View>
-                </View>
-            </Pressable>    
+                </Pressable>
             </View>
-        </SwipeableItem>        
+        </SwipeableItem>
     )
 };
 

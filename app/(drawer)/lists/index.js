@@ -14,6 +14,7 @@ export default function Lists() {
       },
     },    
     storeKey: ['lists'],
+    title: 'Lists'
   };
   return (
     <ListView options={{...options}} />    

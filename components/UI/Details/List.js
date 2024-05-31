@@ -4,18 +4,18 @@ import {
   useContext,
   useEffect,
   useState,
- } from 'react';
+} from 'react';
 
- import {
-  Pressable, 
-  StyleSheet, 
+import {
+  Pressable,
+  StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
 
 import {
   keepPreviousData,
-  useMutation,  
+  useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
@@ -46,15 +46,15 @@ import Fetch from '../../../interfaces/fetch';
 
 const ListParamsContext = createContext({});
 
-const initialFilters = { completed: null, search: ''};
+const initialFilters = { completed: null, search: '' };
 const textColor = colors.darkText;
 
 function ListParamsProvider(props) {
   const [listParams, setListParams] = useState(initialFilters);
 
   return (
-    <ListParamsContext.Provider value={{listParams, setListParams}}>
-      { props.children}
+    <ListParamsContext.Provider value={{ listParams, setListParams }}>
+      {props.children}
     </ListParamsContext.Provider>
   )
 }
@@ -65,8 +65,8 @@ const EmptyListState = () => {
 
   if (!queryData || !queryData.params) {
     return (
-      <View style={{...styles.row, color: colors.white}}>            
-          <Bold style={{color: colors.darkText}}>LOADING</Bold>
+      <View style={{ ...styles.row, color: colors.white }}>
+        <Bold style={{ color: colors.darkText }}>LOADING</Bold>
       </View>
     );
   }
@@ -77,17 +77,17 @@ const EmptyListState = () => {
   }
 
   return (
-    <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>        
-      { !queryData.results.length ? (          
-        <View style={{...styles.row}}>            
-          <Bold style={{color: colors.darkText}}>Add your first list item</Bold>
+    <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>
+      {!queryData.results.length ? (
+        <View style={{ ...styles.row }}>
+          <Bold style={{ color: colors.darkText }}>Add your first list item</Bold>
         </View>
       ) : (
-        <View style={{...styles.row}}>
-          { queryData.params.search.trim().length ?
+        <View style={{ ...styles.row }}>
+          {queryData.params.search.trim().length ?
             (
               <>
-                <Light style={{marginRight: 2}}>No list items containing</Light>
+                <Light style={{ marginRight: 2 }}>No list items containing</Light>
                 <Bold>"{queryData.params.search}"</Bold>
               </>
             ) : (
@@ -97,44 +97,44 @@ const EmptyListState = () => {
             )
           }
         </View>
-      ) }
+      )}
     </View>
   )
 };
 
-const ListList = ({context}) => {   
+const ListList = ({ context }) => {
   const baseUri = `lists/${context[1]}/`;
   const itemsUri = `${baseUri}items/`;
   const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
   const [items, setItems] = useState([]);
-  const {listParams} = useContext(ListParamsContext);
+  const { listParams } = useContext(ListParamsContext);
 
   const initialData = {
-    count: null, 
-    next: null, 
+    count: null,
+    next: null,
     params: {
-        page: 1,
-        per: 100,
-        search: '',
-        sortDirection: 'desc',
-        sortProperty: 'order',
-        completed: null,
-    }, 
+      page: 1,
+      per: 100,
+      search: '',
+      sortDirection: 'desc',
+      sortProperty: 'order',
+      completed: null,
+    },
     results: []
   };
 
-  const DataQuery = useQuery({       
+  const DataQuery = useQuery({
     initialData,
     keepPreviousData: true,
     placeholderData: keepPreviousData,
-    queryFn: async () => await Fetch.get(baseUri),    
-    queryKey: context, 
+    queryFn: async () => await Fetch.get(baseUri),
+    queryKey: context,
   });
 
 
   useEffect(() => {
-    if (DataQuery.data.results) {            
-      const newItems = filterItems(DataQuery.data.results, listParams);          
+    if (DataQuery.data.results) {
+      const newItems = filterItems(DataQuery.data.results, listParams);
       setItems(newItems);
     }
 
@@ -148,9 +148,9 @@ const ListList = ({context}) => {
     });
   }
 
-  function onReorder({data}) {
-    const newItems = filterItems(data, listParams);          
-    setItems(newItems);    
+  function onReorder({ data }) {
+    const newItems = filterItems(data, listParams);
+    setItems(newItems);
     const dataIds = data.map(d => d.id);
     const queryData = queryClient.getQueryData(context);
     const queryDataIds = queryData.results.map(d => d.id);
@@ -162,16 +162,16 @@ const ListList = ({context}) => {
         acc.items.push(cur);
         acc.ids.push(cur.id);
         return acc;
-      }, { items: [], ids: []});
+      }, { items: [], ids: [] });
 
-      reorderMutation.mutate({order: reordered.ids});
+      reorderMutation.mutate({ order: reordered.ids });
     }
   }
 
   const reorderMutation = useMutation({
     mutationFn: async (order) => await Fetch.put(itemsUri, order),
-    onSuccess: (data) => {      
-      const newItems = filterItems(reorderMutation.data.results, listParams);          
+    onSuccess: (data) => {
+      const newItems = filterItems(reorderMutation.data.results, listParams);
       setItems(newItems);
     }
   });
@@ -184,10 +184,10 @@ const ListList = ({context}) => {
         console.warn('Delete List Item Error:', error);
       }
     },
-    onSuccess: (data) => {          
+    onSuccess: (data) => {
       if (!data.error) {
         queryClient.invalidateQueries([context[0]]);
-      } 
+      }
     }
   })
 
@@ -199,20 +199,20 @@ const ListList = ({context}) => {
         return response;
       } catch (error) {
         console.warn('Update List Item Error', error);
-      }    
+      }
     },
-    onSuccess: (data) => {  
+    onSuccess: (data) => {
       queryClient.invalidateQueries([context[0]]);
     },
   });
 
-  const ListItem = useCallback((props) => {    
-    const {drag, getIndex, isActive, item} = props;   
-    
-    const number = getIndex()+1;
+  const ListItem = useCallback((props) => {
+    const { drag, getIndex, isActive, item } = props;
+
+    const number = getIndex() + 1;
 
     const marginBottom = number === items.length ? 56 : 0;
-    
+
     const styled = StyleSheet.create({
       container: {
         flexDirection: 'row',
@@ -222,7 +222,7 @@ const ListList = ({context}) => {
         marginBottom
       },
       checkbox: {
-        ...styles.centered,        
+        ...styles.centered,
         height: 40,
         paddingRight: 4,
         position: 'absolute'
@@ -230,45 +230,45 @@ const ListList = ({context}) => {
       icon: {
         color: textColor,
         size: 16,
-        left: 1,    
+        left: 1,
       },
       body: {
         flex: 1,
-        paddingLeft: 12,   
-        backgroundColor: 'transparent' ,
+        paddingLeft: 12,
+        backgroundColor: 'transparent',
       },
       indexContainer: {
         ...styles.centered,
         // marginLeft: 16,
         height: 20,
-        width: 20, 
+        width: 20,
         borderWidth: item.completed ? 1 : 2,
         borderRadius: 4,
         borderColor: item.completed ? colors.lightText : colors.darkText,
-        
+
       },
       index: {
-        fontSize: 10,     
+        fontSize: 10,
       },
       input: {
         backgroundColor: 'transparent',
         color: textColor,
-        fontFamily: item.completed ? 'Inter-Light' :'Inter-Regular',  
+        fontFamily: item.completed ? 'Inter-Light' : 'Inter-Regular',
         fontSize: 16,
-        lineHeight: 20,                   
+        lineHeight: 20,
         height: '100%',
-        paddingRight: 0,  
+        paddingRight: 0,
         position: 'relative',
         top: -5,
       },
       text: {
         color: colors.lightWhite,
-        position: 'relative', 
+        position: 'relative',
         top: 3
       }
     });
 
-    const RenderRightActions = () => {    
+    const RenderRightActions = () => {
       const { percentOpen } = useSwipeableItemParams();
       const animStyle = useAnimatedStyle(
         () => ({
@@ -278,20 +278,20 @@ const ListList = ({context}) => {
       );
 
       const rightActionStyled = StyleSheet.create({
-        base: {alignItems: 'flex-end', justifyContent: 'center', height: 44},
-        view: {            
+        base: { alignItems: 'flex-end', justifyContent: 'center', height: 44 },
+        view: {
           justifyContent: 'center',
-          alignItems: 'center',              
+          alignItems: 'center',
           width: 60,
           flex: 1,
           ...animStyle,
         },
-        icon: {backgroundColor: colors.remove, transform: [{ translateX: -16 }]}
+        icon: { backgroundColor: colors.remove, transform: [{ translateX: -16 }] }
       })
 
       return (
         <BaseButton style={rightActionStyled.base} onPress={() => { removeListItemMutation.mutate(item) }}>
-          <Animated.View style={rightActionStyled.view}>            
+          <Animated.View style={rightActionStyled.view}>
             <Icon name='trash' styles={rightActionStyled.icon} />
           </Animated.View>
         </BaseButton>
@@ -305,22 +305,22 @@ const ListList = ({context}) => {
         <SwipeableItem
           key={item.id}
           item={item}
-          renderUnderlayLeft={() => <RenderRightActions drag={drag}/>}
+          renderUnderlayLeft={() => <RenderRightActions drag={drag} />}
           snapPointsLeft={[48]}
           overSwipe={20}
         >
           <TouchableOpacity
             activeOpacity={1}
             onLongPress={drag}
-            disabled={isActive}          
-            style={{flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12}}
+            disabled={isActive}
+            style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}
           >
             <View style={styled.indexContainer}>
-              { !item.completed &&              
-                <Regular style={styled.index}>{ number }</Regular>
+              {!item.completed &&
+                <Regular style={styled.index}>{number}</Regular>
               }
               <Pressable style={styled.checkbox} onPress={() => updateListItemMutation.mutate({ id: item.id, completed: !item.completed })}>
-                { item.completed &&
+                {item.completed &&
                   <Icon name='check' styles={styled.icon} />
                 }
                 {/* <Icon name={checkboxIcon} styles={styled.icon} />                 */}
@@ -333,28 +333,28 @@ const ListList = ({context}) => {
                   multiline={true}
                   placeholder='(text)'
                   style={styled.input}
-                  update={(value) => { updateListItemMutation.mutate({ id: item.id, body: value })}} 
+                  update={(value) => { updateListItemMutation.mutate({ id: item.id, body: value }) }}
                   value={item.body}
-                />  
+                />
               </View>
             </View>
-          </TouchableOpacity>        
+          </TouchableOpacity>
         </SwipeableItem>
       </ScaleDecorator>
     )
-  }); 
+  });
 
   if (!items || !items.length) {
-    return null;  
+    return null;
   }
-  
+
   return (
-    <View style={{flex: 1, paddingHorizontal: 16, paddingBottom: 0}}>
+    <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: 0 }}>
       <DraggableFlatList
-        activationDistance={20}           
+        activationDistance={20}
         data={items}
         initialNumToRender={20}
-        keyExtractor={item => item.id}   
+        keyExtractor={item => item.id}
         ListEmptyComponent={<EmptyListState />}
         // ListFooterComponent={<ListFooterComponent />}
         onDragEnd={onReorder}
@@ -366,17 +366,17 @@ const ListList = ({context}) => {
 };
 
 const Header = () => {
-  const {listParams, setListParams} = useContext(ListParamsContext);
+  const { listParams, setListParams } = useContext(ListParamsContext);
 
   function toggleShowCompleted() {
     let completed = null;
-    
-    if (listParams.completed === null) {      
+
+    if (listParams.completed === null) {
       completed = true;
-    } else if (listParams.completed === true) {      
+    } else if (listParams.completed === true) {
       completed = false;
     }
-    setListParams({...listParams, completed})    
+    setListParams({ ...listParams, completed })
   }
 
   const checkboxToggleIconMap = {
@@ -391,7 +391,7 @@ const Header = () => {
     checkboxToggleIcon = checkboxToggleIconMap[listParams.completed];
   }
 
-  const styled = StyleSheet.create({    
+  const styled = StyleSheet.create({
     header: {
       ...DetailStyles.header,
     },
@@ -399,12 +399,12 @@ const Header = () => {
       ...DetailStyles.menu
     },
     button: {
-      width: 40, 
-      height: 40, 
+      width: 40,
+      height: 40,
       ...styles.centered,
     },
     icon: {
-      size: 22, 
+      size: 22,
       color: colors.darkText
     },
   })
@@ -412,30 +412,29 @@ const Header = () => {
   return (
     <View style={styled.header}>
       <Exit />
-      <View style={styled.menu}>             
+      <View style={styled.menu}>
         <Pressable
           onPress={toggleShowCompleted}
           style={styled.button}
         >
           <Icon name={checkboxToggleIcon} styles={styled.icon} />
-        </Pressable>  
+        </Pressable>
         <Menu />
       </View>
     </View>
   )
 }
 
-export default function List({item}) {  
-  console.log('LIST');
+export default function List({ item }) {
   const queryKeys = item.context;
-  const baseUri = queryKeys.join('/')+'/';
+  const baseUri = queryKeys.join('/') + '/';
 
   const styled = StyleSheet.create({
     view: {
       ...DetailStyles.view,
-      backgroundColor: colors.theme.inputs.light.backgroundColor,   
+      backgroundColor: colors.theme.inputs.light.backgroundColor,
     },
-    flex1: {flex: 1},
+    flex1: { flex: 1 },
     content: {
       ...DetailStyles.content
     },
@@ -460,13 +459,13 @@ export default function List({item}) {
         console.warn('Create List Item Error:', error);
       }
     },
-    onSuccess: (data) => {      
-        queryClient.setQueryData(queryKeys, old => {
-            const oldCopy = JSON.parse(JSON.stringify(old));
-            const results = oldCopy.results;
-            results.push(data.results);
-            return {...oldCopy, results };
-        });
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys, old => {
+        const oldCopy = JSON.parse(JSON.stringify(old));
+        const results = oldCopy.results;
+        results.push(data.results);
+        return { ...oldCopy, results };
+      });
     }
   });
 
@@ -474,26 +473,26 @@ export default function List({item}) {
     <ListParamsProvider>
       <View
         style={styled.view}
-      >   
-        <Header />           
+      >
+        <Header />
         <View style={styled.content}>
           <Title />
-          
+
           <Hide>
             <View style={styled.flex1}>
-              <ListList context={queryKeys} />            
-            </View>          
+              <ListList context={queryKeys} />
+            </View>
           </Hide>
-          
+
         </View>
 
         <View style={styles.footer}>
-          <Input            
+          <Input
             onSubmit={createListItemMutation.mutate}
-            placeholder='Create New List Item'            
-          />        
+            placeholder='Create New List Item'
+          />
           <TalkButton keys={queryKeys} />
-        </View>       
+        </View>
       </View>
     </ListParamsProvider>
   );
