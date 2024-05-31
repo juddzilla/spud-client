@@ -104,31 +104,6 @@ export default function ListFlatList({ filters, keys, renderItem }) {
     )
   };
 
-  const ListHeaderComponent = () => {
-    let headerMessage = 'Loadingff ';
-
-    if (DataQuery.data && DataQuery.data.count !== null) {
-      headerMessage = `Showing ${DataQuery.data.results.length} of ${DataQuery.data.count}`
-    }
-
-    return (
-      <View style={{
-        ...styles.row,
-        justifyContent: 'space-between',
-        paddingLeft: 20,
-        backgroundColor: colors.darkBg,
-        height: 48,
-        marginBottom: 4,
-        paddingRight: 8,
-      }}>
-        <View style={{ marginRight: 16 }}>
-          <Bold style={{ fontSize: 12, color: colors.lightText }}>{headerMessage}</Bold>
-        </View>
-        <Search keys={keys} />
-      </View>
-    )
-  };
-
   function onEndReached(e) {
     const threshold = 60;
     if (e.distanceFromEnd && e.distanceFromEnd <= threshold) {
@@ -145,7 +120,6 @@ export default function ListFlatList({ filters, keys, renderItem }) {
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
         ListEmptyComponent={ListEmptyComponent}
-        // ListHeaderComponent={ListHeaderComponent}
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

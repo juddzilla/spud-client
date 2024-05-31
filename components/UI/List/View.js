@@ -38,14 +38,14 @@ export default function ListView({ options }) {
             renderItem={ItemTemplate}
           />
 
-          {/* <View style={{...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8}}>
+          <View style={{ ...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8 }}>
             <CreateInput
               keys={storeKey}
               noRedirect={noRedirect}
-              placeholder={actions.placeholder}            
+              placeholder={actions.placeholder}
             />
-            <TalkButton keys={storeKey} />                  
-          </View> */}
+            <TalkButton keys={storeKey} />
+          </View>
         </View>
       </View>
     </>
