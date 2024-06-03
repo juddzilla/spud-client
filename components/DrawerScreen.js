@@ -4,45 +4,45 @@ import { useNavigation } from 'expo-router';
 import { TouchableOpacity, View } from 'react-native';
 import Icon from './UI/icons';
 
-export default function DrawerScreen(props) {    
-    const { headerRight, title } = props;
-    const navigation = useNavigation();
-    
-    function canGoBack() {
-      return router.back && router.canGoBack();
-    }
-    function goBack() {
-      router.back();   
-    }
+export default function DrawerScreen(props) {
+  const { headerRight, title } = props;
+  const navigation = useNavigation();
 
-    function toggleMenu() {
-      navigation.openDrawer();
-    }
+  function canGoBack() {
+    return router.back && router.canGoBack();
+  }
+  function goBack() {
+    router.back();
+  }
 
-    return (
-      <Drawer.Screen
-        options={{
-          title,
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: 'transparent',
-          },
-          headerLeft: () => {
-            if (!canGoBack()) {
-              return (
-                <TouchableOpacity onPress={toggleMenu}>
-                  <Icon name="navicon" />
-                </TouchableOpacity>                                    
-              )
-            }
+  function toggleMenu() {
+    navigation.openDrawer();
+  }
+
+  return (
+    <Drawer.Screen
+      options={{
+        title,
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: 'transparent',
+        },
+        headerLeft: () => {
+          if (!canGoBack()) {
             return (
-              <TouchableOpacity onPress={goBack}>
-                  <Icon name="leftArrowLong" />
+              <TouchableOpacity onPress={toggleMenu}>
+                <Icon name="navicon" />
               </TouchableOpacity>
             )
-          },
-          headerRight: headerRight || null,
-        }}
-      />
-    )
+          }
+          return (
+            <TouchableOpacity onPress={goBack}>
+              <Icon name="leftArrowLong" />
+            </TouchableOpacity>
+          )
+        },
+        headerRight: headerRight || null,
+      }}
+    />
+  )
 }

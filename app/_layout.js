@@ -1,15 +1,18 @@
 import React,
-  {
-    createContext,
-    useCallback,
-    useEffect,
-    useState,
-  } from 'react';
-import { 
+{
+  createContext,
+
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   Text,
   View,
- } from 'react-native';
+} from 'react-native';
 import { Slot } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -65,9 +68,9 @@ function WebsocketProvider(props) {
         queryClient.refetchQueries({ queryKey: context })
       } else if (Object.hasOwn(data, 'add')) {
         if (Array.isArray(data.add)) {
-          queryClient.setQueryData(context, (oldData) => {              
+          queryClient.setQueryData(context, (oldData) => {
             if (Object.hasOwn(oldData, 'children')) {
-              return {...oldData, children: [...oldData.children, ...data.add]};
+              return { ...oldData, children: [...oldData.children, ...data.add] };
             } else {
 
               return [...oldData, ...data.add];
@@ -75,67 +78,67 @@ function WebsocketProvider(props) {
           })
         }
       }
-      return;      
+      return;
     }
   }, [message])
   return (
-    <WebsocketContext.Provider value={{ message, sendMessage}}>
-      { props.children }
+    <WebsocketContext.Provider value={{ message, sendMessage }}>
+      {props.children}
     </WebsocketContext.Provider>
   )
 
 }
 
 export default function RootLayout() {
-    const [fontsLoaded, fontError] = useFonts({
-      'Inter-Black': Black,        
-      'Inter-Bold': Bold,
-      'Inter-Light': Light,
-      'Inter-Regular': Regular,
-    });
-        
-    const onLayoutRootView = useCallback(async () => {        
-      if (fontsLoaded || fontError) {
-        console.log('!!!!! fontError', fontError);
-        console.log('!!!!!!! fontsLoaded', fontsLoaded);
-      }
-    }, [fontsLoaded, fontError]);
+  const [fontsLoaded, fontError] = useFonts({
+    'Inter-Black': Black,
+    'Inter-Bold': Bold,
+    'Inter-Light': Light,
+    'Inter-Regular': Regular,
+  });
 
-    return (
-      <GestureHandlerRootView
-        style={{
-          backgroundColor: colors.theme.inputs.light.backgroundColor, 
-          flex: 1 
-        }}
-        onLayout={onLayoutRootView}>
-          { fontsLoaded ? (
-            <QueryClientProvider client={queryClient}>
-              <SessionProvider>
-                <WebsocketProvider>
-                  <SafeAreaProvider>
-                    <TalkProvider>
-                      <ActionSheetProvider>              
-                        <SafeAreaView style={{ flex: 1}}>
-                          {/* <KeyboardAvoidingView
-                            behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
-                            style={{ flex: 1}}
-                          >
-                          </KeyboardAvoidingView> */}                                                                   
-                          <Slot />                          
-                          <DetailModal />                          
-                        </SafeAreaView>
-                      </ActionSheetProvider>
-                    </TalkProvider>
-                  </SafeAreaProvider>
-                </WebsocketProvider>                
-              </SessionProvider>
-            </QueryClientProvider>
-          ) : (
-            <View>
-              <Text>Loading</Text>
-            </View>
-          )}
-          
-      </GestureHandlerRootView>
-    );
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      console.log('!!!!! fontError', fontError);
+      console.log('!!!!!!! fontsLoaded', fontsLoaded);
+    }
+  }, [fontsLoaded, fontError]);
+
+  return (
+    <GestureHandlerRootView
+      style={{
+        backgroundColor: colors.theme.inputs.light.backgroundColor,
+        flex: 1
+      }}
+      onLayout={onLayoutRootView}>
+      {fontsLoaded ? (
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>
+            <WebsocketProvider>
+              <SafeAreaProvider>
+                <TalkProvider>
+                  <ActionSheetProvider>
+                    <SafeAreaView style={{ flex: 1 }}>
+                      <KeyboardAvoidingView
+                        behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                        style={{ flex: 1 }}
+                      >
+                        <Slot />
+                        <DetailModal />
+                      </KeyboardAvoidingView>
+                    </SafeAreaView>
+                  </ActionSheetProvider>
+                </TalkProvider>
+              </SafeAreaProvider>
+            </WebsocketProvider>
+          </SessionProvider>
+        </QueryClientProvider>
+      ) : (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      )}
+
+    </GestureHandlerRootView>
+  );
 }

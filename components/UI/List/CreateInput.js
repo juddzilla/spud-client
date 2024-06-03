@@ -1,34 +1,33 @@
 import { useState } from 'react';
-  
-  import {
+
+import {
     Pressable,
     StyleSheet,
     TextInput,
-  } from 'react-native';
-  
-  import Animated from 'react-native-reanimated';
-  
-  import colors from '../colors';
-  import Icon from '../icons';
+} from 'react-native';
 
-  import { useQuery, useMutation } from '@tanstack/react-query';
+import Animated from 'react-native-reanimated';
 
-  import { queryClient } from '../../../contexts/query-client';
+import colors from '../colors';
+import Icon from '../icons';
 
-  import Fetch from '../../../interfaces/fetch';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
-  
-  export default function CreateInput({keys, noRedirect, placeholder}) {    
+import { queryClient } from '../../../contexts/query-client';
+
+import Fetch from '../../../interfaces/fetch';
+
+export default function CreateInput({ keys, noRedirect, placeholder }) {
     const [focus, setFocus] = useState(false);
     const [message, setMessage] = useState('');
 
-    const textInputStyled = StyleSheet.create({    
+    const textInputStyled = StyleSheet.create({
         input: {
             container: {
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                flex: 1,              
-                      
+                flexDirection: 'row',
+                alignItems: 'center',
+                flex: 1,
+
                 zIndex: 10,
                 // overflow: 'hidden',
                 marginRight: 8,
@@ -42,29 +41,29 @@ import { useState } from 'react';
                 shadowRadius: 3,
                 elevation: 10,
             },
-            field: {                    
+            field: {
                 // backgroundColor: 'red', 
-                height: 48,    
+                height: 48,
                 borderWidth: 1,
                 borderColor: focus ? colors.darkText : colors.white,
-                borderRadius: 12,                
+                borderRadius: 12,
                 paddingHorizontal: 16,
-                borderRadius: 12,                      
+                borderRadius: 12,
                 backgroundColor: focus ? colors.white : colors.lightWhite,
                 // marginRight: 0, mnmnm
-                flex: 1,     
-                color: colors.theme.inputs.dark.text.darkest,                            
+                flex: 1,
+                color: colors.theme.inputs.dark.text.darkest,
             },
             icons: {
                 leading: {
-                    size:12, 
-                    color: focus ? 'transparent' : colors.theme.inputs.dark.text.light, 
+                    size: 12,
+                    color: focus ? 'transparent' : colors.theme.inputs.dark.text.light,
                     position: 'absolute',
-                    zIndex: 1, 
+                    zIndex: 1,
                     left: 12,
                 },
                 trailing: {
-                    size: 16, 
+                    size: 16,
                     color: focus ? colors.darkestBg : '#d4d4d4',
                     zIndex: 1,
                 }
@@ -73,14 +72,14 @@ import { useState } from 'react';
                 height: 40,
                 width: 40,
                 justifyContent: 'center',
-                alignItems: 'center',                
+                alignItems: 'center',
                 opacity: (focus && message.trim().length) ? 1 : 0,
-                position: 'absolute', 
+                position: 'absolute',
                 right: 4,
                 // backgroundColor: 'green'
             },
         },
-      });
+    });
 
     function onPress() {
         createMutation.mutate(message);
@@ -93,13 +92,13 @@ import { useState } from 'react';
         queryFn: async () => await Fetch.get(`${keys[0]}/`)
     });
 
-    const createMutation = useMutation({    
-        mutationFn: async (title) => {              
-          try {
-            return await Fetch.post(`${keys[0]}/`, { title });
-          } catch (error) {
-            console.warn('Create Error: ', error);
-          }
+    const createMutation = useMutation({
+        mutationFn: async (title) => {
+            try {
+                return await Fetch.post(`${keys[0]}/`, { title });
+            } catch (error) {
+                console.warn('Create Error: ', error);
+            }
         },
         onSuccess: async (item) => {
             const keyMap = {
@@ -107,19 +106,19 @@ import { useState } from 'react';
                 Convo: 'convos',
                 Note: 'notes',
             };
-          
-            Query.refetch();      
 
-            if (!noRedirect) {   
+            Query.refetch();
+
+            if (!noRedirect) {
                 const keys = [keyMap[item.type], item.uuid];
-                queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type});
-                queryClient.setQueryData(keys, { context: keys, ...item });        
+                queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });
+                queryClient.setQueryData(keys, { context: keys, ...item });
             }
         },
-      })
+    })
 
     return (
-        <Animated.View style={textInputStyled.input.container}>                            
+        <Animated.View style={textInputStyled.input.container}>
             <TextInput
                 value={message}
                 onBlur={() => setFocus(false)}
@@ -135,6 +134,6 @@ import { useState } from 'react';
             >
                 <Icon name='send' styles={textInputStyled.input.icons.trailing} />
             </Pressable>
-        </Animated.View>  
+        </Animated.View>
     )
-  }
+}
