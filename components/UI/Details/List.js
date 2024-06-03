@@ -30,7 +30,6 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
 import { DetailStyles } from './styles';
-import Hide from './Hide';
 import Input from './Input';
 import TalkButton from '../Talk/Button';
 import colors from '../colors';
@@ -350,6 +349,7 @@ const ListList = ({ context }) => {
 
   return (
     <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: 0 }}>
+
       <DraggableFlatList
         activationDistance={20}
         data={items}
@@ -433,6 +433,7 @@ export default function List({ item }) {
     view: {
       ...DetailStyles.view,
       backgroundColor: colors.theme.inputs.light.backgroundColor,
+      flex: 1
     },
     flex1: { flex: 1 },
     content: {
@@ -478,11 +479,9 @@ export default function List({ item }) {
         <View style={styled.content}>
           <Title />
 
-          <Hide>
-            <View style={styled.flex1}>
-              <ListList context={queryKeys} />
-            </View>
-          </Hide>
+          <View style={styled.flex1}>
+            <ListList context={queryKeys} />
+          </View>
 
         </View>
 

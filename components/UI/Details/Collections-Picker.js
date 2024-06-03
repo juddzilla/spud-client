@@ -18,28 +18,28 @@ import Light from '../text/Light';
 import colors from '../colors';
 import styles from '../styles';
 
-export default function CollectionsPicker() {    
+export default function CollectionsPicker() {
     const [data, setData] = useState([]);
     const insets = useSafeAreaInsets();
     // const queryKey = ['details'];
     const { showCollections, setShowCollections } = useContext(CollectionsContext);
 
     const windowWidth = Dimensions.get('window').width;
-    const collectionsView = useRef(new Animated.Value((windowWidth/2))).current;
+    const collectionsView = useRef(new Animated.Value((windowWidth / 2))).current;
 
     const CollectionQuery = useQuery({
-        enabled: false,   
+        enabled: false,
         queryKey: ['collections'],
         queryFn: async () => {
-            const response = await Fetch.get('collections/');            
+            const response = await Fetch.get('collections/');
             return response;
         },
-      });
+    });
 
-      useEffect(() => {
-        const detail = queryClient.getQueryData(['details']);                    
+    useEffect(() => {
+        const detail = queryClient.getQueryData(['details']);
         if (CollectionQuery.data && detail.context.length) {
-            const active = queryClient.getQueryData(detail.context);              
+            const active = queryClient.getQueryData(detail.context);
             const newData = CollectionQuery.data.results.map(j => ({
                 id: j.id,
                 uuid: j.uuid,
@@ -48,77 +48,77 @@ export default function CollectionsPicker() {
             }));
             setData(newData);
         }
-      }, [CollectionQuery.data])
-  
-    useEffect(() => {        
-      const op = showCollections ? slideIn : slideOut;
-      if (showCollections) {
-        CollectionQuery.refetch();
-      }
-      op();
+    }, [CollectionQuery.data])
+
+    useEffect(() => {
+        const op = showCollections ? slideIn : slideOut;
+        if (showCollections) {
+            CollectionQuery.refetch();
+        }
+        op();
     }, [showCollections]);
 
-    const slideIn = () => {    
-      Animated.timing(collectionsView, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }).start();
-    };
-  
-    const slideOut = () => {    
-      Animated.timing(collectionsView, {
-        toValue: windowWidth,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+    const slideIn = () => {
+        Animated.timing(collectionsView, {
+            toValue: 0,
+            duration: 180,
+            useNativeDriver: true,
+        }).start();
     };
 
-    
+    const slideOut = () => {
+        Animated.timing(collectionsView, {
+            toValue: windowWidth,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    };
+
+
     const styled = StyleSheet.create({
         collections: {
             ...DetailStyles.section,
             borderWidth: 1,
             flexDirection: 'column',
-            top: insets.top + 40 + 56, 
-            paddingBottom: insets.bottom,        
+            top: insets.top, // + 40 + 56, 
+            paddingBottom: insets.bottom,
             position: 'absolute',
-            height: Dimensions.get('window').height - ((insets.bottom + insets.top)*2),
-            width: windowWidth,  
+            height: Dimensions.get('window').height - ((insets.bottom + insets.top) * 2),
+            width: windowWidth,
             zIndex: 100,
-        },        
+        },
         container: {
             backgroundColor: 'white',
             ...styles.row,
-            padding: 12,      
+            padding: 12,
             paddingLeft: 0,
             flex: 1,
         },
         checkbox: {
             alignItems: 'center',
-            height: 40, 
-            justifyContent: 'center', 
+            height: 40,
+            justifyContent: 'center',
             width: 40,
             top: 1,
         },
         content: {
-            flex: 1,       
+            flex: 1,
             paddingLeft: 8,
-            ...styles.row,   
+            ...styles.row,
             // backgroundColor: 'green', 
-            alignItems: 'flex-start', 
+            alignItems: 'flex-start',
         },
         date: {
             color: colors.theme.text.medium,
-            fontSize: 12, 
+            fontSize: 12,
         },
         icon: {
             color: colors.text,
-            size: 15,    
+            size: 15,
         },
         index: {
-            fontSize: 12, 
-            color: colors.theme.text.light,            
+            fontSize: 12,
+            color: colors.theme.text.light,
         },
         indexContainer: {
             width: 34,
@@ -130,7 +130,7 @@ export default function CollectionsPicker() {
             ...styles.row,
             flexWrap: 'wrap',
         },
-        row : {
+        row: {
             backgroundColor: colors.white,
             ...styles.row,
             marginBottom: 2,
@@ -140,58 +140,58 @@ export default function CollectionsPicker() {
     });
 
     function onPress(uuid) {
-        const detail = queryClient.getQueryData(['details']);                
+        const detail = queryClient.getQueryData(['details']);
         const newData = data.map(j => ({
             ...j,
             selected: j.uuid === uuid ? !j.selected : j.selected,
         }));
         setData(newData);
-        const uri = `${[...detail.context, 'collections', uuid].join('/')+'/'}`;
+        const uri = `${[...detail.context, 'collections', uuid].join('/') + '/'}`;
         Fetch.post(uri)
             .then(response => {
                 console.log('RESP', response);
             });
     }
 
-    const ListItem = ({ index, item}) => {        
+    const ListItem = ({ index, item }) => {
         return (
-            <View style={styled.row}>            
+            <View style={styled.row}>
                 <Pressable
                     style={styled.container}
                     onPress={() => onPress(item.uuid)}
-                >      
+                >
                     <View style={styled.content}>
-                        
+
                         <View>
                             <Bold style={styled.title}>{item.title}</Bold>
                             <Regular>Selected: {`${item.selected}`}</Regular>
                         </View>
                     </View>
-                </Pressable>            
+                </Pressable>
 
             </View>
         )
     };
 
     return (
-        <Animated.View                
-          style={[
-            styled.collections,
-              { transform: [{translateX: collectionsView}] },
-          ]}>
-            <View style={styled.container}>                
+        <Animated.View
+            style={[
+                styled.collections,
+                { transform: [{ translateX: collectionsView }] },
+            ]}>
+            <View style={styled.container}>
                 <FlatList
                     data={data}
                     renderItem={ListItem}
                     initialNumToRender={20}
-                    keyExtractor={(item, index) => `${item.uuid}+${index}`}                      
-                    // ListEmptyComponent={ListEmptyComponent}
-                    // ListHeaderComponent={ListHeaderComponent}
-                    // onRefresh={onRefresh}
-                    // onEndReached={onEndReached}
-                    // onEndReachedThreshold={0.1}
-                    // //if set to true, the UI will show a loading indicator
-                    // refreshing={false}
+                    keyExtractor={(item, index) => `${item.uuid}+${index}`}
+                // ListEmptyComponent={ListEmptyComponent}
+                // ListHeaderComponent={ListHeaderComponent}
+                // onRefresh={onRefresh}
+                // onEndReached={onEndReached}
+                // onEndReachedThreshold={0.1}
+                // //if set to true, the UI will show a loading indicator
+                // refreshing={false}
                 />
             </View>
         </Animated.View>

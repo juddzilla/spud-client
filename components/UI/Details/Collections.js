@@ -31,11 +31,8 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
 import { DetailStyles } from './styles';
-import Hide from './Hide';
-import Input from './Input';
 import TalkButton from '../Talk/Button';
 import colors from '../colors';
-import DebouncedInput from '../DebouncedInput';
 import Icon from '../icons';
 import styles from '../styles';
 import Bold from '../text/Bold';
