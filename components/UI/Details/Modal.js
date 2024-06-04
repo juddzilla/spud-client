@@ -39,8 +39,7 @@ function DetailComponent() {
   const styled = StyleSheet.create({
     content: {
       flexDirection: 'column',
-      // paddingTop: insets.top,
-      // paddingBottom: insets.bottom,
+
       flex: 1,
       paddingHorizontal: 0,
       backgroundColor: 'rgb(249,249,249)',

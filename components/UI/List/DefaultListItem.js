@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-
+import { Link } from 'expo-router';
 import { queryClient } from '../../../contexts/query-client';
 
 import colors from '../colors';
@@ -23,9 +23,9 @@ const DefaultListItem = ({ index, item }) => {
         return null;
     }
     const key = item.type.toLowerCase() + 's';
+    const keys = [key, item.uuid];
 
     function onPress() {
-        const keys = [key, item.uuid];
         queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });
         queryClient.setQueryData(keys, { context: keys, ...item });
     }
@@ -135,26 +135,29 @@ const DefaultListItem = ({ index, item }) => {
             overSwipe={20}
         >
             <View style={styled.row}>
-                <Pressable
+                <View
                     style={styled.container}
-                    onPress={onPress}
+                // onPress={onPress}
                 >
-                    <View style={styled.content}>
-                        <View style={styled.indexContainer}>
+                    <Link href={`${key}?uuid=${item.uuid}&title=${item.title}`}>
 
-                            <Regular style={styled.index}>{index + 1} </Regular>
-                        </View>
-                        <View>
-                            <Bold style={styled.title}>{item.title}</Bold>
-                            <View style={styled.info}>
-                                {item.subheadline &&
-                                    <Regular style={styled.subtitle}>{item.subheadline}</Regular>
-                                }
-                                <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
+                        <View style={styled.content}>
+                            <View style={styled.indexContainer}>
+
+                                <Regular style={styled.index}>{index + 1} </Regular>
+                            </View>
+                            <View>
+                                <Bold style={styled.title}>{item.title}</Bold>
+                                <View style={styled.info}>
+                                    {item.subheadline &&
+                                        <Regular style={styled.subtitle}>{item.subheadline}</Regular>
+                                    }
+                                    <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                </Pressable>
+                    </Link>
+                </View>
             </View>
         </SwipeableItem>
     )

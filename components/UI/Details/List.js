@@ -58,8 +58,7 @@ function ListParamsProvider(props) {
   )
 }
 
-const EmptyListState = () => {
-  const { context } = queryClient.getQueryData(['details']);
+const EmptyListState = ({ context }) => {
   const queryData = queryClient.getQueryData(context);
 
   if (!queryData || !queryData.params) {
@@ -132,7 +131,7 @@ const ListList = ({ context }) => {
 
 
   useEffect(() => {
-    if (DataQuery.data.results) {
+    if (DataQuery.data && DataQuery.data.results) {
       const newItems = filterItems(DataQuery.data.results, listParams);
       setItems(newItems);
     }
@@ -355,7 +354,7 @@ const ListList = ({ context }) => {
         data={items}
         initialNumToRender={20}
         keyExtractor={item => item.id}
-        ListEmptyComponent={<EmptyListState />}
+        ListEmptyComponent={<EmptyListState context={context} />}
         // ListFooterComponent={<ListFooterComponent />}
         onDragEnd={onReorder}
         renderItem={ListItem}
@@ -475,9 +474,9 @@ export default function List({ item }) {
       <View
         style={styled.view}
       >
-        <Header />
+        {/* <Header /> */}
         <View style={styled.content}>
-          <Title />
+          {/* <Title /> */}
 
           <View style={styled.flex1}>
             <ListList context={queryKeys} />

@@ -28,6 +28,8 @@ import Black from '../assets/fonts/Inter-Black.otf';
 import Light from '../assets/fonts/Inter-Light.otf';
 import Regular from '../assets/fonts/Inter-Regular.otf';
 
+
+import GlobalHeader from '../components/UI/Header';
 import { AuthContext } from '../contexts/auth';
 import { queryClient } from '../contexts/query-client';
 
@@ -118,15 +120,18 @@ export default function RootLayout() {
               <SafeAreaProvider>
                 <TalkProvider>
                   <ActionSheetProvider>
-                    <SafeAreaView style={{ flex: 1 }}>
-                      <KeyboardAvoidingView
-                        behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
-                        style={{ flex: 1 }}
-                      >
-                        <Slot />
-                        <DetailModal />
-                      </KeyboardAvoidingView>
-                    </SafeAreaView>
+                    {/* <SafeAreaView style={{ flex: 1, backgroundColor: 'red' }}> */}
+                    {/* <KeyboardAvoidingView
+                      behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                      style={{ flex: 1 }}
+                    > */}
+                    <>
+                      {/* <GlobalHeader /> */}
+                      <Slot />
+                      {/* <DetailModal /> */}
+                    </>
+                    {/* </KeyboardAvoidingView> */}
+                    {/* </SafeAreaView> */}
                   </ActionSheetProvider>
                 </TalkProvider>
               </SafeAreaProvider>

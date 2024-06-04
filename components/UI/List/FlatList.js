@@ -14,7 +14,7 @@ import Search from './Search';
 import colors from '../colors';
 import styles from '../styles';
 import Bold from '../text/Bold';
-
+import ListHeader from './Header';
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 
@@ -120,6 +120,7 @@ export default function ListFlatList({ filters, keys, renderItem }) {
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
         ListEmptyComponent={ListEmptyComponent}
+        // ListHeaderComponent={() => <ListHeader keys={keys} />}
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

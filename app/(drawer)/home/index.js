@@ -190,7 +190,7 @@ export default function HomeView() {
     ItemTemplate,
     noRedirect: true,
     storeKey: ['queue'],
-    title: 'Quick Queue'
+    title: ['Quick Queue']
   };
 
   function createConvo(item) {

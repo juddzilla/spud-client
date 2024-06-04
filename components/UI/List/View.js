@@ -14,6 +14,7 @@ import Bold from '../text/Bold';
 
 import TalkButton from '../Talk/Button';
 import DrawerScreen from '../../DrawerScreen';
+import GlobalHeader from '../Header';
 
 export default function ListView({ options }) {
   const {
@@ -28,24 +29,23 @@ export default function ListView({ options }) {
 
   return (
     <>
-      <DrawerScreen title={title} />
-      <View style={styles.View}>
+      <View style={{ ...styles.View }}>
         <View style={{ flex: 1, paddingBottom: 0 }}>
-          <ListHeader keys={storeKey} />
+          {/* <ListHeader keys={storeKey} /> */}
           <FlatList
             filters={filters}
             keys={storeKey}
             renderItem={ItemTemplate}
           />
 
-          <View style={{ ...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8 }}>
+          {/* <View style={{ ...styles.footer, backgroundColor: 'transparent', position: 'absolute', bottom: 0, paddingHorizontal: 8 }}>
             <CreateInput
               keys={storeKey}
               noRedirect={noRedirect}
               placeholder={actions.placeholder}
             />
             <TalkButton keys={storeKey} />
-          </View>
+          </View> */}
         </View>
       </View>
     </>
