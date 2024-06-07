@@ -1,8 +1,7 @@
 import { StyleSheet, View } from 'react-native';
+import Convo from '../../../../components/UI/Details/Convo';
 
-import List from "../../../../components/UI/Details/List";
-
-export default function ListDetail() {
+export default function ConvoDetail() {
     const viewStyled = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
@@ -10,7 +9,7 @@ export default function ListDetail() {
 
     return (
         <View style={viewStyled}>
-            <List />
+            <Convo />
         </View>
     )
 }

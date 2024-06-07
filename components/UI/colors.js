@@ -1,5 +1,9 @@
 const black = '#000';
+const concord = 'rgb(101, 94, 180)';
+const infrared = '#F53F5B';
+const tiffany = '#00FFEC';
 const white = '#fff';
+const university = '#ba2b2b';
 
 const slate = {
     lightest: '#f1f5f9', // 100
@@ -58,27 +62,30 @@ const theme = {
         background: {
             primary: '',
             secondary: '',
-            tertiary: '',            
+            tertiary: '',
         },
         text: {
             primary: '',
             secondary: '',
-            tertiary: '',            
+            tertiary: '',
         }
     }
 }
 
 const colors = {
     brand: teal.medium, // teal 400
-    
-    text: slate.dark, 
-    darkText: slate.dark, 
+    concord,
+    infrared,
+    tiffany,
+
+    text: slate.dark,
+    darkText: slate.dark,
     lightText: slate.medium,
 
-    darkBg: slate.light, 
-    lightBg: slate.lightest, 
+    darkBg: slate.light,
+    lightBg: slate.lightest,
 
-    darkestBg: slate.mediumDark, 
+    darkestBg: slate.mediumDark,
     lightWhite: '#f8fafc',
 
     black,
@@ -112,7 +119,7 @@ const colors = {
             color: slate.dark,
             icon: slate.medium,
         },
-        icon: {            
+        icon: {
             unfocused: slate.medium,
         }
     },
@@ -123,6 +130,7 @@ const colors = {
     remove: red.primary,
     removeHint: red.light,
     theme,
+    university,
     phoneBlue: 'rgb(74,164,223)'
 }
 

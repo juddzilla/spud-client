@@ -1,14 +1,9 @@
 import { Stack } from "expo-router";
-import colors from "../../../components/UI/colors";
+
+import { screenOptions } from "../../../components/UI/View/screen";
 
 export default function CollectionsLayout() {
   return (
-    <Stack 
-      screenOptions={{
-        contentStyle: {
-          backgroundColor: colors.theme.backgroundColor,
-        }
-      }}
-    />
+    <Stack screenOptions={screenOptions} />
   );
 }

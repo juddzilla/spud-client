@@ -1,15 +1,9 @@
 import { Stack } from "expo-router";
+import { screenOptions } from "../../../components/UI/View/screen";
 
-export default function HomeLayout() {  
-  
+export default function HomeLayout() {
+
   return (
-    <Stack 
-      screenOptions={{
-        contentStyle: {
-          // height: '100%',
-          // flex: 1,
-        }
-      }}
-    />
+    <Stack screenOptions={screenOptions} />
   );
 }

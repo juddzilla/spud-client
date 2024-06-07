@@ -25,10 +25,10 @@ const DefaultListItem = ({ index, item }) => {
     const key = item.type.toLowerCase() + 's';
     const keys = [key, item.uuid];
 
-    function onPress() {
-        queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });
-        queryClient.setQueryData(keys, { context: keys, ...item });
-    }
+    // function onPress() {
+    //     queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });
+    //     queryClient.setQueryData(keys, { context: keys, ...item });
+    // }
 
     const remove = async () => {
         await Fetch.remove(`${key}/${item.uuid}/`);
@@ -139,8 +139,9 @@ const DefaultListItem = ({ index, item }) => {
                     style={styled.container}
                 // onPress={onPress}
                 >
-                    <Link href={`${key}?uuid=${item.uuid}&title=${item.title}`}>
-
+                    {/* <Link href={`${key}?uuid=${item.uuid}&title=${item.title}`}> */}
+                    <Link href={`${key}/${item.uuid}`}>
+                        {/* options={{ animation: 'slide_from_bottom' }}  */}
                         <View style={styled.content}>
                             <View style={styled.indexContainer}>
 

@@ -8,11 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import AnimatedEllipsis from 'rn-animated-ellipsis';
 
 import { DetailStyles } from './styles';
-import Input from './Input';
-import Exit from './Exit';
-import Title from './Title';
-import Menu from './Menu';
+
 import TalkButton from '../Talk/Button';
+import { useLocalSearchParams, } from 'expo-router';
 
 import colors from '../colors';
 import styles from '../styles';
@@ -23,19 +21,20 @@ import Regular from '../text/Regular';
 import { WebsocketContext } from '../../../contexts/websocket';
 import Fetch from '../../../interfaces/fetch';
 import { convoDate } from '../../../utils/dates';
+import ViewHead from '../View/Header';
 
 
-const Messages = ({uuid}) => {  
-  const queryKeys = ['convos', uuid];
-  const baseUri = `${queryKeys.join('/')}/`;
+const Messages = ({ context }) => {
+  const baseUri = `${context.join('/')}/`;
   const awaitingIndex = 1000000;
   const [messages, setMessages] = useState([]);
 
   const Query = useQuery({
-    queryKey: queryKeys,
+    enabled: false,
+    queryKey: context,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);      
-      const {error, messages} = response;
+      const response = await Fetch.get(baseUri);
+      const { error, messages } = response;
       if (error) {
         return Query.data;
       }
@@ -44,7 +43,7 @@ const Messages = ({uuid}) => {
   });
 
   useEffect(() => {
-    if (!Query.data.children) {
+    if (!Query.data || !Query.data.children) {
       return;
     }
     const sorted = Query.data.children.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -55,16 +54,16 @@ const Messages = ({uuid}) => {
 
     const styled = StyleSheet.create({
       ellipsis: {
-        fontSize: 20, 
+        fontSize: 20,
         color: colors.darkText,
       },
       message: {
-        paddingHorizontal: 8,       
+        paddingHorizontal: 8,
         marginBottom: 24,
       },
-      header: {        
-        justifyContent: 'space-between',        
-        flexDirection: 'row', 
+      header: {
+        justifyContent: 'space-between',
+        flexDirection: 'row',
         alignItems: 'flex-end',
         marginBottom: 4,
         paddingHorizontal: 0,
@@ -87,22 +86,22 @@ const Messages = ({uuid}) => {
     return (
       <View style={styled.message}>
         <View style={styled.header}>
-          <Bold style={styled.user}>{ displayNameMap[item.type] }</Bold>
-          { item.created_at && 
-            
-          <Light style={styled.date}>{convoDate(item.created_at)}</Light>
+          <Bold style={styled.user}>{displayNameMap[item.type]}</Bold>
+          {item.created_at &&
+
+            <Light style={styled.date}>{convoDate(item.created_at)}</Light>
           }
-          
+
         </View>
-        <View>            
-          { (index === awaitingIndex && item.body === 'awaiting') ? (
-            <AnimatedEllipsis numberOfDots={5} style={styled.ellipsis}/>
+        <View>
+          {(index === awaitingIndex && item.body === 'awaiting') ? (
+            <AnimatedEllipsis numberOfDots={5} style={styled.ellipsis} />
           ) : (
             <View>
 
-              <Regular style={styled.text}>{ item.body }</Regular>              
+              <Regular style={styled.text}>{item.body}</Regular>
             </View>
-            )}
+          )}
         </View>
       </View>
     )
@@ -113,37 +112,38 @@ const Messages = ({uuid}) => {
       flex: 1,
       paddingBottom: 44,
       paddingHorizontal: 8,
-    }  
+    }
   });
 
   const ListFooterComponent = () => {
-    if (!messages.length || messages[0].type === 'system') {    
-      return null;      
+    if (!messages.length || messages[0].type === 'system') {
+      return null;
     }
-    return Message({ index: awaitingIndex, item : {type: 'system', created_at: null, body: 'awaiting'}});
+    return Message({ index: awaitingIndex, item: { type: 'system', created_at: null, body: 'awaiting' } });
   };
 
   return (
-    <View style={{...flatlist.container}}>
-      <FlatList          
+    <View style={{ ...flatlist.container }}>
+      <FlatList
         data={messages}
         renderItem={Message}
-        keyExtractor={item => item.id}        
-        inverted={true}    
+        keyExtractor={item => item.id}
+        inverted={true}
         ListHeaderComponent={ListFooterComponent}
       />
     </View>
   )
 }
 
-export default function Convo({item}) {    
-  const queryKeys = item.context;
+export default function Convo() {
+  const local = useLocalSearchParams();
+  const context = ['convos', local.slug];
   const { sendMessage } = useContext(WebsocketContext);
 
   function createMessage(text) {
     sendMessage({
       action: 'create',
-      context: queryKeys,
+      context,
       data: { body: text, },
     });
   }
@@ -162,24 +162,18 @@ export default function Convo({item}) {
   })
 
   return (
-    <View style={styled.view}>   
-      <View style={styled.heading}>
-        <Exit />
-        <View style={styled.menu}>                     
-          <Menu />
-        </View>
-      </View>
+    <View style={styled.view}>
+      <ViewHead context={context} />
       <View style={styled.flex1}>
-        <Title />
-        <Messages uuid={queryKeys[1]}/>
+        <Messages context={context} />
       </View>
 
       <View style={styles.footer}>
-        <Input
-          onSubmit={createMessage} 
-          placeholder='Create New Message'          
-        /> 
-        <TalkButton keys={queryKeys} />
+        {/* <Input
+          onSubmit={createMessage}
+          placeholder='Create New Message'
+        /> */}
+        {/* <TalkButton context={context} /> */}
       </View>
     </View>
   )

@@ -32,6 +32,13 @@ export default function DrawerLayout() {
             drawerIcon: () => <Icon name='list' />,
             drawerLabel: "Lists",
           }}
+          listeners={{
+            drawerItemPress: (e) => {
+              // Prevent default action
+              console.log('list drawerItemPress');
+              // e.preventDefault();
+            },
+          }}
         />
 
         <Drawer.Screen

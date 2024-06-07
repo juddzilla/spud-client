@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
-import { relativeDate } from '../../../utils/dates';
+import { StyleSheet, View } from 'react-native';
 import {
   keepPreviousData,
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
+import { useLocalSearchParams } from 'expo-router';
 import { DetailStyles } from './styles';
-import Exit from './Exit';
-import Menu from './Menu';
-import Title from './Title';
+
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
 import styles from '../styles';
@@ -20,14 +18,17 @@ import TalkButton from '../Talk/Button';
 import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';
 
-export default function Note({item}) {  
-  const queryKeys = item.context;
-  const baseUri = queryKeys.join('/')+'/';
+export default function Note() {
+  const local = useLocalSearchParams();
+  const context = ['notes', local.slug];
+  const baseUri = context.join('/') + '/';
 
-  const [body, setBody] = useState(item.body);
-  const [updatedAt, setUpdatedAt] = useState(item.updatedAt);
+  const data = queryClient.getQueryData([context[0]]);
+  const note = data.results.find(j => j.uuid === context[1]);
+  const [body, setBody] = useState(note.body);
+  const [updatedAt, setUpdatedAt] = useState(note.updated_at);
 
-  async function putNote(data) {    
+  async function putNote(data) {
     try {
       return await Fetch.put(baseUri, data);
     } catch (e) {
@@ -36,10 +37,10 @@ export default function Note({item}) {
   }
 
   const Query = useQuery({
-    queryKey: queryKeys, 
-    queryFn: async () => {        
-      const response = await Fetch.get(baseUri);            
-      setBody(response.body);    
+    queryKey: context,
+    queryFn: async () => {
+      const response = await Fetch.get(baseUri);
+      setBody(response.body);
       setUpdatedAt(response.updated_at);
       return response;
     },
@@ -55,13 +56,13 @@ export default function Note({item}) {
     },
     onSuccess: (data) => {  // variables, context
       setUpdatedAt(data.updated_at);
-      queryClient.setQueryData(queryKeys, oldData => {            
-        return {...oldData, ...data};
+      queryClient.setQueryData(context, oldData => {
+        return { ...oldData, ...data };
       });
-      queryClient.invalidateQueries([queryKeys[0]]);
+      queryClient.invalidateQueries([context[0]]);
     },
   })
-  
+
   const styled = StyleSheet.create({
     view: {
       ...DetailStyles.view,
@@ -69,7 +70,7 @@ export default function Note({item}) {
     },
     content: {
       ...DetailStyles.content,
-      
+
     },
     header: {
       ...DetailStyles.header,
@@ -79,19 +80,19 @@ export default function Note({item}) {
     },
     note: {
       flexWrap: 'wrap',
-      fontSize: 18,        
+      fontSize: 18,
       paddingHorizontal: 16,
       // paddingTop: 16,
       paddingBottom: 36,
-      backgroundColor: 'transparent', 
+      backgroundColor: 'transparent',
       color: colors.darkText,
       lineHeight: 28,
     },
     date: {
-      container: {      
+      container: {
         flexDirection: 'row',
         flex: 1,
-        paddingLeft: 8,      
+        paddingLeft: 8,
       },
       body: {
         fontSize: 12,
@@ -102,45 +103,36 @@ export default function Note({item}) {
   return (
     <View
       style={styled.view}
-    >                
-      { (Query.status === 'pending' && Query.fetchStatus === 'fetching') ? 
+    >
+      {(Query.status === 'pending' && Query.fetchStatus === 'fetching') ?
         (
           <Light>Loading</Light>
-        ) : 
+        ) :
         (
           <View style={styled.content}>
-            <View style={styled.header}>
-              <Exit />
-              <View style={styled.menu}>        
-                <Menu />
-              </View>
-            </View>
-            
-            <Title />
-
             <View style={{
-              flex: 1, 
+              flex: 1,
               // backgroundColor: 'red', 
               // borderRadius: 8, 
               // marginHorizontal: 4,
               // transform: [{ scale: 0.95}]
-            }}>            
+            }}>
               <DebouncedInput
                 multiline={true}
                 placeholder='(untitled)'
                 style={styled.note}
-                update={(value) => { updateMutation.mutate({body: value})}} 
+                update={(value) => { updateMutation.mutate({ body: value }) }}
                 value={body}
               />
             </View>
-            
+
           </View>
-        ) 
-      
+        )
+
       }
-      
+
       <View style={styles.footer}>
-        <TalkButton keys={queryKeys} />        
+        <TalkButton context={context} />
       </View>
     </View>
   )

@@ -1,9 +1,8 @@
-import { View } from 'react-native';
 import { Stack } from "expo-router";
-import colors from '../../../components/UI/colors';
+import { screenOptions } from "../../../components/UI/View/screen";
 
-export default function HomeLayout() {
+export default function ConvosLayout() {
   return (
-    <Stack />
+    <Stack screenOptions={screenOptions} />
   );
 }

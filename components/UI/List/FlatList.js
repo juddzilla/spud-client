@@ -10,17 +10,17 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-import Search from './Search';
-import colors from '../colors';
 import styles from '../styles';
 import Bold from '../text/Bold';
-import ListHeader from './Header';
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 
-export default function ListFlatList({ filters, keys, renderItem }) {
+import ViewHead from '../View/Header';
+
+export default function ListFlatList({ filters, context, renderItem }) {
   const [items, setItems] = useState([]);
-  const uri = keys.join('/') + '/';
+  const uri = context.join('/') + '/';
+
   const sortDefaults = (filters && Object.hasOwn(filters, 'sort')) ? filters.sort.defaults : {};
   const initialData = {
     count: null,
@@ -40,7 +40,7 @@ export default function ListFlatList({ filters, keys, renderItem }) {
 
   const DataQuery = useQuery({
     initialData,
-    queryKey: keys,
+    queryKey: context,
     queryFn: async () => {
       const response = await Fetch.get(uri, initialData.params);
       return { ...response, params: initialData.params };
@@ -60,7 +60,7 @@ export default function ListFlatList({ filters, keys, renderItem }) {
       Fetch.get(DataQuery.data.next)
         .then(response => {
           const results = [...DataQuery.data.results, ...response.results];
-          queryClient.setQueryData(keys, { ...response, results });
+          queryClient.setQueryData(context, { ...response, results });
         });
     }
   }
@@ -119,8 +119,8 @@ export default function ListFlatList({ filters, keys, renderItem }) {
         renderItem={renderItem}
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
-        ListEmptyComponent={ListEmptyComponent}
-        // ListHeaderComponent={() => <ListHeader keys={keys} />}
+        // ListEmptyComponent={ListEmptyComponent}
+        ListHeaderComponent={() => <ViewHead context={context} />}
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

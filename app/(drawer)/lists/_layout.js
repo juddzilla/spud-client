@@ -1,12 +1,8 @@
 import { Stack } from "expo-router";
-import colors from "../../../components/UI/colors";
+import { screenOptions } from "../../../components/UI/View/screen";
 
-export default function HomeLayout() {
+export default function ListsLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShadowVisible: false
-      }}
-    />
+    <Stack screenOptions={screenOptions} />
   );
 }

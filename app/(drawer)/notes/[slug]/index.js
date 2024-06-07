@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
+import Note from '../../../../components/UI/Details/Note';
 
-import List from "../../../../components/UI/Details/List";
 
-export default function ListDetail() {
+export default function NoteDetail() {
     const viewStyled = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
@@ -10,7 +10,7 @@ export default function ListDetail() {
 
     return (
         <View style={viewStyled}>
-            <List />
+            <Note />
         </View>
     )
 }

@@ -1,5 +1,6 @@
 
 import { View } from 'react-native';
+import { useSegments, useLocalSearchParams } from 'expo-router';
 
 import CreateInput from './CreateInput';
 import DefaultListItem from './DefaultListItem';
@@ -13,8 +14,6 @@ import styles from '../styles';
 import Bold from '../text/Bold';
 
 import TalkButton from '../Talk/Button';
-import DrawerScreen from '../../DrawerScreen';
-import GlobalHeader from '../Header';
 
 export default function ListView({ options }) {
   const {
@@ -23,18 +22,18 @@ export default function ListView({ options }) {
     ItemTemplate = DefaultListItem,
     noRedirect,
     storeKey,
-    title,
+
   } = options;
 
 
   return (
     <>
+      {/* <DrawerScreen /> */}
       <View style={{ ...styles.View }}>
         <View style={{ flex: 1, paddingBottom: 0 }}>
-          {/* <ListHeader keys={storeKey} /> */}
           <FlatList
             filters={filters}
-            keys={storeKey}
+            context={storeKey}
             renderItem={ItemTemplate}
           />
 

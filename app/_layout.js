@@ -29,15 +29,12 @@ import Light from '../assets/fonts/Inter-Light.otf';
 import Regular from '../assets/fonts/Inter-Regular.otf';
 
 
-import GlobalHeader from '../components/UI/Header';
 import { AuthContext } from '../contexts/auth';
 import { queryClient } from '../contexts/query-client';
 
 import colors from '../components/UI/colors';
 import { useStorageState } from '../interfaces/storage';
 import { useWebSocket } from '../interfaces/websocket';
-
-import DetailModal from '../components/UI/Details/Modal';
 
 import { WebsocketContext } from '../contexts/websocket';
 

@@ -7,8 +7,6 @@ import {
 } from 'react';
 
 import {
-  FlatList,
-  Pressable,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -19,11 +17,6 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
-
-import Exit from './Exit';
-import Title from './Title';
-
-import Menu from './Menu';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import { BaseButton } from 'react-native-gesture-handler';
@@ -290,66 +283,6 @@ const ListList = ({ context }) => {
   );
 };
 
-const Header = () => {
-  const { listParams, setListParams } = useContext(ListParamsContext);
-
-  function toggleShowCompleted() {
-    let completed = null;
-
-    if (listParams.completed === null) {
-      completed = true;
-    } else if (listParams.completed === true) {
-      completed = false;
-    }
-    setListParams({ ...listParams, completed })
-  }
-
-  const checkboxToggleIconMap = {
-    null: 'checkedFilled',
-    true: 'completedOnly',
-    false: 'completedNot'
-  };
-
-  let checkboxToggleIcon = checkboxToggleIconMap[null];
-
-  if (listParams && !listParams.completed !== null) {
-    checkboxToggleIcon = checkboxToggleIconMap[listParams.completed];
-  }
-
-  const styled = StyleSheet.create({
-    header: {
-      ...DetailStyles.header,
-    },
-    menu: {
-      ...DetailStyles.menu
-    },
-    button: {
-      width: 40,
-      height: 40,
-      ...styles.centered,
-    },
-    icon: {
-      size: 22,
-      color: colors.darkText
-    },
-  })
-
-  return (
-    <View style={styled.header}>
-      <Exit />
-      <View style={styled.menu}>
-        {/* <Pressable
-          onPress={toggleShowCompleted}
-          style={styled.button}
-        >
-          <Icon name={checkboxToggleIcon} styles={styled.icon} />
-        </Pressable>   */}
-        <Menu noCollectionsToggle={true} />
-      </View>
-    </View>
-  )
-}
-
 export default function Collection({ item }) {
   const queryKeys = item.context;
 
@@ -375,10 +308,8 @@ export default function Collection({ item }) {
       <View
         style={styled.view}
       >
-        <Header />
-        <View style={styled.content}>
-          <Title />
 
+        <View style={styled.content}>
           <View style={styled.flex1}>
             <ListList context={queryKeys} />
           </View>

@@ -19,10 +19,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-import Exit from './Exit';
-import Title from './Title';
-
-import Menu from './Menu';
+import { useLocalSearchParams } from 'expo-router';
 
 import DraggableFlatList, { ScaleDecorator, } from "react-native-draggable-flatlist";
 import { BaseButton } from 'react-native-gesture-handler';
@@ -30,7 +27,6 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
 import { DetailStyles } from './styles';
-import Input from './Input';
 import TalkButton from '../Talk/Button';
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
@@ -42,6 +38,7 @@ import Regular from '../text/Regular';
 
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
+import ViewHead from '../View/Header';
 
 const ListParamsContext = createContext({});
 
@@ -342,12 +339,9 @@ const ListList = ({ context }) => {
     )
   });
 
-  if (!items || !items.length) {
-    return null;
-  }
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: 0 }}>
+    <View style={{ flex: 1, }}>
 
       <DraggableFlatList
         activationDistance={20}
@@ -355,7 +349,7 @@ const ListList = ({ context }) => {
         initialNumToRender={20}
         keyExtractor={item => item.id}
         ListEmptyComponent={<EmptyListState context={context} />}
-        // ListFooterComponent={<ListFooterComponent />}
+        ListHeaderComponent={() => <ViewHead context={context} />}
         onDragEnd={onReorder}
         renderItem={ListItem}
         refreshing={true}
@@ -364,69 +358,11 @@ const ListList = ({ context }) => {
   );
 };
 
-const Header = () => {
-  const { listParams, setListParams } = useContext(ListParamsContext);
+export default function List() {
+  const local = useLocalSearchParams();
+  const context = ['lists', local.slug];
 
-  function toggleShowCompleted() {
-    let completed = null;
-
-    if (listParams.completed === null) {
-      completed = true;
-    } else if (listParams.completed === true) {
-      completed = false;
-    }
-    setListParams({ ...listParams, completed })
-  }
-
-  const checkboxToggleIconMap = {
-    null: 'checkedFilled',
-    true: 'completedOnly',
-    false: 'completedNot'
-  };
-
-  let checkboxToggleIcon = checkboxToggleIconMap[null];
-
-  if (listParams && !listParams.completed !== null) {
-    checkboxToggleIcon = checkboxToggleIconMap[listParams.completed];
-  }
-
-  const styled = StyleSheet.create({
-    header: {
-      ...DetailStyles.header,
-    },
-    menu: {
-      ...DetailStyles.menu
-    },
-    button: {
-      width: 40,
-      height: 40,
-      ...styles.centered,
-    },
-    icon: {
-      size: 22,
-      color: colors.darkText
-    },
-  })
-
-  return (
-    <View style={styled.header}>
-      <Exit />
-      <View style={styled.menu}>
-        <Pressable
-          onPress={toggleShowCompleted}
-          style={styled.button}
-        >
-          <Icon name={checkboxToggleIcon} styles={styled.icon} />
-        </Pressable>
-        <Menu />
-      </View>
-    </View>
-  )
-}
-
-export default function List({ item }) {
-  const queryKeys = item.context;
-  const baseUri = queryKeys.join('/') + '/';
+  const baseUri = context.join('/') + '/';
 
   const styled = StyleSheet.create({
     view: {
@@ -460,7 +396,7 @@ export default function List({ item }) {
       }
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys, old => {
+      queryClient.setQueryData(context, old => {
         const oldCopy = JSON.parse(JSON.stringify(old));
         const results = oldCopy.results;
         results.push(data.results);
@@ -474,22 +410,14 @@ export default function List({ item }) {
       <View
         style={styled.view}
       >
-        {/* <Header /> */}
         <View style={styled.content}>
-          {/* <Title /> */}
-
           <View style={styled.flex1}>
-            <ListList context={queryKeys} />
+            <ListList context={context} />
           </View>
-
         </View>
 
         <View style={styles.footer}>
-          <Input
-            onSubmit={createListItemMutation.mutate}
-            placeholder='Create New List Item'
-          />
-          <TalkButton keys={queryKeys} />
+          <TalkButton context={context} />
         </View>
       </View>
     </ListParamsProvider>
