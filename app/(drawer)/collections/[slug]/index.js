@@ -22,6 +22,7 @@ import Regular from '../../../../components/UI/text/Regular';
 import Light from '../../../../components/UI/text/Light';
 
 import { relativeDate } from '../../../../utils/dates';
+import DrawerScreen from '../../../../components/UI/View/DrawerScreen';
 
 const ItemTemplate = ({ index, item }) => {
     if (!item) {
@@ -184,5 +185,10 @@ export default function Collection() {
         ItemTemplate,
         title: 'Collection'
     };
-    return (<ListView options={{ ...options }} />);
+    return (
+        <>
+            <DrawerScreen />
+            <ListView options={{ ...options }} />
+        </>
+    );
 }

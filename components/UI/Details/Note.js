@@ -18,6 +18,8 @@ import TalkButton from '../Talk/Button';
 import Fetch from '../../../interfaces/fetch';
 import { queryClient } from '../../../contexts/query-client';
 
+import ViewHead from '../View/Header';
+
 export default function Note() {
   const local = useLocalSearchParams();
   const context = ['notes', local.slug];
@@ -109,24 +111,27 @@ export default function Note() {
           <Light>Loading</Light>
         ) :
         (
-          <View style={styled.content}>
-            <View style={{
-              flex: 1,
-              // backgroundColor: 'red', 
-              // borderRadius: 8, 
-              // marginHorizontal: 4,
-              // transform: [{ scale: 0.95}]
-            }}>
-              <DebouncedInput
-                multiline={true}
-                placeholder='(untitled)'
-                style={styled.note}
-                update={(value) => { updateMutation.mutate({ body: value }) }}
-                value={body}
-              />
-            </View>
+          <>
+            <ViewHead context={context} />
+            <View style={styled.content}>
+              <View style={{
+                flex: 1,
+                // backgroundColor: 'red', 
+                // borderRadius: 8, 
+                // marginHorizontal: 4,
+                // transform: [{ scale: 0.95}]
+              }}>
+                <DebouncedInput
+                  multiline={true}
+                  placeholder='(untitled)'
+                  style={styled.note}
+                  update={(value) => { updateMutation.mutate({ body: value }) }}
+                  value={body}
+                />
+              </View>
 
-          </View>
+            </View>
+          </>
         )
 
       }

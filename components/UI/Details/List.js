@@ -73,7 +73,7 @@ const EmptyListState = ({ context }) => {
 
   return (
     <View style={{ padding: 16, flex: 1, alignItems: 'center' }}>
-      {!queryData.results.length ? (
+      {!queryData.list_items.length ? (
         <View style={{ ...styles.row }}>
           <Bold style={{ color: colors.darkText }}>Add your first list item</Bold>
         </View>
@@ -98,11 +98,13 @@ const EmptyListState = ({ context }) => {
 };
 
 const ListList = ({ context }) => {
-  const baseUri = `lists/${context[1]}/`;
+  const baseUri = `${context.join('/')}/`;
   const itemsUri = `${baseUri}items/`;
   const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
   const [items, setItems] = useState([]);
   const { listParams } = useContext(ListParamsContext);
+
+  const id = queryClient.getQueryData(context);
 
   const initialData = {
     count: null,
@@ -115,7 +117,7 @@ const ListList = ({ context }) => {
       sortProperty: 'order',
       completed: null,
     },
-    results: []
+    list_items: []
   };
 
   const DataQuery = useQuery({
@@ -128,8 +130,8 @@ const ListList = ({ context }) => {
 
 
   useEffect(() => {
-    if (DataQuery.data && DataQuery.data.results) {
-      const newItems = filterItems(DataQuery.data.results, listParams);
+    if (DataQuery.data && DataQuery.data.list_items) {
+      const newItems = filterItems(DataQuery.data.list_items, listParams);
       setItems(newItems);
     }
 
@@ -148,7 +150,7 @@ const ListList = ({ context }) => {
     setItems(newItems);
     const dataIds = data.map(d => d.id);
     const queryData = queryClient.getQueryData(context);
-    const queryDataIds = queryData.results.map(d => d.id);
+    const queryDataIds = queryData.list_items.map(d => d.id);
     const areEqual = JSON.stringify(dataIds) === JSON.stringify(queryDataIds);
 
     if (!areEqual) {
@@ -166,7 +168,7 @@ const ListList = ({ context }) => {
   const reorderMutation = useMutation({
     mutationFn: async (order) => await Fetch.put(itemsUri, order),
     onSuccess: (data) => {
-      const newItems = filterItems(reorderMutation.data.results, listParams);
+      const newItems = filterItems(reorderMutation.data.list_items, listParams);
       setItems(newItems);
     }
   });
@@ -398,9 +400,9 @@ export default function List() {
     onSuccess: (data) => {
       queryClient.setQueryData(context, old => {
         const oldCopy = JSON.parse(JSON.stringify(old));
-        const results = oldCopy.results;
-        results.push(data.results);
-        return { ...oldCopy, results };
+        const list_items = oldCopy.list_items;
+        list_items.push(data.list_items);
+        return { ...oldCopy, list_items };
       });
     }
   });

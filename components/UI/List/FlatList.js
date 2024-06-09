@@ -17,6 +17,7 @@ import Fetch from '../../../interfaces/fetch';
 
 import ViewHead from '../View/Header';
 
+
 export default function ListFlatList({ filters, context, renderItem }) {
   const [items, setItems] = useState([]);
   const uri = context.join('/') + '/';
@@ -120,7 +121,7 @@ export default function ListFlatList({ filters, context, renderItem }) {
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
         // ListEmptyComponent={ListEmptyComponent}
-        ListHeaderComponent={() => <ViewHead context={context} />}
+        ListHeaderComponent={<ViewHead />}
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

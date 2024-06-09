@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { queryClient } from '../../../contexts/query-client';
 
 import colors from '../colors';
@@ -17,18 +17,26 @@ import Regular from '../text/Regular';
 import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
+const childrenMap = {
+    Convo: 'Messages',
+    List: 'List Items',
+}
 
-const DefaultListItem = ({ index, item }) => {
+export default function DefaultListItem({ index, item }) {
     if (!item) {
         return null;
     }
-    const key = item.type.toLowerCase() + 's';
-    const keys = [key, item.uuid];
+    // const keys = [key, item.uuid];
 
-    // function onPress() {
-    //     queryClient.setQueryData(['details'], { context: keys, title: item.title, type: item.type });
-    //     queryClient.setQueryData(keys, { context: keys, ...item });
-    // }
+    function onPress() {
+        const key = item.type.toLowerCase() + 's';
+        const exists = queryClient.getQueryData([key, item.uuid])
+
+        if (!queryClient.getQueryData([key, item.uuid])) {
+            queryClient.setQueryData([key, item.uuid], item);
+        }
+        router.push(`${key}/${item.uuid}/`);
+    }
 
     const remove = async () => {
         await Fetch.remove(`${key}/${item.uuid}/`);
@@ -41,27 +49,40 @@ const DefaultListItem = ({ index, item }) => {
     const styled = StyleSheet.create({
         container: {
             ...styles.row,
-            padding: 12,
-            paddingLeft: 0,
+            // padding: 12,
+            // paddingLeft: 0,
             flex: 1,
+            // backgroundColor: 'orange',
+            // height: 40,
+            marginBottom: 16,
+
         },
         checkbox: {
-            alignItems: 'center',
-            height: 40,
-            justifyContent: 'center',
-            width: 40,
-            top: 1,
+            // alignItems: 'center',
+            // height: 40,
+            // justifyContent: 'center',
+            // width: 40,
+            // top: 1,
         },
         content: {
             flex: 1,
-            paddingLeft: 8,
+            paddingHorizontal: 8,
             ...styles.row,
-            // backgroundColor: 'green', 
+            // backgroundColor: 'green',
+            borderRadius: 8,
             alignItems: 'flex-start',
+            // minHeight: 40,
+            // borderWidth: 1,
         },
         date: {
             color: colors.theme.text.medium,
             fontSize: 12,
+        },
+        details: {
+            // backgroundColor: 'red',
+            flex: 1,
+            paddingHorizontal: 12,
+            paddingVertical: 12,
         },
         icon: {
             color: item.selected ? colors.text : colors.theme.text.light,
@@ -72,22 +93,44 @@ const DefaultListItem = ({ index, item }) => {
             color: colors.theme.text.light,
         },
         indexContainer: {
-            width: 34,
+            width: 16,
+            // marginRight: 2,
             alignItems: 'flex-end',
-            paddingRight: 8,
-            paddingTop: 2,
+            // backgroundColor: 'yellow',
+            height: 24,
+            // justifyContent: 'center',
+            // paddingRight: 8,
+            marginTop: 14,
         },
         info: {
             ...styles.row,
             flexWrap: 'wrap',
         },
+        link: ({ pressed }) => ({
+            borderRadius: 16,
+            backgroundColor: pressed ? 'orange' : 'rgba(242,242,242,0.4)',
+            flex: 1,
+            marginHorizontal: 8
+        }),
         row: {
             backgroundColor: colors.white,
             ...styles.row,
-            marginBottom: 2,
+            flex: 1,
+            // marginBottom: 2,
         },
-        subtitle: { fontSize: 12, color: colors.theme.text.medium, marginRight: 6 },
-        title: { flexWrap: 'wrap', backgroundColor: 'transparent', fontSize: 16, color: colors.theme.text.dark, marginBottom: 4 },
+        subtitle: {
+            fontSize: 12,
+            color: colors.theme.text.medium,
+            marginRight: 6
+        },
+        title: {
+            backgroundColor: 'transparent',
+            color: colors.darkText,
+            flexWrap: 'wrap',
+            fontSize: 15,
+            marginBottom: 4,
+            // height: 24,
+        },
     });
 
     const RenderUnderlayLeftActions = () => {
@@ -96,10 +139,10 @@ const DefaultListItem = ({ index, item }) => {
         const animStyle = useAnimatedStyle(
             () => ({
                 ...styles.centered,
-                backgroundColor: colors.remove,
-                height: '100%',
-                width: 60,
+                // backgroundColor: colors.remove,
+                // height: '100%',
                 opacity: percentOpen.value,
+                width: 60,
 
             }),
             [percentOpen]
@@ -109,10 +152,12 @@ const DefaultListItem = ({ index, item }) => {
             <RectButton
                 onPress={remove}
                 style={{
-                    flex: 1,
+                    // flex: 1,
+                    // backgroundColor: 'red',
                     justifyContent: 'center',
                     alignItems: 'flex-end',
-                    marginBottom: 2,
+                    height: 60,
+                    // marginBottom: 2,
                 }}
             >
                 <Animated.View
@@ -131,37 +176,34 @@ const DefaultListItem = ({ index, item }) => {
             key={item.id}
             item={item}
             renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
-            snapPointsLeft={[60]}
+            snapPointsLeft={[40]}
             overSwipe={20}
         >
             <View style={styled.row}>
-                <View
-                    style={styled.container}
-                // onPress={onPress}
-                >
-                    {/* <Link href={`${key}?uuid=${item.uuid}&title=${item.title}`}> */}
-                    <Link href={`${key}/${item.uuid}`}>
-                        {/* options={{ animation: 'slide_from_bottom' }}  */}
-                        <View style={styled.content}>
-                            <View style={styled.indexContainer}>
-
-                                <Regular style={styled.index}>{index + 1} </Regular>
-                            </View>
-                            <View>
+                <View style={styled.container}>
+                    {/* <Link href={`${key}/${item.uuid}`}> */}
+                    <View style={styled.content}>
+                        <View style={styled.indexContainer}>
+                            <Regular style={styled.index}>{index + 1} </Regular>
+                        </View>
+                        <Pressable onPress={onPress} style={styled.link}>
+                            <View style={styled.details}>
                                 <Bold style={styled.title}>{item.title}</Bold>
                                 <View style={styled.info}>
-                                    {item.subheadline &&
-                                        <Regular style={styled.subtitle}>{item.subheadline}</Regular>
+                                    {Object.hasOwn(item, 'children_count') &&
+                                        <>
+                                            <Regular style={styled.subtitle}>{`${item.children_count} ${childrenMap[item.type]}`}</Regular>
+                                            <Regular style={styled.date}>| </Regular>
+                                        </>
                                     }
                                     <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
                                 </View>
                             </View>
-                        </View>
-                    </Link>
+                        </Pressable>
+                    </View>
+                    {/* </Link> */}
                 </View>
             </View>
         </SwipeableItem>
     )
-};
-
-export default DefaultListItem;
+}

@@ -30,7 +30,10 @@ const Messages = ({ context }) => {
   const [messages, setMessages] = useState([]);
 
   const Query = useQuery({
-    enabled: false,
+    // enabled: false,
+    initialData: {
+      children: [],
+    },
     queryKey: context,
     queryFn: async () => {
       const response = await Fetch.get(baseUri);

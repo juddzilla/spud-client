@@ -21,6 +21,8 @@ import { queryClient } from '../../../contexts/query-client';
 
 import { useActionSheet } from '@expo/react-native-action-sheet';
 
+import DrawerScreen from '../../../components/UI/View/DrawerScreen';
+
 class ActionableItemObserver {
   constructor() {
     this.data = null;
@@ -331,8 +333,11 @@ export default function HomeView() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <ListView options={{ ...options }} />
-    </View>
+    <>
+      <DrawerScreen />
+      <View style={{ flex: 1 }}>
+        <ListView options={{ ...options }} />
+      </View>
+    </>
   );
 }

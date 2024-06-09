@@ -20,6 +20,8 @@ import Light from '../../../components/UI/text/Light';;
 
 import { relativeDate } from '../../../utils/dates';
 
+import DrawerScreen from '../../../components/UI/View/DrawerScreen';
+
 const ItemTemplate = ({ index, item }) => {
     if (!item) {
         return null;
@@ -181,6 +183,7 @@ export default function Collections() {
 
     return (
         <>
+            <DrawerScreen />
             <ListView options={{ ...options }} />
         </>
     );

@@ -1,9 +1,8 @@
-import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View, } from 'react-native';
 
 import colors from '../../../components/UI/colors';
-import Convo from '../../../components/UI/Details/Convo';
 import ListView from '../../../components/UI/List/View';
+import DrawerScreen from '../../../components/UI/View/DrawerScreen';
 
 export default function Convos() {
   const context = ['convos'];
@@ -31,6 +30,7 @@ export default function Convos() {
 
   return (
     <>
+      <DrawerScreen />
       <View style={{ flex: 1, backgroundColor: colors.brand }}>
         <View style={viewStyled}>
           <ListView options={{ ...options }} />

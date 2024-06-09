@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import List from "../../../../components/UI/Details/List";
+import DrawerScreen from '../../../../components/UI/View/DrawerScreen';
 
 export default function ListDetail() {
     const viewStyled = StyleSheet.create({
@@ -9,8 +10,11 @@ export default function ListDetail() {
     });
 
     return (
-        <View style={viewStyled}>
-            <List />
-        </View>
+        <>
+            <DrawerScreen />
+            <View style={viewStyled}>
+                <List />
+            </View>
+        </>
     )
 }

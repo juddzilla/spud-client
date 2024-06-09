@@ -8,19 +8,12 @@ export default function DrawerLayout() {
       <Drawer
         backBehavior="history"
         screenOptions={{
-          drawerStyle: {
-            // backgroundColor: 'green',
-            // below four properties will remove the shadow
-            borderBottomColor: "transparent",
-            shadowColor: 'transparent',
-            borderBottomWidth: 0,
-            elevation: 0
-          },
-          headerShown: false
+          headerShown: false,
+          unmountOnBlur: true,
         }}
       >
         <Drawer.Screen
-          name="home"
+          name="queue"
           options={{
             drawerIcon: () => <Icon name='home' />,
             drawerLabel: "Home",
@@ -31,13 +24,6 @@ export default function DrawerLayout() {
           options={{
             drawerIcon: () => <Icon name='list' />,
             drawerLabel: "Lists",
-          }}
-          listeners={{
-            drawerItemPress: (e) => {
-              // Prevent default action
-              console.log('list drawerItemPress');
-              // e.preventDefault();
-            },
           }}
         />
 
