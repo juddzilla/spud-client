@@ -13,26 +13,33 @@ import styles from '../styles';
 import { typeColorMap } from './styles';
 import { titleNameMap } from './title';
 
+const subheadlineTypeMap = {
+    lists: (list) => `${list.children_count} List Items`,
+    convos: (convo) => `${convo.children_count} Messages`,
+    notes: (note) => `Last Updated: ${note.updated_at}`,
+    collections: (collection) => { }
+}
+
 export default function ViewHead({ children }) {
     const local = useLocalSearchParams();
     const segments = useSegments();
 
-    const section = segments[1];
+    const type = segments[1];
     const uuid = local.slug;
 
-    const context = [section, uuid].filter(Boolean);
+    const context = [type, uuid].filter(Boolean);
 
     const DataQuery = useQuery({
         enabled: false,
-        queryKey: context.filter(Boolean),
+        queryKey: context,
     });
 
     let subheadline = '';
     if (DataQuery.data) {
-        if (DataQuery.data.count) {
+        if (uuid) {
+            subheadline = subheadlineTypeMap[type](DataQuery.data);
+        } else {
             subheadline = `Showing ${DataQuery.data.results.length} of ${DataQuery.data.count}`;
-        } else if (DataQuery.data.results && DataQuery.data.results.length) {
-            subheadline = `${DataQuery.data.results.length}`;
         }
     }
 
