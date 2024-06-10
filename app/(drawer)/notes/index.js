@@ -5,23 +5,7 @@ import ListView from '../../../components/UI/List/View';
 
 
 export default function Notes() {
-  const context = ['notes'];
-
-  const options = {
-    actions: {
-      placeholder: 'Create New Note',
-
-    },
-    filters: {
-      placeholder: 'Search Notes',
-      sort: {
-        defaults: { property: 'updated_at', direction: 'desc' },
-        fields: ['title', 'updated_at'],
-      },
-    },
-    storeKey: context,
-    title: 'Notes'
-  };
+  const options = {};
 
   const viewStyled = StyleSheet.create({
     flex: 1,

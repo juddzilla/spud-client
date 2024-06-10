@@ -1,26 +1,37 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
+import { useLocalSearchParams, useSegments } from 'expo-router';
 
 import colors from '../colors';
 
-import Icon, { sorting } from '../icons';
+import { sorting } from '../icons';
 
 import { queryClient } from '../../../contexts/query-client';
 import { useEffect, useState } from 'react';
 
 import Fetch from '../../../interfaces/fetch';
 
-export default function Sort({ fields, keys }) {       
+import { HeaderToggleableIcon } from '../View/Header';
+import { listSort } from '../type';
+
+export default function Sort() {
   const [disabled, setDisabled] = useState(true);
-  const uri = `${keys[0]}/`;  
+  const segments = useSegments();
+  const local = useLocalSearchParams();
+  const type = segments[1];
+  const uuid = local.slug;
+  const context = [type, uuid].filter(Boolean);
+  const { fields } = listSort(type);
+
+  const uri = context.join('/') + '/';
 
   const DataQuery = useQuery({
     enabled: false,
-    queryKey: keys,
+    queryKey: context,
   });
 
-  useEffect(() => {  
-    if (DataQuery.data) {
+  useEffect(() => {
+    if (DataQuery.data && DataQuery.data.results) {
       setDisabled(DataQuery.data.results.length === 0);
     }
   }, [DataQuery.data]);
@@ -29,82 +40,75 @@ export default function Sort({ fields, keys }) {
     inactive: {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
-      color: colors.sort.inactive,
+      color: colors.white,
     },
     active: {
       backgroundColor: 'transparent',
-      borderColor: colors.darkText,
-      color: colors.sort.active,
+      borderColor: colors.white,//colors.darkText,
+      color: colors.white, //colors.sort.active,
     }
   };
 
   function update(param) {
-    const params = {...DataQuery.data.params, ...param};    
+    const params = { ...DataQuery.data.params, ...param };
     Fetch.get(uri, params)
-      .then(response => queryClient.setQueryData(keys, response));
+      .then(response => queryClient.setQueryData(context, response));
   }
-  
-  const SortButton = (property) => {    
-    const isActive = DataQuery.data && DataQuery.data.params && DataQuery.data.params.sortProperty === property;  
+
+  const SortButton = (property) => {
+    const isActive = DataQuery.data && DataQuery.data.params && DataQuery.data.params.sortProperty === property;
     const styles = isActive ? buttonTheme.active : buttonTheme.inactive;
-    const buttonStyle = StyleSheet.create({
-      alignItems: 'center',
-      height: 32,
-      justifyContent: 'center',
-      marginLeft: 3,
-      width: 40,
-      backgroundColor: styles.backgroundColor,
-      border: 1,
-      borderWidth: 1,
-      borderColor: styles.borderColor,
-      borderRadius: 4,
-    });
-    
-    const sortIcon = () => {            
-      let color = styles.color;
+
+    const sortIcon = () => {
+      const color = styles.color;
       let name = sorting[property].inactive;
 
       let iconSize = 16;
-            
-      if (isActive) {      
+
+      if (isActive) {
         name = DataQuery.data.params.sortDirection === 'asc' ? sorting[property].asc : sorting[property].desc;
         iconSize = 19;
       }
-  
+
       return { color, name, size: iconSize };
     };
 
     const properties = sortIcon(property);
-    
-    function chooseSort(property) {     
+
+    function chooseSort(property) {
       if (disabled) {
         return;
       }
-      
+
       let direction = 'desc';
       if (isActive) {
         direction = ['asc', 'desc'].filter(dir => dir !== DataQuery.data.params.sortDirection)[0];
       }
 
-      update({ sortProperty: property, sortDirection: direction});
+      update({ sortProperty: property, sortDirection: direction });
     }
 
     return (
-      <Pressable
-        key={property}
+      <HeaderToggleableIcon
+        key={`sort-${properties.name}`}
+        icon={properties.name}
         onPress={() => chooseSort(property)}
-        style={buttonStyle}
-      >
-        <Icon name={properties.name} styles={{size: properties.size, color: styles.color }} />
-      </Pressable>
-    )
+        style={{
+          button: { ...styles },
+          icon: {
+            color: properties.color,
+            size: properties.size
+          }
+        }}
+      />
+    );
   }
-      
+
   return (
     (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            { fields.map(SortButton)}          
-        </View>          
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 12 }}>
+        {fields.map(SortButton)}
+      </View>
     )
   )
 }

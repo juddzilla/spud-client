@@ -1,148 +1,79 @@
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { Alert, Pressable } from 'react-native';
 
-import colors from '../colors';
+import { useLocalSearchParams, useSegments } from 'expo-router';
+
 import Icon from '../icons';
-import styles from '../styles';
 
 import { queryClient } from '../../../contexts/query-client';
 
-import { useDebouncedValue } from '../../../utils/debounce';
-
 import Fetch from '../../../interfaces/fetch';
+import colors from '../colors';
 
-export default function Search({ keys }) {
-    const [disabled, setDisabled] = useState(true);
-    const [focused, setFocused] = useState(false);
-    const [search, setSearch] = useState('');
-    const debouncedSearch = useDebouncedValue(search, 500);
-    const uri = `${keys[0]}/`;
-    const inputRef = useRef();
+export default function Search() {
+    const [search, setSearch] = useState(null);
+    const local = useLocalSearchParams();
+    const segments = useSegments();
+    const context = [segments[1], local.slug].filter(Boolean);
+    const uri = `${context[0]}/`;
 
-    const DataQuery = useQuery({
-        enabled: false,
-        queryKey: keys,
-    });
 
     useEffect(() => {
-        if (DataQuery.data) {
-            setDisabled(search.trim().length === 0 && DataQuery.data.results.length === 0);
-        }
-    }, [DataQuery.data]);
-
-    let height = 32;
-    let searchIconSize = 12;
-
-    useEffect(() => {
-        if (search.trim().length && search !== DataQuery.data.params.search) {
-            update({ search });
-        }
-    }, [debouncedSearch]);
-
-    useEffect(() => {
-        if (focused) {
-            inputRef.current.focus();
-        }
-    }, [focused])
-
-    const focusedOrHasSearch = focused || search.trim().length > 0;
-
-    const style = StyleSheet.create({
-        container: {
-            ...styles.row,
-            backgroundColor: focusedOrHasSearch ? colors.lightWhite : 'transparent',
-
-            borderWidth: 1,
-            // borderRadius: height / 2,
-            borderRadius: height / 2,
-            overflow: 'hidden',
-            borderColor: focusedOrHasSearch ? colors.darkText : colors.white,
+        update(search);
+    }, [search]);
 
 
-            // flex: 1,
-            justifyContent: 'space-between',
-            marginRight: 8,
+    function update(value) {
+        const current = queryClient.getQueryData(context);
 
-        },
-        search: {
-            color: focusedOrHasSearch ? colors.darkText : colors.sort.inactive,
-            size: searchIconSize,
-        },
-        icon: {
-            container: {
-                height,
-                width: height,
-                ...styles.centered,
-                // backgroundColor: 'red',
-                // borderWidth: 1,
-                borderColor: focusedOrHasSearch ? colors.darkText : colors.white,
-            },
-        },
-        input: {
-            height,
-            marginRight: 0,
-            color: colors.darkText,
-            paddingLeft: 18,
-            paddingRight: 44,
-            position: focused ? 'relative' : 'absolute',
-            opacity: focused ? 1 : 0,
-            // flex: 1,
-        },
-        close: {
-            button: {
-                height,
-                width: height,
-                position: 'absolute',
-                right: 0,
-                ...styles.centered,
-            },
-            icon: {
-                color: disabled ? colors.button.disabled : colors.button.enabled,
-                size: 18,
-            },
-        },
-    });
-
-    function clearSearch() {
-        setSearch('');
-        update({ search: '' });
-    }
-
-    function update(param) {
-        if (DataQuery.status === 'pending') {
+        if (!current) {
             return;
         }
-        const params = { ...DataQuery.data.params, ...param };
+        const params = { ...current.params, search: value };
+
         Fetch.get(uri, params)
-            .then(response => queryClient.setQueryData(keys, response));
+            .then(response =>
+                queryClient.setQueryData(context, { ...response, params })
+            );
+    }
+
+    function onPress() {
+        const title = 'Search';
+        const options = [
+            {
+                onPress: (text) => {
+                    const newValue = text.trim().length ? text : '';
+                    setSearch(text.trim());
+                    // update({ search: newValue });
+                },
+                style: 'default',
+                text: 'Submit'
+            },
+            {
+                style: 'cancel',
+                text: 'Cancel'
+            }
+        ];
+
+        if (search) {
+            options.splice(1, 0, {
+                onPress: () => setSearch(''),
+                style: 'default',
+                text: 'Clear'
+            })
+        }
+        Alert.prompt(
+            title,
+            null,
+            options,
+            'plain-text',
+            search,
+        )
     }
 
     return (
-        <View style={style.container}>
-            <TextInput
-                editable={!!disabled === false}
-                onBlur={() => setFocused(false)}
-                onChangeText={setSearch}
-                onFocus={() => setFocused(true)}
-                placeholder='Search'
-                placeholderTextColor={colors.darkText}
-                ref={inputRef}
-                style={style.input}
-                value={search}
-            />
-            <View style={style.icon.container}>
-                {search.trim().length > 0 ?
-                    (<Pressable
-                        onPress={clearSearch}
-                        style={style.close.button}>
-                        <Icon name='close' styles={style.close.icon} />
-                    </Pressable>) :
-                    (<Pressable onPress={() => setFocused(true)}>
-                        <Icon name='search' styles={style.search} />
-                    </Pressable>)
-                }
-            </View>
-        </View>
-    )
+        <Pressable onPress={onPress}>
+            <Icon name='search' styles={{ size: 18, color: colors.white }} />
+        </Pressable>
+    );
 }

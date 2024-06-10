@@ -49,10 +49,8 @@ export default function DefaultListItem({ index, item }) {
     const styled = StyleSheet.create({
         container: {
             ...styles.row,
-            // padding: 12,
-            // paddingLeft: 0,
             flex: 1,
-            // backgroundColor: 'orange',
+            backgroundColor: 'transparent',
             // height: 40,
             marginBottom: 16,
 
@@ -66,10 +64,10 @@ export default function DefaultListItem({ index, item }) {
         },
         content: {
             flex: 1,
-            paddingHorizontal: 8,
+            paddingLeft: 8,
             ...styles.row,
-            // backgroundColor: 'green',
-            borderRadius: 8,
+            backgroundColor: 'transparent',
+            // borderRadius: 8,            
             alignItems: 'flex-start',
             // minHeight: 40,
             // borderWidth: 1,
@@ -93,7 +91,7 @@ export default function DefaultListItem({ index, item }) {
             color: colors.theme.text.light,
         },
         indexContainer: {
-            width: 16,
+            width: 20,
             // marginRight: 2,
             alignItems: 'flex-end',
             // backgroundColor: 'yellow',
@@ -107,13 +105,15 @@ export default function DefaultListItem({ index, item }) {
             flexWrap: 'wrap',
         },
         link: ({ pressed }) => ({
-            borderRadius: 16,
+            borderTopLeftRadius: 16,
+            borderBottomLeftRadius: 16,
             backgroundColor: pressed ? 'orange' : 'rgba(242,242,242,0.4)',
             flex: 1,
-            marginHorizontal: 8
+            // marginHorizontal: 8
+            marginLeft: 4,
         }),
         row: {
-            backgroundColor: colors.white,
+            // backgroundColor: colors.white,
             ...styles.row,
             flex: 1,
             // marginBottom: 2,
@@ -176,7 +176,7 @@ export default function DefaultListItem({ index, item }) {
             key={item.id}
             item={item}
             renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
-            snapPointsLeft={[40]}
+            snapPointsLeft={[60]}
             overSwipe={20}
         >
             <View style={styled.row}>

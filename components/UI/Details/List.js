@@ -7,7 +7,9 @@ import {
 } from 'react';
 
 import {
+  Alert,
   Pressable,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -27,6 +29,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import SwipeableItem, { useSwipeableItemParams, } from "react-native-swipeable-item";
 
 import { DetailStyles } from './styles';
+
 import TalkButton from '../Talk/Button';
 import colors from '../colors';
 import DebouncedInput from '../DebouncedInput';
@@ -38,7 +41,9 @@ import Regular from '../text/Regular';
 
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
-import ViewHead from '../View/Header';
+import ViewHead, { HeaderButton } from '../View/Header';
+
+import { colorway } from '../type';
 
 const ListParamsContext = createContext({});
 
@@ -97,7 +102,7 @@ const EmptyListState = ({ context }) => {
   )
 };
 
-const ListList = ({ context }) => {
+const DraggableList = ({ context }) => {
   const baseUri = `${context.join('/')}/`;
   const itemsUri = `${baseUri}items/`;
   const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
@@ -343,22 +348,47 @@ const ListList = ({ context }) => {
 
 
   return (
-    <View style={{ flex: 1, }}>
-
+    <View style={{ flex: 1 }}>
       <DraggableFlatList
         activationDistance={20}
         data={items}
         initialNumToRender={20}
         keyExtractor={item => item.id}
         ListEmptyComponent={<EmptyListState context={context} />}
-        ListHeaderComponent={() => <ViewHead context={context} />}
+        // ListHeaderComponent={() => <ViewHead />}
         onDragEnd={onReorder}
         renderItem={ListItem}
         refreshing={true}
+        onScrollOffsetChange={(j) => { console.log('j', j) }}
       />
     </View>
   );
 };
+
+const AddListItem = ({ submit }) => {
+  const style = {
+    icon: { color: colorway('lists') },
+    text: { color: colorway('lists') }
+  };
+
+  function onPress() {
+    const title = 'New List Item';
+    Alert.prompt(
+      title,
+      null,
+      submit,
+      'plain-text'
+    )
+  }
+
+  return (
+    <HeaderButton
+      icon='plus'
+      onPress={onPress}
+      style={style}
+    />
+  )
+}
 
 export default function List() {
   const local = useLocalSearchParams();
@@ -409,19 +439,26 @@ export default function List() {
 
   return (
     <ListParamsProvider>
-      <View
-        style={styled.view}
-      >
-        <View style={styled.content}>
-          <View style={styled.flex1}>
-            <ListList context={context} />
-          </View>
-        </View>
+      <View style={styled.view}>
+        <ViewHead>
+          <AddListItem
+            submit={createListItemMutation.mutate}
+          />
+        </ViewHead>
+        <DraggableList context={context} />
+        {/* <View
+          style={styled.view}
+        >
+          <View style={styled.content}>
+            <View style={styled.flex1}>
+            </View>
+          </View> */}
 
-        <View style={styles.footer}>
-          <TalkButton context={context} />
-        </View>
+        {/* <View style={styles.footer}>
+            <TalkButton context={context} />
+          </View> */}
+        {/* </View> */}
       </View>
-    </ListParamsProvider>
+    </ListParamsProvider >
   );
 }

@@ -1,9 +1,9 @@
 import { Drawer } from 'expo-router/drawer';
 import { useSegments, useLocalSearchParams, useNavigation, router } from 'expo-router';
 import {
-    TouchableOpacity, Dimensions,
+    Alert,
+    TouchableOpacity,
     Pressable,
-    StyleSheet, View
 } from 'react-native';
 import Icon from '../icons';
 import colors from '../colors';
@@ -11,21 +11,24 @@ import { useQuery, } from '@tanstack/react-query';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 import styles from '../styles';
+import Search from '../List/Search';
 
-import { titleNameMap } from './title';
+import { drawerTitle, hasSearch } from '../type';
+import { colorway } from '../type';
 
-import { typeColorMap } from './styles';
+
 export default function DrawerScreen() {
     const local = useLocalSearchParams();
     const segments = useSegments();
     const navigation = useNavigation();
 
-    const section = segments[1];
+    const type = segments[1];
     const uuid = local.slug;
-    const drawerTitle = uuid ? titleNameMap[section] : 'Spud';
+
+    const title = uuid ? drawerTitle[type] : 'Spud';
 
     function canGoBack() {
-        return section !== 'queue';
+        return type !== 'queue';
     }
 
     function goBack() {
@@ -36,12 +39,21 @@ export default function DrawerScreen() {
         router.setParams({ title: null, uuid: null });
     }
 
+    function headerRight() {
+        if (!hasSearch([type, uuid])) {
+            return null;
+        }
+
+
+        return (<Search />)
+    }
+
     return (
         <Drawer.Screen
             options={{
-                title: drawerTitle,
+                title,
                 headerShown: true,
-                headerStyle: { backgroundColor: typeColorMap(section) },
+                headerStyle: { backgroundColor: colorway(type) },
                 headerLeft: () => {
                     if (!canGoBack()) {
                         return (
@@ -56,7 +68,7 @@ export default function DrawerScreen() {
                         </TouchableOpacity>
                     )
                 },
-                // headerRight: headerRight || null,
+                headerRight,
             }}
         />
     )

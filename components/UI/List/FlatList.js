@@ -15,14 +15,23 @@ import Bold from '../text/Bold';
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 
-import ViewHead from '../View/Header';
+import { useLocalSearchParams, useSegments } from 'expo-router';
 
+import { listSort } from '../type';
 
-export default function ListFlatList({ filters, context, renderItem }) {
+export default function ListFlatList({ renderItem }) {
   const [items, setItems] = useState([]);
-  const uri = context.join('/') + '/';
 
-  const sortDefaults = (filters && Object.hasOwn(filters, 'sort')) ? filters.sort.defaults : {};
+  const local = useLocalSearchParams();
+  const segments = useSegments();
+
+  const type = segments[1];
+  const uuid = local.slug;
+
+  const context = [type, uuid].filter(Boolean);
+  const uri = context.join('/') + '/';
+  const sort = listSort(type);
+
   const initialData = {
     count: null,
     next: null,
@@ -34,9 +43,9 @@ export default function ListFlatList({ filters, context, renderItem }) {
     results: []
   };
 
-  if (Object.keys(sortDefaults).length) {
-    initialData.params.sortDirection = sortDefaults.direction;
-    initialData.params.sortProperty = sortDefaults.property;
+  if (sort) {
+    initialData.params.sortDirection = sort.defaults.direction;
+    initialData.params.sortProperty = sort.defaults.property;
   }
 
   const DataQuery = useQuery({
@@ -120,8 +129,7 @@ export default function ListFlatList({ filters, context, renderItem }) {
         renderItem={renderItem}
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
-        // ListEmptyComponent={ListEmptyComponent}
-        ListHeaderComponent={<ViewHead />}
+        // ListEmptyComponent={ListEmptyComponent}        
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

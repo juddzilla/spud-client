@@ -5,8 +5,7 @@ import DefaultListItem from './DefaultListItem';
 import FlatList from './FlatList';
 
 import styles from '../styles';
-
-import TalkButton from '../Talk/Button';
+import ViewHeading from './Header';
 
 export default function ListView({ options }) {
   const {
@@ -23,6 +22,7 @@ export default function ListView({ options }) {
     <>
       {/* <DrawerScreen /> */}
       <View style={{ ...styles.View }}>
+        <ViewHeading />
         <View style={{ flex: 1, }}>
           <FlatList
             filters={filters}

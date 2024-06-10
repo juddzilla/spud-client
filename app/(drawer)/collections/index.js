@@ -164,22 +164,7 @@ const ItemTemplate = ({ index, item }) => {
 };
 
 export default function Collections() {
-    const options = {
-        actions: {
-            placeholder: 'Create Collections',
-
-        },
-        filters: {
-            placeholder: 'Search Collections',
-            sort: {
-                defaults: { property: 'updated_at', direction: 'desc' },
-                fields: ['body', 'updated_at'],
-            },
-        },
-        storeKey: ['collections'],
-        ItemTemplate,
-        title: 'Collections'
-    };
+    const options = { ItemTemplate };
 
     return (
         <>

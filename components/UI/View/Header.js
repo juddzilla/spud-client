@@ -1,6 +1,7 @@
 import { useSegments, useLocalSearchParams } from 'expo-router';
 import {
     Dimensions,
+    Pressable,
     StyleSheet,
     View,
 } from 'react-native';
@@ -9,15 +10,77 @@ import { useQuery, } from '@tanstack/react-query';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 import styles from '../styles';
+import Icon from '../icons';
 
-import { typeColorMap } from './styles';
-import { titleNameMap } from './title';
+import { colorway } from '../type';
+import { drawerTitle } from '../type';
 
 const subheadlineTypeMap = {
     lists: (list) => `${list.children_count} List Items`,
     convos: (convo) => `${convo.children_count} Messages`,
     notes: (note) => `Last Updated: ${note.updated_at}`,
     collections: (collection) => { }
+};
+
+export const HeaderButton = ({ icon, style = {}, onPress, text }) => {
+    const styled = StyleSheet.create({
+        button: {
+            paddingHorizontal: 20,
+            paddingVertical: 4,
+            backgroundColor: colors.white,
+            ...styles.centered,
+            borderRadius: 16,
+            ...style.button,
+            // height: 40,
+
+        },
+        icon: {
+            size: 16,
+            ...style.icon,
+        },
+        text: {
+            ...style.text,
+        }
+    });
+
+    return (
+        <Pressable onPress={onPress} style={styled.button}>
+            {
+                text &&
+                <Bold style={styled.text}>{text}</Bold>
+            }
+            {icon &&
+                <Icon name={icon} styles={styled.icon} />
+            }
+        </Pressable>
+    )
+};
+
+export const HeaderToggleableIcon = ({ icon, style = {}, onPress }) => {
+    const dimension = 36;
+    const styled = StyleSheet.create({
+        button: {
+            ...styles.centered,
+            backgroundColor: styles.backgroundColor,
+            border: 1,
+            // borderColor: 'black', //styles.borderColor,            
+            borderRadius: 4,
+            borderWidth: 1,
+            height: dimension,
+            marginLeft: 3,
+            width: dimension,
+            ...style.button,
+
+        },
+        icon: {
+            ...style.icon,
+        },
+    });
+    return (
+        <Pressable onPress={onPress} style={styled.button}>
+            <Icon name={icon} styles={style.icon} />
+        </Pressable>
+    );
 }
 
 export default function ViewHead({ children }) {
@@ -43,15 +106,17 @@ export default function ViewHead({ children }) {
         }
     }
 
-    const backgroundColor = typeColorMap(context[0]);
+    const backgroundColor = colorway(context[0]);
     const slantConstant = 36;
-    const title = (DataQuery.data && DataQuery.data.title) ? DataQuery.data.title : titleNameMap[context[0]];
+    const title = (DataQuery.data && DataQuery.data.title) ? DataQuery.data.title : drawerTitle[context[0]];
     const widthConstant = Dimensions.get('window').width * 0.075;
 
     const styled = StyleSheet.create({
+        children: { flexDirection: 'row' },
         container: {
             paddingTop: 24,
             backgroundColor,
+            // flex: 1,
         },
         content: {
             paddingHorizontal: 20,
@@ -68,9 +133,9 @@ export default function ViewHead({ children }) {
         },
         shape: {
             backgroundColor,
-            flex: 1,
+            // flex: 1,
             flexDirection: 'row',
-            overflow: 'hidden'
+            overflow: 'hidden',
         },
         slant: {
             backgroundColor: colors.white,
@@ -99,9 +164,10 @@ export default function ViewHead({ children }) {
                 </View>
 
                 {children &&
-                    { ...children }
+                    <View style={styled.children}>
+                        {children}
+                    </View>
                 }
-
             </View>
             <View style={styled.shape}>
                 <View style={styled.slant}></View>

@@ -181,19 +181,7 @@ export default function HomeView() {
   }, []);
 
 
-  const options = {
-    actions: {
-      placeholder: 'Create New Queue Item',
-
-    },
-    filters: {
-      placeholder: 'Search Queue',
-    },
-    ItemTemplate,
-    noRedirect: true,
-    storeKey: ['queue'],
-    title: ['Quick Queue']
-  };
+  const options = { ItemTemplate };
 
   function createConvo(item) {
     console.log('create convo', item);
