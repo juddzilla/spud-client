@@ -166,7 +166,7 @@ export default function Convo() {
 
   return (
     <View style={styled.view}>
-      <ViewHead context={context} />
+      <ViewHead />
       <View style={styled.flex1}>
         <Messages context={context} />
       </View>

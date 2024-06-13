@@ -1,21 +1,14 @@
 import { Drawer } from 'expo-router/drawer';
 import { useSegments, useLocalSearchParams, useNavigation, router } from 'expo-router';
-import {
-    Alert,
-    TouchableOpacity,
-    Pressable,
-} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Icon from '../icons';
-import colors from '../colors';
-import { useQuery, } from '@tanstack/react-query';
-import Bold from '../text/Bold';
-import Light from '../text/Light';
-import styles from '../styles';
 import Search from '../List/Search';
-
-import { drawerTitle, hasSearch } from '../type';
-import { colorway } from '../type';
-
+import colors from '../colors';
+import Light from '../text/Light';
+import Regular from '../text/Regular';
+import Black from '../text/Black';
+import Bold from '../text/Bold';
+import { colorway, hasSearch, singular } from '../type';
 
 export default function DrawerScreen() {
     const local = useLocalSearchParams();
@@ -25,7 +18,7 @@ export default function DrawerScreen() {
     const type = segments[1];
     const uuid = local.slug;
 
-    const title = uuid ? drawerTitle[type] : 'Spud';
+    const title = uuid ? singular(type) : 'Spud';
 
     function canGoBack() {
         return type !== 'queue';
@@ -39,11 +32,31 @@ export default function DrawerScreen() {
         router.setParams({ title: null, uuid: null });
     }
 
+    function headerLeft() {
+        let name = 'leftArrowLong';
+        let onPress = goBack;
+
+        if (!canGoBack()) {
+            name = 'navicon';
+            onPress = navigation.openDrawer;
+        }
+        return (
+            <TouchableOpacity onPress={onPress}>
+                <Icon name={name} styles={{ color: colors.white }} />
+            </TouchableOpacity>
+        )
+    }
+
     function headerRight() {
-        if (!hasSearch([type, uuid])) {
+        if (uuid && type !== 'collections') {
+            return (
+                <TouchableOpacity>
+                    <Icon name='collectionAdd' styles={{ color: colors.white, size: 20 }} />
+                </TouchableOpacity>
+            )
+        } else if (!hasSearch([type, uuid])) {
             return null;
         }
-
 
         return (<Search />)
     }
@@ -51,23 +64,10 @@ export default function DrawerScreen() {
     return (
         <Drawer.Screen
             options={{
-                title,
+                headerTitle: () => (<Bold style={{ fontSize: 18, color: colors.white }}>{title}</Bold>),
                 headerShown: true,
                 headerStyle: { backgroundColor: colorway(type) },
-                headerLeft: () => {
-                    if (!canGoBack()) {
-                        return (
-                            <TouchableOpacity onPress={navigation.openDrawer}>
-                                <Icon name="navicon" />
-                            </TouchableOpacity>
-                        )
-                    }
-                    return (
-                        <TouchableOpacity onPress={goBack}>
-                            <Icon name="leftArrowLong" />
-                        </TouchableOpacity>
-                    )
-                },
+                headerLeft,
                 headerRight,
             }}
         />

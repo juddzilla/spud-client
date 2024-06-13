@@ -7,18 +7,16 @@ import ListView from '../../../components/UI/List/View';
 export default function Notes() {
   const options = {};
 
-  const viewStyled = StyleSheet.create({
+  const styled = StyleSheet.create({
+    backgroundColor: colors.notes,
     flex: 1,
-    backgroundColor: 'white',
   });
 
   return (
     <>
       <DrawerScreen />
-      <View style={{ flex: 1 }}>
-        <View style={viewStyled}>
-          <ListView options={{ ...options }} />
-        </View>
+      <View style={styled}>
+        <ListView options={{ ...options }} />
       </View>
     </>
   );

@@ -19,17 +19,7 @@ export const drawerTitle = {
     notes: 'Notes',
 }
 
-export const colorway = (type) => {
-    const mapping = {
-        collections: colors.university,
-        convos: colors.infrared,
-        lists: colors.brand,
-        notes: colors.concord,
-        queue: colors.tiffany,
-    };
-
-    return mapping[type];
-};
+export const colorway = (type) => colors[type];
 
 export const listSort = (type) => {
     const mapping = {

@@ -73,7 +73,7 @@ export default function Add() {
         <HeaderButton
             onPress={onPress}
             style={styled}
-            icon='plus'
+            text='Add New'
         />
     )
 }

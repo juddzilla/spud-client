@@ -7,19 +7,17 @@ import DrawerScreen from '../../../components/UI/View/DrawerScreen';
 export default function Convos() {
   const options = {};
 
-  const viewStyled = StyleSheet.create({
+  const styled = StyleSheet.create({
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.convos,
   });
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <DrawerScreen />
-      <View style={{ flex: 1 }}>
-        <View style={viewStyled}>
-          <ListView options={{ ...options }} />
-        </View>
+      <View style={styled}>
+        <ListView options={{ ...options }} />
       </View>
-    </>
+    </View>
   );
 }

@@ -166,10 +166,17 @@ const ItemTemplate = ({ index, item }) => {
 export default function Collections() {
     const options = { ItemTemplate };
 
+    const styled = StyleSheet.create({
+        backgroundColor: colors.collections,
+        flex: 1,
+    });
+
     return (
         <>
             <DrawerScreen />
-            <ListView options={{ ...options }} />
+            <View style={styled}>
+                <ListView options={{ ...options }} />
+            </View>
         </>
     );
 }

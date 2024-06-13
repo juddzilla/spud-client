@@ -180,9 +180,6 @@ export default function HomeView() {
     return () => Observer.unsubscribe
   }, []);
 
-
-  const options = { ItemTemplate };
-
   function createConvo(item) {
     console.log('create convo', item);
     // send queue id; create convo; create assoc; delete queie id, return convo; redirecrt
@@ -320,11 +317,16 @@ export default function HomeView() {
     });
   }
 
+  const styled = StyleSheet.create({
+    backgroundColor: colors.queue,
+    flex: 1,
+  });
+
   return (
     <>
       <DrawerScreen />
-      <View style={{ flex: 1 }}>
-        <ListView options={{ ...options }} />
+      <View style={styled}>
+        <ListView options={{ ItemTemplate }} />
       </View>
     </>
   );

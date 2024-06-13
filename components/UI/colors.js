@@ -5,6 +5,12 @@ const tiffany = '#00FFEC';
 const white = '#fff';
 const university = '#ba2b2b';
 
+const collections = university;
+const convos = concord;
+const lists = tiffany;
+const notes = infrared;
+const queue = university;
+
 const slate = {
     lightest: '#f1f5f9', // 100
     light: '#e2e8f0', // 200
@@ -74,6 +80,12 @@ const theme = {
 
 const colors = {
     brand: teal.medium, // teal 400
+
+    collections,
+    convos,
+    lists,
+    notes,
+    queue,
     concord,
     infrared,
     tiffany,

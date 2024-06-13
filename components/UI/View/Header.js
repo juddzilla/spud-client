@@ -1,5 +1,7 @@
+import { useContext, useEffect, useRef, } from 'react';
 import { useSegments, useLocalSearchParams } from 'expo-router';
 import {
+    Animated,
     Dimensions,
     Pressable,
     StyleSheet,
@@ -14,6 +16,8 @@ import Icon from '../icons';
 
 import { colorway } from '../type';
 import { drawerTitle } from '../type';
+
+import { ListViewContext } from '../../../contexts/list-view';
 
 const subheadlineTypeMap = {
     lists: (list) => `${list.children_count} List Items`,
@@ -46,11 +50,12 @@ export const HeaderButton = ({ icon, style = {}, onPress, text }) => {
     return (
         <Pressable onPress={onPress} style={styled.button}>
             {
+                icon &&
+                <Icon name={icon} styles={styled.icon} />
+            }
+            {
                 text &&
                 <Bold style={styled.text}>{text}</Bold>
-            }
-            {icon &&
-                <Icon name={icon} styles={styled.icon} />
             }
         </Pressable>
     )
@@ -86,6 +91,8 @@ export const HeaderToggleableIcon = ({ icon, style = {}, onPress }) => {
 export default function ViewHead({ children }) {
     const local = useLocalSearchParams();
     const segments = useSegments();
+    // const { scrolled } = useContext(ListViewContext);
+
 
     const type = segments[1];
     const uuid = local.slug;
@@ -107,60 +114,39 @@ export default function ViewHead({ children }) {
     }
 
     const backgroundColor = colorway(context[0]);
-    const slantConstant = 36;
     const title = (DataQuery.data && DataQuery.data.title) ? DataQuery.data.title : drawerTitle[context[0]];
     const widthConstant = Dimensions.get('window').width * 0.075;
 
     const styled = StyleSheet.create({
         children: { flexDirection: 'row' },
         container: {
-            paddingTop: 24,
             backgroundColor,
-            // flex: 1,
+            // marginBottom: 200,
         },
         content: {
-            paddingHorizontal: 20,
             paddingBottom: widthConstant / 2,
+            paddingHorizontal: 16,
             flexDirection: 'row',
             justifyContent: 'space-between',
+            // marginBottom: 120,
         },
-        action: {
-            backgroundColor: colors.lightWhite,
-            borderRadius: 16,
-            ...styles.centered,
-            paddingVertical: 18,
-            paddingHorizontal: 30,
-        },
-        shape: {
-            backgroundColor,
-            // flex: 1,
-            flexDirection: 'row',
-            overflow: 'hidden',
-        },
-        slant: {
-            backgroundColor: colors.white,
-            width: slantConstant * 2,
-            height: slantConstant * 2,
-            borderTopLeftRadius: '50%',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-        },
-        solid: {
-            flex: 1,
-            height: slantConstant,
-            backgroundColor: colors.white,
-            marginLeft: slantConstant * 2,
-        }
+
     });
 
 
     return (
-        <View style={styled.container} >
+        <View style={styled.container}>
+            {/* <View style={styled.top} /> */}
+            {/* <Animated.View
+                style={[
+                    styled.top,
+                    { transform: [{ scale: topAnim }] },
+                ]}
+            /> */}
             <View style={styled.content}>
                 <View style={{ flex: 1 }}>
-                    <Bold style={{ fontSize: 24, textTransform: 'capitalize' }}>{title}</Bold>
-                    <Light style={{ fontSize: 12 }}>{subheadline}</Light>
+                    <Bold style={{ color: 'white', fontSize: 24, textTransform: 'capitalize' }}>{title}</Bold>
+                    <Light style={{ fontSize: 12, color: 'white', }}>{subheadline}</Light>
                 </View>
 
                 {children &&
@@ -169,10 +155,10 @@ export default function ViewHead({ children }) {
                     </View>
                 }
             </View>
-            <View style={styled.shape}>
+            {/* <View style={styled.shape}>
                 <View style={styled.slant}></View>
                 <View style={styled.solid}></View>
-            </View>
+            </View> */}
         </View>
     );
 }

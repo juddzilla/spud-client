@@ -1,4 +1,4 @@
-import ViewHead, { HeaderToggleableIcon } from "../View/Header";
+import ViewHead from "../View/Header";
 import Add from "./Add";
 import Sort from "./Sort";
 

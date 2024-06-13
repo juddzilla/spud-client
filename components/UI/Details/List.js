@@ -359,7 +359,6 @@ const DraggableList = ({ context }) => {
         onDragEnd={onReorder}
         renderItem={ListItem}
         refreshing={true}
-        onScrollOffsetChange={(j) => { console.log('j', j) }}
       />
     </View>
   );

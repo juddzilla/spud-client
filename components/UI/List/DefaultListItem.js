@@ -50,7 +50,7 @@ export default function DefaultListItem({ index, item }) {
         container: {
             ...styles.row,
             flex: 1,
-            backgroundColor: 'transparent',
+            backgroundColor: colors.white,
             // height: 40,
             marginBottom: 16,
 
@@ -113,7 +113,7 @@ export default function DefaultListItem({ index, item }) {
             marginLeft: 4,
         }),
         row: {
-            // backgroundColor: colors.white,
+            backgroundColor: colors.white,
             ...styles.row,
             flex: 1,
             // marginBottom: 2,

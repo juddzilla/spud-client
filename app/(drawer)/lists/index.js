@@ -6,15 +6,15 @@ import DrawerScreen from '../../../components/UI/View/DrawerScreen';
 export default function Lists() {
   const options = {};
 
-  const viewStyled = StyleSheet.create({
+  const styled = StyleSheet.create({
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.lists,
   });
 
   return (
     <>
       <DrawerScreen />
-      <View style={viewStyled}>
+      <View style={styled}>
         <ListView options={{ ...options }} />
       </View>
     </>
