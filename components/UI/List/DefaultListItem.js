@@ -40,7 +40,7 @@ export default function DefaultListItem({ index, item }) {
     }
 
     const remove = async () => {
-        await Fetch.remove(`${key}/${item.uuid}/`);
+        await Fetch.remove([key, item.uuid]);
         queryClient.setQueryData([key], old => {
             const oldCopy = JSON.parse(JSON.stringify(old));
             return {

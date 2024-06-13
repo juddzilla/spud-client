@@ -103,9 +103,7 @@ const EmptyListState = ({ context }) => {
 };
 
 const DraggableList = ({ context }) => {
-  const baseUri = `${context.join('/')}/`;
-  const itemsUri = `${baseUri}items/`;
-  const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
+  const itemsContext = [...context, 'items'];
   const [items, setItems] = useState([]);
   const { listParams } = useContext(ListParamsContext);
 
@@ -169,7 +167,7 @@ const DraggableList = ({ context }) => {
   }
 
   const reorderMutation = useMutation({
-    mutationFn: async (order) => await Fetch.put(itemsUri, order),
+    mutationFn: async (order) => await Fetch.put(itemsContext, order),
     onSuccess: (data) => {
       const newItems = filterItems(reorderMutation.data.list_items, listParams);
       setItems(newItems);
@@ -179,7 +177,7 @@ const DraggableList = ({ context }) => {
   const removeListItemMutation = useMutation({
     mutationFn: async ({ id }) => {
       try {
-        return await Fetch.remove(itemUri(id));
+        return await Fetch.remove([...itemsContext, id]);
       } catch (error) {
         console.warn('Delete List Item Error:', error);
       }
@@ -195,7 +193,7 @@ const DraggableList = ({ context }) => {
     mutationFn: async (data) => {
       const { id, ...rest } = data;
       try {
-        const response = await Fetch.put(itemUri(id), rest);
+        const response = await Fetch.put([...itemsContext, id], rest);
         return response;
       } catch (error) {
         console.warn('Update List Item Error', error);

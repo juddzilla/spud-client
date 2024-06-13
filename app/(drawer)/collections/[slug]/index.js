@@ -37,7 +37,7 @@ const ItemTemplate = ({ index, item }) => {
     }
 
     const remove = async () => {
-        await Fetch.remove(`${key}/${item.uuid}/`);
+        await Fetch.remove([key, item.uuid]);
         queryClient.setQueryData([key], old => {
             const oldCopy = JSON.parse(JSON.stringify(old));
             return oldCopy.filter(i => i.uuid !== item.uuid)

@@ -1,6 +1,8 @@
 import environment from "./environment";
 import { Storage } from './storage';
 
+const uriFromContext = (context) => context.join('/') + '/';
+
 class CustomFetch {
   constructor() {
     this.api = environment.apiHost;
@@ -12,7 +14,7 @@ class CustomFetch {
   }
 
   async get(context, query) {
-    const url = context.join('/') + '/';
+    const url = uriFromContext(context);
     const headers = {
       Authorization: await this.token(),
     };
@@ -50,6 +52,7 @@ class CustomFetch {
   }
 
   async post(context, data) {
+    const url = uriFromContext(context);
     const target = `${this.api}/${url}`;
     const body = JSON.stringify(data);
     const headers = {
@@ -82,7 +85,8 @@ class CustomFetch {
       });
   }
 
-  async put(url, data) {
+  async put(context, data) {
+    const url = uriFromContext(context);
     const target = `${this.api}/${url}`;
     const body = JSON.stringify(data);
     const headers = {

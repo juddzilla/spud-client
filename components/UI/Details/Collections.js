@@ -94,8 +94,7 @@ const EmptyListState = () => {
 };
 
 const ListList = ({ context }) => {
-  const baseUri = context.join('/') + '/';
-  const itemUri = (itemId) => `${baseUri}item/${itemId}/`;
+  const itemContext = [...context, 'item'];
   const [items, setItems] = useState([]);
   const { listParams } = useContext(ListParamsContext);
 
@@ -131,7 +130,7 @@ const ListList = ({ context }) => {
   const removeListItemMutation = useMutation({
     mutationFn: async ({ id }) => {
       try {
-        return await Fetch.remove(itemUri(id));
+        return await Fetch.remove([...itemContext, id]);
       } catch (error) {
         console.warn('Delete List Item Error:', error);
       }

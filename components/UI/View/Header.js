@@ -103,7 +103,6 @@ export default function ViewHead({ children }) {
 
     const updateTitleMutation = useMutation({
         mutationFn: async (title) => {
-            const uri = context.join('/') + '/';
             return await Fetch.put(context, { title });
         },
         onError: (error, variables, context) => {

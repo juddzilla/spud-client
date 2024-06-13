@@ -105,7 +105,7 @@ const ItemTemplate = ({ index, item }) => {
     Observer.notify(item);
   };
   const remove = async () => {
-    await Fetch.remove(`queue/${item.uuid}/`);
+    await Fetch.remove(['queue', item.uuid]);
     queryClient.setQueryData(['queue'], oldData => oldData.filter(i => i.uuid !== item.uuid));
   };
 
