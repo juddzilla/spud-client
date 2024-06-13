@@ -115,7 +115,8 @@ class CustomFetch {
       });
   }
 
-  async remove(url) {
+  async remove(context) {
+    const url = uriFromContext(context);
     const headers = {
       Authorization: await this.token(),
     };
