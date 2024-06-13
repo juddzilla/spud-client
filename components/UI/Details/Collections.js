@@ -117,7 +117,7 @@ const ListList = ({ context }) => {
     initialData,
     keepPreviousData: true,
     placeholderData: keepPreviousData,
-    queryFn: async () => await Fetch.get(baseUri),
+    queryFn: async () => await Fetch.get(context),
     queryKey: context,
   });
 

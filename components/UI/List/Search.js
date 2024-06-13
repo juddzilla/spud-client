@@ -15,8 +15,6 @@ export default function Search() {
     const local = useLocalSearchParams();
     const segments = useSegments();
     const context = [segments[1], local.slug].filter(Boolean);
-    const uri = `${context[0]}/`;
-
 
     useEffect(() => {
         update(search);
@@ -31,7 +29,7 @@ export default function Search() {
         }
         const params = { ...current.params, search: value };
 
-        Fetch.get(uri, params)
+        Fetch.get(context, params)
             .then(response =>
                 queryClient.setQueryData(context, { ...response, params })
             );
@@ -42,9 +40,7 @@ export default function Search() {
         const options = [
             {
                 onPress: (text) => {
-                    const newValue = text.trim().length ? text : '';
                     setSearch(text.trim());
-                    // update({ search: newValue });
                 },
                 style: 'default',
                 text: 'Submit'

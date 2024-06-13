@@ -26,7 +26,7 @@ export default function Add() {
         queryFn: async () => {
             const currentData = queryClient.getQueryData(context);
             const params = { ...currentData.params, page: 1 };
-            const response = await Fetch.get(`${type}/`, params);
+            const response = await Fetch.get(context, params);
             return { ...response, params };
         }
     });

@@ -109,8 +109,6 @@ const DraggableList = ({ context }) => {
   const [items, setItems] = useState([]);
   const { listParams } = useContext(ListParamsContext);
 
-  const id = queryClient.getQueryData(context);
-
   const initialData = {
     count: null,
     next: null,
@@ -129,7 +127,7 @@ const DraggableList = ({ context }) => {
     initialData,
     keepPreviousData: true,
     placeholderData: keepPreviousData,
-    queryFn: async () => await Fetch.get(baseUri),
+    queryFn: async () => await Fetch.get(context),
     queryKey: context,
   });
 
@@ -382,9 +380,9 @@ const AddListItem = ({ submit }) => {
 
   return (
     <HeaderButton
-      icon='plus'
       onPress={onPress}
       style={style}
+      text='Add New'
     />
   )
 }

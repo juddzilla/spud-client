@@ -1,14 +1,13 @@
-import { useContext, useEffect, useRef, } from 'react';
 import { useSegments, useLocalSearchParams } from 'expo-router';
 import {
-    Animated,
+    Alert,
     Dimensions,
     Pressable,
     StyleSheet,
     View,
 } from 'react-native';
 import colors from '../colors';
-import { useQuery, } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import Bold from '../text/Bold';
 import Light from '../text/Light';
 import styles from '../styles';
@@ -17,7 +16,7 @@ import Icon from '../icons';
 import { colorway } from '../type';
 import { drawerTitle } from '../type';
 
-import { ListViewContext } from '../../../contexts/list-view';
+import Fetch from '../../../interfaces/fetch';
 
 const subheadlineTypeMap = {
     lists: (list) => `${list.children_count} List Items`,
@@ -91,8 +90,6 @@ export const HeaderToggleableIcon = ({ icon, style = {}, onPress }) => {
 export default function ViewHead({ children }) {
     const local = useLocalSearchParams();
     const segments = useSegments();
-    // const { scrolled } = useContext(ListViewContext);
-
 
     const type = segments[1];
     const uuid = local.slug;
@@ -103,6 +100,24 @@ export default function ViewHead({ children }) {
         enabled: false,
         queryKey: context,
     });
+
+    const updateTitleMutation = useMutation({
+        mutationFn: async (title) => {
+            const uri = context.join('/') + '/';
+            return await Fetch.put(context, { title });
+        },
+        onError: (error, variables, context) => {
+            // An error happened!
+            console.log(`rolling back optimistic update with id ${context.id}`)
+        },
+        onSuccess: (data) => {  // variables, context
+            console.log('onsuc', data);
+            // queryClient.setQueryData(context, oldData => {
+            //     return { ...oldData, ...data };
+            // });
+            // queryClient.invalidateQueries([context[0]]);
+        },
+    })
 
     let subheadline = '';
     if (DataQuery.data) {
@@ -130,22 +145,30 @@ export default function ViewHead({ children }) {
             justifyContent: 'space-between',
             // marginBottom: 120,
         },
-
     });
+
+    function onPress() {
+        if (!uuid) {
+            return;
+        }
+
+        Alert.prompt(
+            'Rename',
+            null,
+            updateTitleMutation.mutate,
+            'plain-text',
+            title,
+        )
+    }
 
 
     return (
         <View style={styled.container}>
-            {/* <View style={styled.top} /> */}
-            {/* <Animated.View
-                style={[
-                    styled.top,
-                    { transform: [{ scale: topAnim }] },
-                ]}
-            /> */}
             <View style={styled.content}>
                 <View style={{ flex: 1 }}>
-                    <Bold style={{ color: 'white', fontSize: 24, textTransform: 'capitalize' }}>{title}</Bold>
+                    <Pressable onPress={onPress}>
+                        <Bold style={{ color: 'white', fontSize: 24, textTransform: 'capitalize' }}>{title}</Bold>
+                    </Pressable>
                     <Light style={{ fontSize: 12, color: 'white', }}>{subheadline}</Light>
                 </View>
 
@@ -155,10 +178,6 @@ export default function ViewHead({ children }) {
                     </View>
                 }
             </View>
-            {/* <View style={styled.shape}>
-                <View style={styled.slant}></View>
-                <View style={styled.solid}></View>
-            </View> */}
         </View>
     );
 }

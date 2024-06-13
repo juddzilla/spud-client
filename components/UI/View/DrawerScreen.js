@@ -48,10 +48,10 @@ export default function DrawerScreen() {
     }
 
     function headerRight() {
-        if (uuid && type !== 'collections') {
+        if (uuid) {
             return (
                 <TouchableOpacity>
-                    <Icon name='collectionAdd' styles={{ color: colors.white, size: 20 }} />
+                    <Icon name='trash' styles={{ color: colors.white, size: 20 }} />
                 </TouchableOpacity>
             )
         } else if (!hasSearch([type, uuid])) {

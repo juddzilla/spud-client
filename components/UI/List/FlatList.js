@@ -29,7 +29,6 @@ export default function ListFlatList({ renderItem }) {
   const uuid = local.slug;
 
   const context = [type, uuid].filter(Boolean);
-  const uri = context.join('/') + '/';
   const sort = listSort(type);
 
   const initialData = {
@@ -52,7 +51,7 @@ export default function ListFlatList({ renderItem }) {
     initialData,
     queryKey: context,
     queryFn: async () => {
-      const response = await Fetch.get(uri, initialData.params);
+      const response = await Fetch.get(context, initialData.params);
       return { ...response, params: initialData.params };
     },
     keepPreviousData: true,

@@ -17,6 +17,8 @@ import Regular from '../text/Regular';
 import Fetch from '../../../interfaces/fetch';
 import { relativeDate } from '../../../utils/dates';
 
+import { fromModelName } from '../type';
+
 const childrenMap = {
     Convo: 'Messages',
     List: 'List Items',
@@ -28,9 +30,8 @@ export default function DefaultListItem({ index, item }) {
     }
     // const keys = [key, item.uuid];
 
+    const key = fromModelName(item.type);
     function onPress() {
-        const key = item.type.toLowerCase() + 's';
-        const exists = queryClient.getQueryData([key, item.uuid])
 
         if (!queryClient.getQueryData([key, item.uuid])) {
             queryClient.setQueryData([key, item.uuid], item);
@@ -42,7 +43,11 @@ export default function DefaultListItem({ index, item }) {
         await Fetch.remove(`${key}/${item.uuid}/`);
         queryClient.setQueryData([key], old => {
             const oldCopy = JSON.parse(JSON.stringify(old));
-            return oldCopy.filter(i => i.uuid !== item.uuid)
+            return {
+                ...old,
+                next: null,
+                results: oldCopy.results.filter(i => i.uuid !== item.uuid),
+            };
         });
     }
 
@@ -152,12 +157,9 @@ export default function DefaultListItem({ index, item }) {
             <RectButton
                 onPress={remove}
                 style={{
-                    // flex: 1,
-                    // backgroundColor: 'red',
                     justifyContent: 'center',
                     alignItems: 'flex-end',
                     height: 60,
-                    // marginBottom: 2,
                 }}
             >
                 <Animated.View
@@ -172,38 +174,41 @@ export default function DefaultListItem({ index, item }) {
     };
 
     return (
-        <SwipeableItem
-            key={item.id}
-            item={item}
-            renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
-            snapPointsLeft={[60]}
-            overSwipe={20}
-        >
-            <View style={styled.row}>
-                <View style={styled.container}>
-                    {/* <Link href={`${key}/${item.uuid}`}> */}
-                    <View style={styled.content}>
-                        <View style={styled.indexContainer}>
-                            <Regular style={styled.index}>{index + 1} </Regular>
-                        </View>
-                        <Pressable onPress={onPress} style={styled.link}>
-                            <View style={styled.details}>
-                                <Bold style={styled.title}>{item.title}</Bold>
-                                <View style={styled.info}>
-                                    {Object.hasOwn(item, 'children_count') &&
-                                        <>
-                                            <Regular style={styled.subtitle}>{`${item.children_count} ${childrenMap[item.type]}`}</Regular>
-                                            <Regular style={styled.date}>| </Regular>
-                                        </>
-                                    }
-                                    <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
-                                </View>
+        <View>
+
+            <SwipeableItem
+                key={item.id}
+                item={item}
+                renderUnderlayLeft={() => <RenderUnderlayLeftActions />}
+                snapPointsLeft={[60]}
+                overSwipe={20}
+            >
+                <View style={styled.row}>
+                    <View style={styled.container}>
+                        {/* <Link href={`${key}/${item.uuid}`}> */}
+                        <View style={styled.content}>
+                            <View style={styled.indexContainer}>
+                                <Regular style={styled.index}>{index + 1} </Regular>
                             </View>
-                        </Pressable>
+                            <Pressable onPress={onPress} style={styled.link}>
+                                <View style={styled.details}>
+                                    <Bold style={styled.title}>{item.title}</Bold>
+                                    <View style={styled.info}>
+                                        {Object.hasOwn(item, 'children_count') &&
+                                            <>
+                                                <Regular style={styled.subtitle}>{`${item.children_count} ${childrenMap[item.type]}`}</Regular>
+                                                <Regular style={styled.date}>| </Regular>
+                                            </>
+                                        }
+                                        <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
+                                    </View>
+                                </View>
+                            </Pressable>
+                        </View>
+                        {/* </Link> */}
                     </View>
-                    {/* </Link> */}
                 </View>
-            </View>
-        </SwipeableItem>
+            </SwipeableItem>
+        </View>
     )
 }

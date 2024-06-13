@@ -11,7 +11,8 @@ class CustomFetch {
     return `Token ${token}`;
   }
 
-  async get(url, query) {
+  async get(context, query) {
+    const url = context.join('/') + '/';
     const headers = {
       Authorization: await this.token(),
     };

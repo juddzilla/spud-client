@@ -25,7 +25,6 @@ import ViewHead from '../View/Header';
 
 
 const Messages = ({ context }) => {
-  const baseUri = `${context.join('/')}/`;
   const awaitingIndex = 1000000;
   const [messages, setMessages] = useState([]);
 
@@ -36,7 +35,7 @@ const Messages = ({ context }) => {
     },
     queryKey: context,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);
+      const response = await Fetch.get(context);
       const { error, messages } = response;
       if (error) {
         return Query.data;

@@ -1,5 +1,4 @@
 import colors from "./colors";
-import { queryClient } from "../../contexts/query-client";
 
 export const singular = (type) => {
     const plural = {
@@ -75,4 +74,14 @@ export const hasSearch = ([type, uuid]) => {
     } else {
         return enabled.includes(type) && enabledWithUUID.includes(type);
     }
+}
+
+export const fromModelName = (type) => {
+    const mapping = {
+        Collection: 'collections',
+        Convo: 'convos',
+        List: 'lists',
+        Note: 'notes'
+    };
+    return mapping[type];
 }

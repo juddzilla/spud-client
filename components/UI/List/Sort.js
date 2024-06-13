@@ -23,8 +23,6 @@ export default function Sort() {
   const context = [type, uuid].filter(Boolean);
   const { fields } = listSort(type);
 
-  const uri = context.join('/') + '/';
-
   const DataQuery = useQuery({
     enabled: false,
     queryKey: context,
@@ -51,7 +49,7 @@ export default function Sort() {
 
   function update(param) {
     const params = { ...DataQuery.data.params, ...param };
-    Fetch.get(uri, params)
+    Fetch.get(context, params)
       .then(response => queryClient.setQueryData(context, response));
   }
 

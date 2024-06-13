@@ -23,7 +23,6 @@ import ViewHead from '../View/Header';
 export default function Note() {
   const local = useLocalSearchParams();
   const context = ['notes', local.slug];
-  const baseUri = context.join('/') + '/';
 
   const data = queryClient.getQueryData([context[0]]);
   const note = data.results.find(j => j.uuid === context[1]);
@@ -32,7 +31,7 @@ export default function Note() {
 
   async function putNote(data) {
     try {
-      return await Fetch.put(baseUri, data);
+      return await Fetch.put(context, data);
     } catch (e) {
       console.log('Put Note Error:', e);
     }
@@ -41,7 +40,7 @@ export default function Note() {
   const Query = useQuery({
     queryKey: context,
     queryFn: async () => {
-      const response = await Fetch.get(baseUri);
+      const response = await Fetch.get(context);
       setBody(response.body);
       setUpdatedAt(response.updated_at);
       return response;

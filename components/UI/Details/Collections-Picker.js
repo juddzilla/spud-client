@@ -21,6 +21,7 @@ import styles from '../styles';
 export default function CollectionsPicker() {
     const [data, setData] = useState([]);
     const insets = useSafeAreaInsets();
+    const context = ['collections'];
     // const queryKey = ['details'];
     const { showCollections, setShowCollections } = useContext(CollectionsContext);
 
@@ -29,9 +30,9 @@ export default function CollectionsPicker() {
 
     const CollectionQuery = useQuery({
         enabled: false,
-        queryKey: ['collections'],
+        queryKey: context,
         queryFn: async () => {
-            const response = await Fetch.get('collections/');
+            const response = await Fetch.get(context);
             return response;
         },
     });
