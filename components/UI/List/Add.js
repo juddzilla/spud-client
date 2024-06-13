@@ -34,7 +34,7 @@ export default function Add() {
     const createMutation = useMutation({
         mutationFn: async (title) => {
             try {
-                return await Fetch.post(`${type}/`, { title });
+                return await Fetch.post(context, { title });
             } catch (error) {
                 console.warn('Create Error: ', error);
             }

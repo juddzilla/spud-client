@@ -391,8 +391,6 @@ export default function List() {
   const local = useLocalSearchParams();
   const context = ['lists', local.slug];
 
-  const baseUri = context.join('/') + '/';
-
   const styled = StyleSheet.create({
     view: {
       ...DetailStyles.view,
@@ -419,7 +417,7 @@ export default function List() {
       const data = { body: text.trim() };
 
       try {
-        return await Fetch.post(baseUri, data)
+        return await Fetch.post(context, data)
       } catch (error) {
         console.warn('Create List Item Error:', error);
       }

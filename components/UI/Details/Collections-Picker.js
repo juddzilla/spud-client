@@ -147,8 +147,7 @@ export default function CollectionsPicker() {
             selected: j.uuid === uuid ? !j.selected : j.selected,
         }));
         setData(newData);
-        const uri = `${[...detail.context, 'collections', uuid].join('/') + '/'}`;
-        Fetch.post(uri)
+        Fetch.post([...detail.context, 'collections', uuid])
             .then(response => {
                 console.log('RESP', response);
             });

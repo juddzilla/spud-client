@@ -49,7 +49,7 @@ class CustomFetch {
       });
   }
 
-  async post(url, data) {
+  async post(context, data) {
     const target = `${this.api}/${url}`;
     const body = JSON.stringify(data);
     const headers = {
