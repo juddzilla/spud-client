@@ -38,7 +38,7 @@ export const HeaderButton = ({ icon, style = {}, onPress, text }) => {
 
         },
         icon: {
-            size: 16,
+            size: 11,
             ...style.icon,
         },
         text: {

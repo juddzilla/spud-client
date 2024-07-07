@@ -14,7 +14,7 @@ class CustomFetch {
   }
 
   async get(context, query) {
-    const url = uriFromContext(context);
+    const url = Array.isArray(context) ? uriFromContext(context) : context;
     const headers = {
       Authorization: await this.token(),
     };

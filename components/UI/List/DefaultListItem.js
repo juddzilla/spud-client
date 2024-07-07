@@ -28,11 +28,13 @@ export default function DefaultListItem({ index, item }) {
     if (!item) {
         return null;
     }
-    // const keys = [key, item.uuid];
 
     const key = fromModelName(item.type);
-    function onPress() {
 
+    function onPress() {
+        if (!item.uuid) {
+            return;
+        }
         if (!queryClient.getQueryData([key, item.uuid])) {
             queryClient.setQueryData([key, item.uuid], item);
         }
@@ -54,35 +56,24 @@ export default function DefaultListItem({ index, item }) {
     const styled = StyleSheet.create({
         container: {
             ...styles.row,
-            flex: 1,
             backgroundColor: colors.white,
-            // height: 40,
+            flex: 1,
             marginBottom: 16,
 
         },
-        checkbox: {
-            // alignItems: 'center',
-            // height: 40,
-            // justifyContent: 'center',
-            // width: 40,
-            // top: 1,
-        },
+        checkbox: {},
         content: {
+            ...styles.row,
+            alignItems: 'flex-start',
+            backgroundColor: 'transparent',
             flex: 1,
             paddingLeft: 8,
-            ...styles.row,
-            backgroundColor: 'transparent',
-            // borderRadius: 8,            
-            alignItems: 'flex-start',
-            // minHeight: 40,
-            // borderWidth: 1,
         },
         date: {
             color: colors.theme.text.medium,
             fontSize: 12,
         },
         details: {
-            // backgroundColor: 'red',
             flex: 1,
             paddingHorizontal: 12,
             paddingVertical: 12,
@@ -96,36 +87,34 @@ export default function DefaultListItem({ index, item }) {
             color: colors.theme.text.light,
         },
         indexContainer: {
-            width: 20,
-            // marginRight: 2,
             alignItems: 'flex-end',
-            // backgroundColor: 'yellow',
             height: 24,
-            // justifyContent: 'center',
-            // paddingRight: 8,
             marginTop: 14,
+            width: 20,
         },
         info: {
             ...styles.row,
             flexWrap: 'wrap',
         },
         link: ({ pressed }) => ({
+            backgroundColor: pressed ? 'orange' : 'rgba(242,242,242,0.4)',
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,
-            backgroundColor: pressed ? 'orange' : 'rgba(242,242,242,0.4)',
             flex: 1,
-            // marginHorizontal: 8
             marginLeft: 4,
         }),
-        row: {
+        placeholder: {
             backgroundColor: colors.white,
+            flex: 3
+        },
+        row: {
             ...styles.row,
+            backgroundColor: colors.white,
             flex: 1,
-            // marginBottom: 2,
         },
         subtitle: {
-            fontSize: 12,
             color: colors.theme.text.medium,
+            fontSize: 12,
             marginRight: 6
         },
         title: {
@@ -134,7 +123,6 @@ export default function DefaultListItem({ index, item }) {
             flexWrap: 'wrap',
             fontSize: 15,
             marginBottom: 4,
-            // height: 24,
         },
     });
 
@@ -175,7 +163,6 @@ export default function DefaultListItem({ index, item }) {
 
     return (
         <View>
-
             <SwipeableItem
                 key={item.id}
                 item={item}
@@ -185,24 +172,34 @@ export default function DefaultListItem({ index, item }) {
             >
                 <View style={styled.row}>
                     <View style={styled.container}>
-                        {/* <Link href={`${key}/${item.uuid}`}> */}
                         <View style={styled.content}>
                             <View style={styled.indexContainer}>
-                                <Regular style={styled.index}>{index + 1} </Regular>
+                                <Regular style={styled.index}>{index + 1}</Regular>
                             </View>
                             <Pressable onPress={onPress} style={styled.link}>
-                                <View style={styled.details}>
-                                    <Bold style={styled.title}>{item.title}</Bold>
-                                    <View style={styled.info}>
-                                        {Object.hasOwn(item, 'children_count') &&
-                                            <>
-                                                <Regular style={styled.subtitle}>{`${item.children_count} ${childrenMap[item.type]}`}</Regular>
-                                                <Regular style={styled.date}>| </Regular>
-                                            </>
-                                        }
-                                        <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
+                                {item.uuid ? (
+                                    <View style={styled.details}>
+                                        <Bold style={styled.title}>{item.title}</Bold>
+                                        <View style={styled.info}>
+                                            {Object.hasOwn(item, 'children_count') &&
+                                                <>
+                                                    <Regular style={styled.subtitle}>{`${item.children_count} ${childrenMap[item.type]}`}</Regular>
+                                                    <Regular style={styled.date}>| </Regular>
+                                                </>
+                                            }
+                                            <Light style={styled.date}>{relativeDate(item.updated_at)}</Light>
+                                        </View>
                                     </View>
-                                </View>
+                                ) : (
+                                    <View style={styled.details}>
+                                        <View style={{ ...styled.title, ...styled.placeholder, height: 20, width: '50%', backgroundColor: styled.title.color }} />
+                                        <View style={{ ...styled.info, width: '90%' }}>
+                                            <View style={{ ...styled.subtitle, ...styled.placeholder, height: styled.subtitle.fontSize, backgroundColor: styled.subtitle.color }} />
+                                            <View style={{ ...styled.date, ...styled.placeholder, height: styled.date.fontSize, backgroundColor: styled.date.color }} />
+                                            <View style={{ ...styled.date, ...styled.placeholder, height: styled.date.fontSize, backgroundColor: styled.date.color }} />
+                                        </View>
+                                    </View>
+                                )}
                             </Pressable>
                         </View>
                         {/* </Link> */}

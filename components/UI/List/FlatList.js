@@ -79,8 +79,9 @@ export default function ListFlatList({ renderItem }) {
       // DataQuery.refetch();
     }
   }
-
+  console.log("ddd");
   const ListEmptyComponent = () => {
+    console.log("ListEmptyComponent 0");
     const Empty = (props) => (
       <View style={{
         flex: 1,
@@ -96,17 +97,22 @@ export default function ListFlatList({ renderItem }) {
       </View>
     );
 
+    console.log("ListEmptyComponent", DataQuery.status);
+
     if (DataQuery.status === 'pending') {
       return (
         <Empty><Bold>LLLLERDING</Bold></Empty>
       )
     }
 
+
     if (DataQuery.data.params && DataQuery.data.params.search.trim().length > 0) {
+      console.log("ListEmptyComponent 2");
       return (
         <Empty><Bold>No matches for "{DataQuery.data.params.search}"</Bold></Empty>
       )
     }
+    console.log("ListEmptyComponent 3");
 
     return (
       <Empty><Bold>Create Your First Below</Bold></Empty>
@@ -128,7 +134,7 @@ export default function ListFlatList({ renderItem }) {
         renderItem={renderItem}
         initialNumToRender={20}
         keyExtractor={(item, index) => `${item.uuid}+${index}`}
-        // ListEmptyComponent={ListEmptyComponent}        
+        ListEmptyComponent={ListEmptyComponent}
         onRefresh={onRefresh}
         // onEndReached={onEndReached}
         // onEndReachedThreshold={0.1}

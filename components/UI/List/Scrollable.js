@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
     Dimensions,
-    FlatList,
+    ScrollView,
+    StyleSheet,
     View,
 } from 'react-native';
 
@@ -17,7 +18,9 @@ import Fetch from '../../../interfaces/fetch';
 
 import { useLocalSearchParams, useSegments } from 'expo-router';
 
-import { listSort } from '../type';
+import { colorway, listSort } from '../type';
+import ViewHeading from './Header';
+
 import colors from '../colors';
 
 export default function Scrollable({ renderItem }) {
@@ -25,6 +28,7 @@ export default function Scrollable({ renderItem }) {
 
     const local = useLocalSearchParams();
     const segments = useSegments();
+    const backgroundColor = colorway(segments[1]);
 
     const type = segments[1];
     const uuid = local.slug;
@@ -70,7 +74,10 @@ export default function Scrollable({ renderItem }) {
             Fetch.get(DataQuery.data.next)
                 .then(response => {
                     const results = [...DataQuery.data.results, ...response.results];
-                    queryClient.setQueryData(context, { ...response, results });
+                    const current = queryClient.getQueryData(context);
+                    const params = { ...current.params, page: current.params.page + 1 };
+                    console.log('p', params);
+                    queryClient.setQueryData(context, { ...response, params, results });
                 });
         }
     }
@@ -81,65 +88,182 @@ export default function Scrollable({ renderItem }) {
         }
     }
 
-    const ListEmptyComponent = () => {
-        const Empty = (props) => (
-            <View style={{
-                flex: 1,
-                ...styles.centered
-            }}>
-                <View style={{
-                    height: Dimensions.get('window').width - 32,
-                    width: Dimensions.get('window').width - 32,
-                    ...styles.centered
-                }}>
-                    {props.children}
-                </View>
-            </View>
-        );
+    function onScroll({ nativeEvent }) {
+        const threshold = 0;
 
-        if (DataQuery.status === 'pending') {
-            return (
-                <Empty><Bold>LLLLERDING</Bold></Empty>
-            )
-        }
+        const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+            return layoutMeasurement.height + contentOffset.y >=
+                contentSize.height - threshold;
+        };
 
-        if (DataQuery.data.params && DataQuery.data.params.search.trim().length > 0) {
-            return (
-                <Empty><Bold>No matches for "{DataQuery.data.params.search}"</Bold></Empty>
-            )
-        }
-
-        return (
-            <Empty><Bold>Create Your First Below</Bold></Empty>
-        )
-    };
-
-    function onEndReached(e) {
-        const threshold = 60;
-        if (e.distanceFromEnd && e.distanceFromEnd <= threshold) {
+        if (isCloseToBottom(nativeEvent)) {
             nextPage();
         }
     }
 
+
+    const Container = (props) => (
+        <View
+            style={{ flex: 1, backgroundColor: colors.white }}
+        >
+            {props.children}
+        </View>
+    );
+
+    const slantConstant = 16;
+    const styled = StyleSheet.create({
+        slant: {
+            width: 0,
+            height: 0,
+            borderBottomWidth: slantConstant,
+            borderBottomColor: colors.white,
+            borderLeftWidth: slantConstant,
+            borderLeftColor: 'transparent',
+        },
+        shape: {
+            backgroundColor,
+            flexDirection: 'row',
+            height: slantConstant,
+            overflow: 'hidden',
+        },
+        solid: {
+            backgroundColor: colors.white,
+            height: slantConstant,
+            flex: 1,
+        },
+    });
+
     const Component = renderItem;
 
+    const rendering = () => {
+        if (DataQuery.status === 'pending') {
+            return (
+                <Container>
+                    {
+                        Array
+                            .from({ length: 20 }, (v, i) => ({ index: i }))
+                            .map((item, index) => {
+                                return (
+                                    <Component
+                                        key={`${type}-item-${index}`}
+                                        index={index}
+                                        item={item}
+                                    />
+                                )
+                            })
+                    }
+                </Container>
+            )
+        } else if (!items || items.length === 0) {
+            const displayText = (DataQuery.data.params && DataQuery.data.params.search && DataQuery.data.params.search.trim().length > 0) ? `No matches for "${DataQuery.data.params.search}"` : "Create Your First Below";
+
+            return (
+                <Container>
+                    <View style={{
+                        flex: 1,
+                        ...styles.centered
+                    }}>
+                        <View style={{
+                            height: Dimensions.get('window').width - 32,
+                            width: Dimensions.get('window').width - 32,
+                            ...styles.centered
+                        }}>
+                            <Bold>{displayText}</Bold>
+                        </View>
+                    </View>
+                </Container>
+            )
+        }
+
+        return (
+            <Container>
+                {
+                    items.map((item, index) => {
+                        return (
+                            <Component
+                                key={`${type}-item-${index}`}
+                                index={index}
+                                item={item}
+                            />
+                        )
+                    })
+                }
+            </Container>
+        )
+    };
+
     return (
-        <View style={{ flex: 1, backgroundColor: colors.white }}>
-            {
-                !items &&
-                <ListEmptyComponent />
-            }
-            {
-                items.map((item, index) => {
-                    return (
-                        <Component
-                            key={`${type}-item-${index}`}
-                            index={index}
-                            item={item}
-                        />
-                    )
-                })
-            }
-        </View>
+        <ScrollView
+            stickyHeaderIndices={[1]}
+            onMomentumScrollEnd={onScroll}
+            scrollEventThrottle={16}
+            style={{ flex: 1, backgroundColor }}
+        >
+            <View style={{ height: 24, backgroundColor }} />
+            <ViewHeading />
+            <View style={styled.shape}>
+                <View style={styled.slant}></View>
+                <View style={styled.solid}></View>
+            </View>
+            {rendering()}
+        </ScrollView>
     )
+
+    // if (true) {
+    // if (DataQuery.status === 'pending') {
+    //     return (
+    //         <Container>
+    //             {
+    //                 Array
+    //                     .from({ length: 20 }, (v, i) => ({ index: i }))
+    //                     .map((item, index) => {
+    //                         return (
+    //                             <Component
+    //                                 key={`${type}-item-${index}`}
+    //                                 index={index}
+    //                                 item={item}
+    //                             />
+    //                         )
+    //                     })
+    //             }
+    //         </Container>
+    //     )
+    //     // } else if (true) {
+    // } else if (!items || items.length === 0) {
+    //     const displayText = (DataQuery.data.params && DataQuery.data.params.search.trim().length > 0) ? `No matches for "${DataQuery.data.params.search}"` : "Create Your First Below";
+
+    //     return (
+    //         <Container>
+    //             <View style={{
+    //                 flex: 1,
+    //                 ...styles.centered
+    //             }}>
+    //                 <View style={{
+    //                     height: Dimensions.get('window').width - 32,
+    //                     width: Dimensions.get('window').width - 32,
+    //                     ...styles.centered
+    //                 }}>
+    //                     <Bold>{displayText}</Bold>
+    //                 </View>
+    //             </View>
+    //         </Container>
+    //     )
+    // }
+
+
+    // return (
+    //     <Container>
+    //         {
+    //             items.map((item, index) => {
+    //                 return (
+    //                     <Component
+    //                         key={`${type}-item-${index}`}
+    //                         index={index}
+    //                         item={item}
+    //                     />
+    //                 )
+    //             })
+    //         }
+    //     </Container>
+    // )
 }
