@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useSegments } from 'expo-router';
@@ -7,6 +8,7 @@ import colors from '../colors';
 import { sorting } from '../icons';
 
 import { queryClient } from '../../../contexts/query-client';
+import { CustomRoutingContext } from '../../../contexts/custom-routing';
 import { useEffect, useState } from 'react';
 
 import Fetch from '../../../interfaces/fetch';
@@ -16,10 +18,11 @@ import { listSort } from '../type';
 
 export default function Sort() {
   const [disabled, setDisabled] = useState(true);
-  const segments = useSegments();
-  const local = useLocalSearchParams();
-  const type = segments[1];
-  const uuid = local.slug;
+  const { stack } = useContext(CustomRoutingContext);
+  // const segments = useSegments();
+  // const local = useLocalSearchParams();
+  const type = stack[0];
+  const uuid = stack[1];
   const context = [type, uuid].filter(Boolean);
   const { fields } = listSort(type);
 

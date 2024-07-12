@@ -1,24 +1,16 @@
 import React,
 {
-  createContext,
-
   useCallback,
   useEffect,
   useState,
 } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
   Text,
   View,
 } from 'react-native';
 import { Slot } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -32,11 +24,11 @@ import Regular from '../assets/fonts/Inter-Regular.otf';
 import { AuthContext } from '../contexts/auth';
 import { queryClient } from '../contexts/query-client';
 
-import colors from '../components/UI/colors';
 import { useStorageState } from '../interfaces/storage';
 import { useWebSocket } from '../interfaces/websocket';
 
 import { WebsocketContext } from '../contexts/websocket';
+import { CustomRoutingContext } from '../contexts/custom-routing';
 
 import TalkProvider from '../components/UI/Talk/Provider';
 
@@ -88,6 +80,24 @@ function WebsocketProvider(props) {
 
 }
 
+function CustomRoutingProvider(props) {
+  const [stack, setStack] = useState([['queue']]);
+
+  function setRoute(route) {
+    const existingIndex = stack.indexOf(route);
+    if (existingIndex === -1) {
+      setStack([...stack, route]);
+    } else {
+      setStack(stack.slice(0, existingIndex))
+    }
+  }
+
+  return (
+    <CustomRoutingContext.Provider value={{ stack, setStack: setRoute }}>
+      {props.children}
+    </CustomRoutingContext.Provider>
+  )
+}
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Black': Black,
@@ -111,46 +121,49 @@ export default function RootLayout() {
       }}
       onLayout={onLayoutRootView}>
       {fontsLoaded ? (
-        <QueryClientProvider client={queryClient}>
-          <SessionProvider>
-            <WebsocketProvider>
-              <SafeAreaProvider>
-                <TalkProvider>
-                  <ActionSheetProvider>
-                    {/* <SafeAreaView style={{ flex: 1, backgroundColor: 'red' }}> */}
-                    {/* <KeyboardAvoidingView
-                      behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
-                      style={{ flex: 1 }}
-                    > */}
-                    <>
-                      {/* <GlobalHeader /> */}
-                      <View style={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'red',
-                        // zIndex: 10,
-                      }}>
-                        <Text>Judd</Text>
-                      </View>
-                      <View style={{
-                        flex: 1,
-                        backgroundColor: 'orange',
-                        // zIndex: 10,
-                      }}>
-                        <Slot />
+        <CustomRoutingProvider>
 
-                      </View>
-                      {/* <DetailModal /> */}
-                    </>
-                    {/* </KeyboardAvoidingView> */}
-                    {/* </SafeAreaView> */}
-                  </ActionSheetProvider>
-                </TalkProvider>
-              </SafeAreaProvider>
-            </WebsocketProvider>
-          </SessionProvider>
-        </QueryClientProvider>
+          <QueryClientProvider client={queryClient}>
+            <SessionProvider>
+              <WebsocketProvider>
+                <SafeAreaProvider>
+                  <TalkProvider>
+                    <ActionSheetProvider>
+                      {/* <SafeAreaView style={{ flex: 1, backgroundColor: 'red' }}> */}
+                      {/* <KeyboardAvoidingView
+                        behavior={Platform.OS !== 'ios' ? 'padding' : 'height'}
+                        style={{ flex: 1 }}
+                      > */}
+                      <>
+                        {/* <GlobalHeader /> */}
+                        <View style={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: 'red',
+                          // zIndex: 10,
+                        }}>
+                          <Text>Judd</Text>
+                        </View>
+                        <View style={{
+                          flex: 1,
+                          backgroundColor: 'orange',
+                          // zIndex: 10,
+                        }}>
+                          <Slot />
+
+                        </View>
+                        {/* <DetailModal /> */}
+                      </>
+                      {/* </KeyboardAvoidingView> */}
+                      {/* </SafeAreaView> */}
+                    </ActionSheetProvider>
+                  </TalkProvider>
+                </SafeAreaProvider>
+              </WebsocketProvider>
+            </SessionProvider>
+          </QueryClientProvider>
+        </CustomRoutingProvider>
       ) : (
         <View>
           <Text>Loading</Text>

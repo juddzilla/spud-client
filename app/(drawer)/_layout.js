@@ -10,6 +10,7 @@ export default function DrawerLayout() {
         screenOptions={{
           headerShown: false,
           unmountOnBlur: true,
+
           // drawerStyle: {
           //   backgroundColor: 'yellow',
           // },
@@ -17,7 +18,10 @@ export default function DrawerLayout() {
           //   color: 'green'
           // }
         }}
-
+        drawerContent={(props) => {
+          console.log('props', props);
+          return (<View><Text>Judd</Text></View>)
+        }}
       >
         <Drawer.Screen
           name="queue"

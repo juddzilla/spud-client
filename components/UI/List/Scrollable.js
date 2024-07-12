@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     Dimensions,
     ScrollView,
@@ -18,6 +18,8 @@ import Fetch from '../../../interfaces/fetch';
 
 import { useLocalSearchParams, useSegments } from 'expo-router';
 
+import { CustomRoutingContext } from '../../../contexts/custom-routing';
+
 import { colorway, listSort } from '../type';
 import ViewHeading from './Header';
 
@@ -26,17 +28,22 @@ import colors from '../colors';
 export default function Scrollable({ renderItem }) {
     const [items, setItems] = useState([]);
 
-    const local = useLocalSearchParams();
-    const segments = useSegments();
+    const { stack } = useContext(CustomRoutingContext);
+    const context = stack[stack.length - 1];
+    console.log('CXT', context);
+    // const local = useLocalSearchParams();
+    // const segments = useSegments();
     const backgroundColor = 'transparent';
     // const backgroundColor = colorway(segments[1]);
 
-    const type = segments[1];
-    const uuid = local.slug;
+    const type = stack[0] || 'queue';
+    console.log('type', type)
+    // const type = segments[1];
+    // const uuid = local.slug;
 
-    const context = [type, uuid].filter(Boolean);
+    // const context = [type, uuid].filter(Boolean);
     const sort = listSort(type);
-
+    console.log('sort', sort);
     const initialData = {
         count: null,
         next: null,
@@ -48,7 +55,7 @@ export default function Scrollable({ renderItem }) {
         results: []
     };
 
-    if (sort) {
+    if (sort.fields.length > 0) {
         initialData.params.sortDirection = sort.defaults.direction;
         initialData.params.sortProperty = sort.defaults.property;
     }
@@ -201,7 +208,7 @@ export default function Scrollable({ renderItem }) {
             style={{ flex: 1, backgroundColor }}
         >
             <View style={{ height: 24, backgroundColor }} />
-            <ViewHeading />
+            {/* <ViewHeading /> */}
             {/* <View style={styled.shape}>
                 <View style={styled.slant}></View>
                 <View style={styled.solid}></View>

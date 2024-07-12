@@ -21,7 +21,7 @@ export default function Index() {
       )
     }
     return (
-      <Redirect href={"/(drawer)/queue"} />
+      <Redirect href={"/(drawer)/custom"} />
     )
   }
 }
