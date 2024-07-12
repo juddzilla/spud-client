@@ -6,7 +6,7 @@ import DrawerScreen from '../../../../components/UI/View/DrawerScreen';
 export default function ListDetail() {
     const viewStyled = StyleSheet.create({
         flex: 1,
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
     });
 
     return (

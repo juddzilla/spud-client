@@ -4,6 +4,7 @@ export const singular = (type) => {
     const plural = {
         collection: 'Collection',
         convos: 'Convo',
+        queue: 'Inbox item',
         lists: 'List',
         notes: 'Note',
     };
@@ -13,7 +14,7 @@ export const singular = (type) => {
 export const drawerTitle = {
     collections: 'Collections',
     convos: 'Convos',
-    queue: 'Queue',
+    queue: 'Inbox',
     lists: 'Lists',
     notes: 'Notes',
 }

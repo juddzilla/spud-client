@@ -54,8 +54,8 @@ const styled = StyleSheet.create({
     marginVertical: 2,
     flexDirection: 'row',
     alignItems: 'center',
-    borderRightWidth: 4,
-    borderRightColor: colors.removeHint,
+    // borderRightWidth: 4,
+    // borderRightColor: colors.removeHint,
   },
   icon: {
     container: {
@@ -68,24 +68,25 @@ const styled = StyleSheet.create({
     },
   },
   indexContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
     maxWidth: 24,
     minWidth: 16,
-
+    marginRight: 4,
+    // backgroundColor: 'red'
   },
   index: {
-    color: colors.darkText,
+    color: colors.lightText,
     fontSize: 10,
     letterSpacing: 0.1,
   },
   info: {
     ...styles.row,
     paddingRight: 8,
-    paddingLeft: 20,
+    paddingLeft: 16,
     // marginLeft: 8,
     paddingVertical: 12,
-    backgroundColor: colors.lightWhite,
+    backgroundColor: colors.stone,
     flex: 1,
   },
   itemDot: {
@@ -94,7 +95,7 @@ const styled = StyleSheet.create({
   },
   title: {
     color: colors.darkText,
-    fontSize: 14,
+    fontSize: 16,
     letterSpacing: 0.1,
   },
 });
@@ -318,13 +319,13 @@ export default function HomeView() {
   }
 
   const styled = StyleSheet.create({
-    backgroundColor: colors.queue,
+    backgroundColor: colors.stone,
     flex: 1,
   });
 
   return (
     <>
-      <DrawerScreen />
+      {/* <DrawerScreen /> */}
       <View style={styled}>
         <ListView options={{ ItemTemplate }} />
       </View>

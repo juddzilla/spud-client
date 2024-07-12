@@ -69,7 +69,7 @@ export default function Search() {
 
     return (
         <Pressable onPress={onPress}>
-            <Icon name='search' styles={{ size: 18, color: colors.white }} />
+            <Icon name='search' styles={{ size: 18, color: colors.darkText }} />
         </Pressable>
     );
 }

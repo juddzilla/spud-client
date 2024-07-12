@@ -28,7 +28,8 @@ export default function Scrollable({ renderItem }) {
 
     const local = useLocalSearchParams();
     const segments = useSegments();
-    const backgroundColor = colorway(segments[1]);
+    const backgroundColor = 'transparent';
+    // const backgroundColor = colorway(segments[1]);
 
     const type = segments[1];
     const uuid = local.slug;
@@ -104,7 +105,7 @@ export default function Scrollable({ renderItem }) {
 
     const Container = (props) => (
         <View
-            style={{ flex: 1, backgroundColor: colors.white }}
+            style={{ flex: 1, }}
         >
             {props.children}
         </View>
@@ -201,10 +202,10 @@ export default function Scrollable({ renderItem }) {
         >
             <View style={{ height: 24, backgroundColor }} />
             <ViewHeading />
-            <View style={styled.shape}>
+            {/* <View style={styled.shape}>
                 <View style={styled.slant}></View>
                 <View style={styled.solid}></View>
-            </View>
+            </View> */}
             {rendering()}
         </ScrollView>
     )

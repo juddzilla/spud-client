@@ -106,7 +106,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView
       style={{
-        backgroundColor: colors.theme.inputs.light.backgroundColor,
+        // backgroundColor: colors.theme.inputs.light.backgroundColor,
         flex: 1
       }}
       onLayout={onLayoutRootView}>
@@ -124,7 +124,23 @@ export default function RootLayout() {
                     > */}
                     <>
                       {/* <GlobalHeader /> */}
-                      <Slot />
+                      <View style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'red',
+                        // zIndex: 10,
+                      }}>
+                        <Text>Judd</Text>
+                      </View>
+                      <View style={{
+                        flex: 1,
+                        backgroundColor: 'orange',
+                        // zIndex: 10,
+                      }}>
+                        <Slot />
+
+                      </View>
                       {/* <DetailModal /> */}
                     </>
                     {/* </KeyboardAvoidingView> */}

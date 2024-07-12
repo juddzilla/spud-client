@@ -392,7 +392,7 @@ export default function List() {
   const styled = StyleSheet.create({
     view: {
       ...DetailStyles.view,
-      backgroundColor: colors.theme.inputs.light.backgroundColor,
+      backgroundColor: colors.stone,
       flex: 1
     },
     flex1: { flex: 1 },

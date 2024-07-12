@@ -9,11 +9,12 @@ export default function Convos() {
 
   const styled = StyleSheet.create({
     flex: 1,
-    backgroundColor: colors.convos,
+    // backgroundColor: colors.convos,
+
   });
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'transparent', }}>
       <DrawerScreen />
       <View style={styled}>
         <ListView options={{ ...options }} />

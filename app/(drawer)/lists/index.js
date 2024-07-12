@@ -8,7 +8,7 @@ export default function Lists() {
 
   const styled = StyleSheet.create({
     flex: 1,
-    backgroundColor: colors.lists,
+    backgroundColor: colors.stone,
   });
 
   return (

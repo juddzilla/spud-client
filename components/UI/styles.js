@@ -1,6 +1,6 @@
 
 import colors from "./colors";
-const buttons = {    
+const buttons = {
     icon: {
         height: 48,
         width: 48,
@@ -16,7 +16,7 @@ const row = { alignItems: 'center', flexDirection: 'row' };
 
 const header = {
     alignItems: 'center',
-    flexDirection: 'row',    
+    flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 8,
     input: {
@@ -27,19 +27,19 @@ const header = {
     }
 };
 
-const View = { flex: 1,  };
+const View = { flex: 1 };
 
 const footer = {
     // backgroundColor: 'green',
-    backgroundColor: 'transparent',    
+    backgroundColor: 'transparent',
     bottom: 0,
     flex: 1,
-    flexDirection: 'row', 
-    justifyContent: 'flex-end',     
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     left: 0,
     paddingBottom: 8,
     paddingHorizontal: 8,
-    position: 'absolute', 
+    position: 'absolute',
     width: '100%',
 };
 

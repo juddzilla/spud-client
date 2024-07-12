@@ -1,10 +1,10 @@
 const black = '#000';
 const concord = 'rgb(101, 94, 180)';
 const infrared = '#F53F5B';
+const stone = '#fafaf9';
 const tiffany = '#00FFEC';
 const white = '#fff';
 const university = '#ba2b2b';
-
 const collections = university;
 const convos = concord;
 const lists = tiffany;
@@ -141,6 +141,7 @@ const colors = {
     },
     remove: red.primary,
     removeHint: red.light,
+    stone,
     theme,
     university,
     phoneBlue: 'rgb(74,164,223)'

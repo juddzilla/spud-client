@@ -43,11 +43,11 @@ export default function Add() {
     })
 
     function onPress() {
-        const message = 'Enter the title';
-        const title = `Create new ${singular(type)}`;
+        // const message = type === 'queue' ? null : 'Enter the title';
+        const title = `Create New ${singular(type)}`;
         Alert.prompt(
             title,
-            message,
+            null,
             createMutation.mutate,
             'plain-text'
         )

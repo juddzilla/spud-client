@@ -1,16 +1,23 @@
-import { View } from 'react-native';
+import { View, SafeAreaView, Text } from 'react-native';
 import { Drawer } from 'expo-router/drawer';
 import Icon from '../../components/UI/icons';
 
 export default function DrawerLayout() {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'purple' }}>
       <Drawer
         backBehavior="history"
         screenOptions={{
           headerShown: false,
           unmountOnBlur: true,
+          // drawerStyle: {
+          //   backgroundColor: 'yellow',
+          // },
+          // drawerLabelStyle: {
+          //   color: 'green'
+          // }
         }}
+
       >
         <Drawer.Screen
           name="queue"

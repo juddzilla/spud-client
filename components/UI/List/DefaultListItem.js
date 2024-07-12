@@ -56,7 +56,7 @@ export default function DefaultListItem({ index, item }) {
     const styled = StyleSheet.create({
         container: {
             ...styles.row,
-            backgroundColor: colors.white,
+            // backgroundColor: 'red', //colors.white,
             flex: 1,
             marginBottom: 16,
 
@@ -97,7 +97,7 @@ export default function DefaultListItem({ index, item }) {
             flexWrap: 'wrap',
         },
         link: ({ pressed }) => ({
-            backgroundColor: pressed ? 'orange' : 'rgba(242,242,242,0.4)',
+            backgroundColor: pressed ? 'orange' : 'transparent',
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,
             flex: 1,
@@ -109,7 +109,8 @@ export default function DefaultListItem({ index, item }) {
         },
         row: {
             ...styles.row,
-            backgroundColor: colors.white,
+            // backgroundColor: colors.white,
+            backgroundColor: colors.stone,
             flex: 1,
         },
         subtitle: {
@@ -121,7 +122,7 @@ export default function DefaultListItem({ index, item }) {
             backgroundColor: 'transparent',
             color: colors.darkText,
             flexWrap: 'wrap',
-            fontSize: 15,
+            fontSize: 16,
             marginBottom: 4,
         },
     });

@@ -85,7 +85,7 @@ export default function Note() {
       paddingHorizontal: 16,
       // paddingTop: 16,
       paddingBottom: 36,
-      backgroundColor: 'transparent',
+      backgroundColor: colors.stone,
       color: colors.darkText,
       lineHeight: 28,
     },
@@ -122,7 +122,7 @@ export default function Note() {
               }}>
                 <DebouncedInput
                   multiline={true}
-                  placeholder='(untitled)'
+                  placeholder='(nothing yet)'
                   style={styled.note}
                   update={(value) => { updateMutation.mutate({ body: value }) }}
                   value={body}

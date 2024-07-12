@@ -1,6 +1,6 @@
 import { Drawer } from 'expo-router/drawer';
 import { useSegments, useLocalSearchParams, useNavigation, router } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import Icon from '../icons';
 import Search from '../List/Search';
 import colors from '../colors';
@@ -42,7 +42,7 @@ export default function DrawerScreen() {
         }
         return (
             <TouchableOpacity onPress={onPress}>
-                <Icon name={name} styles={{ color: colors.white }} />
+                <Icon name={name} styles={{ color: colors.darkText }} />
             </TouchableOpacity>
         )
     }
@@ -51,7 +51,7 @@ export default function DrawerScreen() {
         if (uuid) {
             return (
                 <TouchableOpacity>
-                    <Icon name='trash' styles={{ color: colors.white, size: 20 }} />
+                    <Icon name='trash' styles={{ color: colors.darkText, size: 20 }} />
                 </TouchableOpacity>
             )
         } else if (!hasSearch([type, uuid])) {
@@ -64,9 +64,10 @@ export default function DrawerScreen() {
     return (
         <Drawer.Screen
             options={{
-                headerTitle: () => (<Bold style={{ fontSize: 18, color: colors.white }}>{title}</Bold>),
+                headerTitle: () => (<Bold style={{ fontSize: 18, color: colors.darkText }}>{title}</Bold>),
                 headerShown: true,
-                headerStyle: { backgroundColor: colorway(type) },
+                headerStyle: { backgroundColor: colors.stone },
+                // headerStyle: { backgroundColor: colorway(type) },
                 headerLeft,
                 headerRight,
             }}

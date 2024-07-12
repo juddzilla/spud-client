@@ -127,7 +127,8 @@ export default function ViewHead({ children }) {
         }
     }
 
-    const backgroundColor = colorway(context[0]);
+    const backgroundColor = colors.stone;
+    // const backgroundColor = colorway(context[0]);
     const title = (DataQuery.data && DataQuery.data.title) ? DataQuery.data.title : drawerTitle[context[0]];
     const widthConstant = Dimensions.get('window').width * 0.075;
 
@@ -166,9 +167,9 @@ export default function ViewHead({ children }) {
             <View style={styled.content}>
                 <View style={{ flex: 1 }}>
                     <Pressable onPress={onPress}>
-                        <Bold style={{ color: 'white', fontSize: 24, textTransform: 'capitalize' }}>{title}</Bold>
+                        <Bold style={{ color: colors.darkText, fontSize: 24, textTransform: 'capitalize' }}>{title}</Bold>
                     </Pressable>
-                    <Light style={{ fontSize: 12, color: 'white', }}>{subheadline}</Light>
+                    <Light style={{ fontSize: 12, color: colors.darkText, }}>{subheadline}</Light>
                 </View>
 
                 {children &&
