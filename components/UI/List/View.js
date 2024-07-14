@@ -73,19 +73,12 @@ function ListViewProvider(props) {
 //   )
 // }
 
-export default function ListView({ options }) {
-
-  const { context, ItemTemplate = DefaultListItem } = options;
+export default function ListView() {
 
   return (
     <ListViewProvider>
       <View style={styles.View}>
-        <Scrollable context={context} renderItem={ItemTemplate} />
-        {/* <Scrolling>
-          <View style={{ flex: 1 }}>
-            <Scrollable renderItem={ItemTemplate} />
-          </View>
-        </Scrolling> */}
+        <Scrollable />
       </View>
     </ListViewProvider>
   );

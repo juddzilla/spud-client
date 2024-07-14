@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item";
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { queryClient } from '../../../contexts/query-client';
-
+import { CustomRoutingContext } from '../../../contexts/custom-routing';
 import colors from '../colors';
 import Icon from '../icons';
 import styles from '../styles';
@@ -29,16 +29,21 @@ export default function DefaultListItem({ index, item }) {
         return null;
     }
 
+    const { setStack } = useContext(CustomRoutingContext)
+
     const key = fromModelName(item.type);
 
     function onPress() {
         if (!item.uuid) {
             return;
         }
-        if (!queryClient.getQueryData([key, item.uuid])) {
-            queryClient.setQueryData([key, item.uuid], item);
+
+        const context = [key, item.uuid];
+        if (!queryClient.getQueryData(context)) {
+            queryClient.setQueryData(context, item);
         }
-        router.push(`${key}/${item.uuid}/`);
+        // router.push(`${key}/${item.uuid}/`);
+        setStack(context.join(':'));
     }
 
     const remove = async () => {

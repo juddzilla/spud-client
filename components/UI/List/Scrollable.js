@@ -6,6 +6,8 @@ import {
     View,
 } from 'react-native';
 
+import Animated, { FadeIn } from 'react-native-reanimated';
+
 import {
     keepPreviousData,
     useQuery,
@@ -16,34 +18,35 @@ import Bold from '../text/Bold';
 import { queryClient } from '../../../contexts/query-client';
 import Fetch from '../../../interfaces/fetch';
 
-import { useLocalSearchParams, useSegments } from 'expo-router';
-
 import { CustomRoutingContext } from '../../../contexts/custom-routing';
 
-import { colorway, listSort } from '../type';
-import ViewHeading from './Header';
+import { listSort } from '../type';
 
 import colors from '../colors';
 
-export default function Scrollable({ renderItem }) {
+import InboxListItem from '../Inbox/List-Item';
+import DefaultListItem from './DefaultListItem';
+
+const listItemMap = {
+    queue: InboxListItem
+};
+
+export default function Scrollable() {
     const [items, setItems] = useState([]);
 
-    const { stack } = useContext(CustomRoutingContext);
-    const context = stack[stack.length - 1];
-    console.log('CXT', context);
-    // const local = useLocalSearchParams();
-    // const segments = useSegments();
+    const DURATION = 180;
+    const DELAY = 90;
+
+    const { current } = useContext(CustomRoutingContext);
+    const context = current;
+
     const backgroundColor = 'transparent';
-    // const backgroundColor = colorway(segments[1]);
 
-    const type = stack[0] || 'queue';
-    console.log('type', type)
-    // const type = segments[1];
-    // const uuid = local.slug;
+    const type = current[0];
+    const renderItem = Object.hasOwn(listItemMap, type) ? listItemMap[type] : DefaultListItem;
 
-    // const context = [type, uuid].filter(Boolean);
     const sort = listSort(type);
-    console.log('sort', sort);
+
     const initialData = {
         count: null,
         next: null,
@@ -84,7 +87,7 @@ export default function Scrollable({ renderItem }) {
                     const results = [...DataQuery.data.results, ...response.results];
                     const current = queryClient.getQueryData(context);
                     const params = { ...current.params, page: current.params.page + 1 };
-                    console.log('p', params);
+
                     queryClient.setQueryData(context, { ...response, params, results });
                 });
         }
@@ -187,12 +190,18 @@ export default function Scrollable({ renderItem }) {
             <Container>
                 {
                     items.map((item, index) => {
+
                         return (
-                            <Component
-                                key={`${type}-item-${index}`}
-                                index={index}
-                                item={item}
-                            />
+                            <Animated.View
+                                entering={FadeIn.duration(DURATION).delay(index * DELAY)}
+
+                            >
+                                <Component
+                                    key={`${type}-item-${index}`}
+                                    index={index}
+                                    item={item}
+                                />
+                            </Animated.View>
                         )
                     })
                 }
@@ -208,70 +217,7 @@ export default function Scrollable({ renderItem }) {
             style={{ flex: 1, backgroundColor }}
         >
             <View style={{ height: 24, backgroundColor }} />
-            {/* <ViewHeading /> */}
-            {/* <View style={styled.shape}>
-                <View style={styled.slant}></View>
-                <View style={styled.solid}></View>
-            </View> */}
             {rendering()}
         </ScrollView>
     )
-
-    // if (true) {
-    // if (DataQuery.status === 'pending') {
-    //     return (
-    //         <Container>
-    //             {
-    //                 Array
-    //                     .from({ length: 20 }, (v, i) => ({ index: i }))
-    //                     .map((item, index) => {
-    //                         return (
-    //                             <Component
-    //                                 key={`${type}-item-${index}`}
-    //                                 index={index}
-    //                                 item={item}
-    //                             />
-    //                         )
-    //                     })
-    //             }
-    //         </Container>
-    //     )
-    //     // } else if (true) {
-    // } else if (!items || items.length === 0) {
-    //     const displayText = (DataQuery.data.params && DataQuery.data.params.search.trim().length > 0) ? `No matches for "${DataQuery.data.params.search}"` : "Create Your First Below";
-
-    //     return (
-    //         <Container>
-    //             <View style={{
-    //                 flex: 1,
-    //                 ...styles.centered
-    //             }}>
-    //                 <View style={{
-    //                     height: Dimensions.get('window').width - 32,
-    //                     width: Dimensions.get('window').width - 32,
-    //                     ...styles.centered
-    //                 }}>
-    //                     <Bold>{displayText}</Bold>
-    //                 </View>
-    //             </View>
-    //         </Container>
-    //     )
-    // }
-
-
-    // return (
-    //     <Container>
-    //         {
-    //             items.map((item, index) => {
-    //                 return (
-    //                     <Component
-    //                         key={`${type}-item-${index}`}
-    //                         index={index}
-    //                         item={item}
-    //                     />
-    //                 )
-    //             })
-    //         }
-    //     </Container>
-    // )
 }

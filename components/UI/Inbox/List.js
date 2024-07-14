@@ -3,11 +3,6 @@ import InboxListItem from "./List-Item";
 
 export default function InboxList() {
     return (
-        <ListView
-            options={{
-                context: ['queue'],
-                ItemTemplate: InboxListItem
-            }}
-        />
+        <ListView options={{ ItemTemplate: InboxListItem }} />
     )
 }

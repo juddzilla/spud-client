@@ -385,9 +385,10 @@ const AddListItem = ({ submit }) => {
   )
 }
 
-export default function List() {
-  const local = useLocalSearchParams();
-  const context = ['lists', local.slug];
+export default function List(context) {
+  console.log('LIST', context);
+  // const local = useLocalSearchParams();
+  // const context = ['lists', local.slug];
 
   const styled = StyleSheet.create({
     view: {

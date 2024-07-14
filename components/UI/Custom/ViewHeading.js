@@ -5,8 +5,14 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../../contexts/query-client';
 import { CustomRoutingContext } from '../../../contexts/custom-routing';
 
+const viewMap = {
+    queue: 'Inbox',
+    lists: 'Lists',
+    notes: 'Notes',
+    convos: 'Convos',
+};
 export default function ViewHeading() {
-    const { stack } = useContext(CustomRoutingContext);
+    const { current, stack } = useContext(CustomRoutingContext);
     const [context, setContext] = useState(null);
     const [title, setTitle] = useState(null);
     const [totals, setTotals] = useState([null, null])
@@ -18,25 +24,15 @@ export default function ViewHeading() {
     });
 
     useEffect(() => {
-        console.log('stackhhh', stack);
-        setContext(stack[stack.length - 1]);
-    }, [stack])
+        // console.log('stackhhh', stack);
+        console.log('22', current);
+
+        setTitle(viewMap[current[0]]);
+
+    }, [current])
+
 
     useEffect(() => {
-        setTitle(context);
-        console.log('contexthhh', context);
-        // setTimeout(() => {
-
-        //     console.log('queryClient', queryClient.getQueryData(context));
-        // }, 5000)
-    }, [context])
-
-    useEffect(() => {
-        console.log('cached jjj', cached.data);
-        console.log('queryClient', queryClient.getQueryData(context));
-        setTimeout(() => {
-
-        }, 5000)
         if (cached.data) {
             if (Object.hasOwn(cached.data, 'count')) {
                 setSubtitle(`Showing ${cached.data.results.length} of ${cached.data.count}`);
@@ -48,7 +44,7 @@ export default function ViewHeading() {
 
     return (
         <View>
-            <Text>{title}</Text>
+            <Text>1{title}</Text>
             <Text>{subtitle}</Text>
         </View>
     )

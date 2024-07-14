@@ -1,7 +1,7 @@
 import { View, SafeAreaView, Text } from 'react-native';
 import { Drawer } from 'expo-router/drawer';
 import Icon from '../../components/UI/icons';
-
+import CustomDrawer from '../../components/UI/Custom/Drawer';
 export default function DrawerLayout() {
   return (
     <View style={{ flex: 1, backgroundColor: 'purple' }}>
@@ -18,10 +18,7 @@ export default function DrawerLayout() {
           //   color: 'green'
           // }
         }}
-        drawerContent={(props) => {
-          console.log('props', props);
-          return (<View><Text>Judd</Text></View>)
-        }}
+        drawerContent={CustomDrawer}
       >
         <Drawer.Screen
           name="queue"

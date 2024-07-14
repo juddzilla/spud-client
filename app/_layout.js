@@ -81,19 +81,29 @@ function WebsocketProvider(props) {
 }
 
 function CustomRoutingProvider(props) {
-  const [stack, setStack] = useState([['queue']]);
+  const initial = ['queue'];
+  const [stack, setStack] = useState(initial);
 
   function setRoute(route) {
+    console.log('route', route);
     const existingIndex = stack.indexOf(route);
     if (existingIndex === -1) {
       setStack([...stack, route]);
+    } else if (existingIndex === 0) {
+      setStack(initial);
     } else {
       setStack(stack.slice(0, existingIndex))
     }
   }
 
+  console.log('STACK', stack);
   return (
-    <CustomRoutingContext.Provider value={{ stack, setStack: setRoute }}>
+    <CustomRoutingContext.Provider
+      value={{
+        current: stack[stack.length - 1].split(':'),
+        stack,
+        setStack: setRoute,
+      }}>
       {props.children}
     </CustomRoutingContext.Provider>
   )
